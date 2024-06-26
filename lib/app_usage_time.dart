@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class AppUsageTime extends StatelessWidget {
   const AppUsageTime({super.key});
@@ -26,8 +27,21 @@ class _AppUsageTime extends StatefulWidget {
 }
 
 class _AppUsageState extends State<_AppUsageTime> {
-  void CheckAppUsageTime() {
-    setState(() {});
+  static const platform = MethodChannel('com.example.app/usage');
+
+  String _usageTime = 'Unknown';
+
+  Future<void> _getUsageTime() async {
+    String usageTime;
+    try {
+      final int result = await platform.invokeMethod('getUsageTime');
+      usageTime = 'App usage time: $result minutes';
+    } on PlatformException catch (e) {
+      usageTime = "Failed to get usage time: '${e.message}'.";
+    }
+    setState(() {
+      _usageTime = usageTime;
+    });
   }
 
   @override
@@ -37,19 +51,23 @@ class _AppUsageState extends State<_AppUsageTime> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: const Center(
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              'your App Usage Time is',
+              'Your App Usage Time is:',
+            ),
+            Text(
+              _usageTime,
+              style: Theme.of(context).textTheme.headline4,
             ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: CheckAppUsageTime,
-        tooltip: 'Increment',
+        onPressed: _getUsageTime,
+        tooltip: 'Get Usage Time',
         child: const Icon(Icons.update),
       ),
     );
