@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'dart:async';
 import 'package:usage_stats/usage_stats.dart';
 
@@ -13,25 +12,6 @@ class _AppUsageState extends State<AppUsageTime> {
   Map<String?, NetworkInfo?> _netInfoMap = Map();
 
   @override
-  State<_AppUsageTime> createState() => _AppUsageState();
-}
-
-class _AppUsageState extends State<_AppUsageTime> {
-  static const platform = MethodChannel('com.example.app/usage');
-
-  String _usageTime = 'Unknown';
-
-  Future<void> _getUsageTime() async {
-    String usageTime;
-    try {
-      final int result = await platform.invokeMethod('getUsageTime');
-      usageTime = 'App usage time: $result minutes';
-    } on PlatformException catch (e) {
-      usageTime = "Failed to get usage time: '${e.message}'.";
-    }
-    setState(() {
-      _usageTime = usageTime;
-    });
   void initState() {
     super.initState();
 
@@ -86,29 +66,6 @@ class _AppUsageState extends State<_AppUsageTime> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'Your App Usage Time is:',
-            ),
-            Text(
-              _usageTime,
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _getUsageTime,
-        tooltip: 'Get Usage Time',
-        child: const Icon(Icons.update),
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(title: const Text("Usage Stats"), actions: [
