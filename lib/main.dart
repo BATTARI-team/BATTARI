@@ -2,7 +2,7 @@ import 'package:battari/app_usage_time.dart';
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const AppUsageTime());
+  runApp(AppUsageTime());
 }
 
 class MyApp extends StatelessWidget {
