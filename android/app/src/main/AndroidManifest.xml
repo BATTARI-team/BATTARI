@@ -29,7 +29,23 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+
+				<!-- Add android:stopWithTask option only when necessary. -->
+				<service 
+						android:name="com.pravera.flutter_foreground_task.service.ForegroundService"
+						android:foregroundServiceType="dataSync|remoteMessaging" 
+						android:exported="false" />
     </application>
+
+			<!-- required -->
+			<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+			<!-- foregroundServiceType: dataSync -->
+			<uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+
+			<!-- foregroundServiceType: remoteMessaging -->
+			<uses-permission android:name="android.permission.FOREGROUND_SERVICE_REMOTE_MESSAGING" />
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility?hl=en and
          https://developer.android.com/reference/android/content/Intent#ACTION_PROCESS_TEXT.
