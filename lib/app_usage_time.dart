@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:usage_stats/usage_stats.dart';
 
 class AppUsageTime extends StatefulWidget {
+  const AppUsageTime({super.key});
+
   @override
   _AppUsageState createState() => _AppUsageState();
 }
@@ -55,7 +57,7 @@ class _AppUsageState extends State<AppUsageTime> {
           print('-----\n');
         }
       }
-      this.setState(() {
+      setState(() {
         events = queryEvents.reversed.toList();
         _netInfoMap = netInfoMap;
       });
@@ -66,40 +68,41 @@ class _AppUsageState extends State<AppUsageTime> {
 
   @override
   Widget build(BuildContext context) {
+    List<EventUsageInfo> filteredEvents = events
+        .where((event) => event.eventType == '1' || event.eventType == '2')
+        .toList();
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(title: const Text("Usage Stats"), actions: [
+        appBar: AppBar(title: const Text("Usage Stats"), actions: const [
           IconButton(
             onPressed: UsageStats.grantUsagePermission,
             icon: Icon(Icons.settings),
           )
         ]),
-        body: Container(
-          child: RefreshIndicator(
-            onRefresh: initUsage,
-            child: ListView.separated(
-              itemBuilder: (context, index) {
-                var event = events[index];
-                var networkInfo = _netInfoMap[event.packageName];
-                return ListTile(
-                  title: Text(events[index].packageName!),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                          "Last time used: ${DateTime.fromMillisecondsSinceEpoch(int.parse(events[index].timeStamp!)).toIso8601String()}"),
-                      networkInfo == null
-                          ? Text("Unknown network usage")
-                          : Text("Received bytes: ${networkInfo.rxTotalBytes}\n" +
-                              "Transfered bytes : ${networkInfo.txTotalBytes}"),
-                    ],
-                  ),
-                  trailing: Text(events[index].eventType!),
-                );
-              },
-              separatorBuilder: (context, index) => Divider(),
-              itemCount: events.length,
-            ),
+        body: RefreshIndicator(
+          onRefresh: initUsage,
+          child: ListView.separated(
+            itemBuilder: (context, index) {
+              var event = filteredEvents[index];
+              var networkInfo = _netInfoMap[event.packageName];
+              return ListTile(
+                title: Text(event.packageName!),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                        "Last time used: ${DateTime.fromMillisecondsSinceEpoch(int.parse(events[index].timeStamp!)).toIso8601String()}"),
+                    networkInfo == null
+                        ? const Text("Unknown network usage")
+                        : Text("Received bytes: ${networkInfo.rxTotalBytes}\n"
+                            "Transfered bytes : ${networkInfo.txTotalBytes}"),
+                  ],
+                ),
+                trailing: Text(event.eventType!),
+              );
+            },
+            separatorBuilder: (context, index) => Divider(),
+            itemCount: filteredEvents.length,
           ),
         ),
       ),
