@@ -12,12 +12,21 @@ class _WebSocketTestState extends State<WebSocketTest> {
   @override
   Widget build(BuildContext context) {
 		final channel = WebSocketChannel.connect(
-			Uri.parse('wss://192.168.10.3:5050/ws'),
+			Uri.parse('ws://192.168.11.10:5050/ws'),
 		);
 
 		return StreamBuilder(stream: channel.stream,
 		builder: (context, snapshot) {
-			return Text(snapshot.hasData ? '${snapshot.data}' : 'No data');
+			return Column(
+			  children: [
+			    Text(snapshot.hasData ? '${snapshot.data}' : 'No data'),
+					TextButton(child: const Text('Send message'),
+					  onPressed: () {
+					    channel.sink.add('Hello!');
+					  },
+					),
+				],
+			);
 		});
   }
 
