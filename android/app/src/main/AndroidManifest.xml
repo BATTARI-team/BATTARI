@@ -38,6 +38,7 @@
 						android:exported="false" />
     </application>
 
+			<uses-permission android:name="android.permission.INTERNET" />
 			<!-- required -->
 			<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 

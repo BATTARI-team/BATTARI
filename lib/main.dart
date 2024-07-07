@@ -1,9 +1,21 @@
+import 'dart:io';
+
+import 'package:battari/websocket_test.dart';
 import 'package:flutter/material.dart';
 
-import 'background.dart';
-
 void main() {
+	HttpOverrides.global = MyHttpOverride();
   runApp(const MyApp());
+}
+
+class MyHttpOverride extends HttpOverrides {
+	@override
+	HttpClient createHttpClient(SecurityContext? context) {
+		return super.createHttpClient(context)
+			..badCertificateCallback = (X509Certificate cert, String host, int port) {
+				return true;
+			};
+	}
 }
 
 class MyApp extends StatelessWidget {
@@ -88,7 +100,7 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: const Text("battari"),
       ),
-			body: const Background(),
+			body: const WebSocketTest(),
 //      body: Center(
 //        // Center is a layout widget. It takes a single child and positions it
 //        // in the middle of the parent.
