@@ -1,8 +1,12 @@
 import 'package:battari/app_usage_time.dart';
+import 'package:battari/transciption.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 void main() {
-  runApp(AppUsageTime());
+  SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
+  runApp(SpeechScreen());
 }
 
 class MyApp extends StatelessWidget {
