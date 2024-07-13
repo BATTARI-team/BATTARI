@@ -37,7 +37,8 @@
 						android:foregroundServiceType="dataSync|remoteMessaging" 
 						android:exported="false" />
     </application>
-
+			<!-- localnotification -->
+			<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 			<!-- required -->
 			<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
