@@ -28,14 +28,15 @@ class _BackgroundState extends State<Background> {
                       AndroidFlutterLocalNotificationsPlugin>();
           debugPrint("aa");
           if (androidFlutterLocalNotificationPlugin != null) {
-//            await androidFlutterLocalNotificationPlugin
-//                .requestNotificationsPermission();
+            await androidFlutterLocalNotificationPlugin
+                .requestNotificationsPermission();
             await flutterLocalNotificationPlugin.show(
                 counter_notif_id,
                 "counter",
                 num.toString(),
                 const NotificationDetails(
-                    android: AndroidNotificationDetails("counter", "counter")));
+                    android: AndroidNotificationDetails("counter", "counter",
+                        priority: Priority.high, importance: Importance.max)));
           } else {
             debugPrint("androidFlutterLocalNotificationPlugin is null");
           }
@@ -66,9 +67,10 @@ class _BackgroundState extends State<Background> {
   void _initForegroundTask() {
     FlutterForegroundTask.init(
       androidNotificationOptions: AndroidNotificationOptions(
-          channelId: 'foregroundService',
-          channelName: 'battari',
-          showWhen: true),
+        channelId: 'foregroundService',
+        channelName: 'battari',
+        showWhen: true,
+      ),
       iosNotificationOptions:
           const IOSNotificationOptions(showNotification: true, playSound: true),
       foregroundTaskOptions: const ForegroundTaskOptions(
