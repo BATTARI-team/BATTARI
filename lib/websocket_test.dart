@@ -35,13 +35,11 @@ class _WebSocketTestState extends State<WebSocketTest> {
 					),
 					TextButton(child: const Text('Close'),
 					  onPressed: () {
-					    channel.sink.close();
+					    channel.sink.close(1000, "Goodbye, world!");
 					  },
 					),
 				],
 			);
 		});
   }
-
-
 }

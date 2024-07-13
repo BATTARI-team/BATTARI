@@ -1,25 +1,27 @@
 import 'dart:io';
 
+import 'package:battari/call_view.dart';
+import 'package:battari/wait_for_call_view.dart';
 import 'package:battari/websocket_test.dart';
 import 'package:flutter/material.dart';
 
 void main() {
-	HttpOverrides.global = MyHttpOverride();
-  runApp(const MyApp());
+  HttpOverrides.global = MyHttpOverride();
+  runApp(const Battari());
 }
 
 class MyHttpOverride extends HttpOverrides {
-	@override
-	HttpClient createHttpClient(SecurityContext? context) {
-		return super.createHttpClient(context)
-			..badCertificateCallback = (X509Certificate cert, String host, int port) {
-				return true;
-			};
-	}
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback = (X509Certificate cert, String host, int port) {
+        return true;
+      };
+  }
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class Battari extends StatelessWidget {
+  const Battari({super.key});
 
   // This widget is the root of your application.
   @override
@@ -45,7 +47,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: WaitForCall(),
     );
   }
 }
@@ -100,7 +102,7 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: const Text("battari"),
       ),
-			body: const WebSocketTest(),
+      body: const WebSocketTest(),
 //      body: Center(
 //        // Center is a layout widget. It takes a single child and positions it
 //        // in the middle of the parent.
