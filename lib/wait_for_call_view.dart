@@ -41,42 +41,50 @@ class _LastTalkingWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(15.0),
-      child: Column(
-        children: [
-          Container(
-              width: double.infinity,
-              child: Text("@takutakutakutaku",
-                  textAlign: TextAlign.start, style: headerStyle)),
-          Container(
-            constraints: BoxConstraints(minWidth: double.infinity),
-            child: Card(
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      height: 100,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(100),
-                        child: Image.network(
-                            "https://avatars.githubusercontent.com/u/44548782?v=4"),
-                      ),
+      child: Column(children: [
+        Container(
+            width: double.infinity,
+            child: Text("@takutakutakutaku",
+                textAlign: TextAlign.start, style: headerStyle)),
+        Container(
+          constraints: BoxConstraints(minWidth: double.infinity),
+          child: Card(
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    height: 100,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(100),
+                      child: Image.network(
+                          "https://avatars.githubusercontent.com/u/44548782?v=4"),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: const Text("田中太郎"),
-                    ),
-                    Text("Instagramを未定た"),
-                  ],
-                ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: const Text("田中太郎"),
+                  ),
+                  Text("Instagramを未定た"),
+                ],
               ),
             ),
           ),
-          SizedBox(height: 20),
-          keywordsWidget(keywords: ["Flutter", "Dart", "Firebase"]),
-        ],
-      ),
+        ),
+        SizedBox(height: 20),
+        keywordsWidget(keywords: ["Flutter", "Dart", "Firebase"]),
+        Row(
+          children: [
+            Flexible(
+                child: TextFormField(
+                    decoration: InputDecoration(
+              hintText: "キャンセルの理由を伝える",
+              suffixIcon: IconButton(icon: Icon(Icons.send), onPressed: () {}),
+            ))),
+          ],
+        ),
+      ]),
     );
   }
 }
