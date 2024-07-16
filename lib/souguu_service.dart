@@ -7,7 +7,7 @@ class SouguuService {
   final ProviderRef<SouguuService> ref;
   SouguuService(this.ref);
   void Souguu() async {
-    int countdown = 60;
+    int countdown = 20;
     const userName = "たくと ";
     final state = ref.read(flutterLocalNotificationsPluginProvider);
     while (countdown >= 0) {
