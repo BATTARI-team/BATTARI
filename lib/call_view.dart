@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 const appBarHeight = 40;
 
 class CallView extends StatelessWidget {
-  const CallView({Key? key}) : super(key: key);
+  const CallView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +14,7 @@ class CallView extends StatelessWidget {
         SizedBox(
           height: appBarHeight.toDouble(),
         ),
-        BattariHeader(title: "")
+        BattariHeader(title: "aiueo")
       ],
     ));
   }
