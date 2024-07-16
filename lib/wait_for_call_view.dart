@@ -1,91 +1,118 @@
+import 'package:battari/battari_widgets.dart';
 import 'package:battari/call_view.dart';
+import 'package:battari/const_value.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
-class WaitForCall extends StatelessWidget {
+class WaitForCall extends StatefulWidget {
   const WaitForCall({super.key});
+
+  @override
+  State<WaitForCall> createState() => _WaitForCallState();
+}
+
+class _WaitForCallState extends State<WaitForCall> {
+  bool isTalking = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Padding(
-      padding: const EdgeInsets.all(13.0),
-      child: Column(
-        children: [
-          SizedBox(
-            height: appBarHeight.toDouble(),
-          ),
-          Container(
-            decoration: BoxDecoration(color: Colors.white),
-            width: double.infinity,
-            child: Card(
-              color: Colors.transparent,
-              elevation: 0,
-              child: CountDownWidget(
-                20,
-                isNeedInfence: true,
-              ),
+        body: SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(basicPaddingSize),
+        child: Column(
+          children: [
+            SizedBox(
+              height: appBarHeight.toDouble(),
             ),
-          ),
-          _LastTalkingWidget(),
-        ],
+            if (!isTalking) CountdownWidget(),
+            _LastTalkingWidget(),
+            TextButton(
+                child: Text("通話画面トグル"),
+                onPressed: () {
+                  setState(() => isTalking = !isTalking);
+                }),
+            if (!isTalking) _CancelWidget(),
+          ],
+        ),
       ),
     ));
   }
 }
 
-const headerStyle = TextStyle(fontWeight: FontWeight.w600, fontSize: 25);
+void startCall() {}
+
+class CountdownWidget extends StatelessWidget {
+  const CountdownWidget({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        BattariHeader(title: "通話まで・・"),
+        Container(
+          decoration: BoxDecoration(color: Colors.white),
+          width: double.infinity,
+          child: Card(
+            color: Colors.transparent,
+            elevation: 0,
+            child: CountDownWidget(
+              20,
+              isNeedInfence: true,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _CancelWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) => Row(
+        children: [
+          Flexible(
+              child: TextFormField(
+                  decoration: InputDecoration(
+            hintText: "キャンセルの理由を伝える",
+            suffixIcon: IconButton(icon: Icon(Icons.send), onPressed: () {}),
+          ))),
+        ],
+      );
+}
 
 class _LastTalkingWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(15.0),
-      child: Column(children: [
-        Container(
-            width: double.infinity,
-            child: Text("@takutakutakutaku",
-                textAlign: TextAlign.start, style: headerStyle)),
-        Container(
-          constraints: BoxConstraints(minWidth: double.infinity),
-          child: Card(
-            child: Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    height: 100,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(100),
-                      child: Image.network(
-                          "https://avatars.githubusercontent.com/u/44548782?v=4"),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: const Text("田中太郎"),
-                  ),
-                  Text("Instagramを未定た"),
-                ],
-              ),
+    return Column(children: [
+      BattariHeader(
+        title: "相手",
+        subTitle: "@takutaktuaktau",
+      ),
+      Container(
+        constraints: BoxConstraints(minWidth: double.infinity),
+        child: Card(
+          child: const Padding(
+            padding: EdgeInsets.all(12.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                UserIcon(),
+                Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: Text("田中太郎"),
+                ),
+                Text("Instagramを未定た"),
+              ],
             ),
           ),
         ),
-        SizedBox(height: 20),
-        keywordsWidget(keywords: ["Flutter", "Dart", "Firebase"]),
-        Row(
-          children: [
-            Flexible(
-                child: TextFormField(
-                    decoration: InputDecoration(
-              hintText: "キャンセルの理由を伝える",
-              suffixIcon: IconButton(icon: Icon(Icons.send), onPressed: () {}),
-            ))),
-          ],
-        ),
-      ]),
-    );
+      ),
+      SizedBox(height: 20),
+      keywordsWidget(keywords: ["Flutter", "Dart", "Firebase"]),
+    ]);
   }
 }
 
@@ -100,14 +127,11 @@ class keywordsWidget extends StatelessWidget {
             constraints: BoxConstraints(minWidth: double.infinity),
             child: Row(
               children: [
-                Text("5月24日", style: headerStyle),
+                Text("最後の通話", style: HeaderStyle),
                 SizedBox(
                   width: 10,
                 ),
-                Text(
-                  "最後の通話",
-                  style: TextStyle(fontSize: 20),
-                )
+                BattariSubHeader(title: "5月24日"),
               ],
             )),
         Container(

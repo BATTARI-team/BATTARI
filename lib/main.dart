@@ -1,13 +1,17 @@
 import 'dart:io';
 
+import 'package:battari/background_service.dart';
 import 'package:battari/call_view.dart';
+import 'package:battari/home.dart';
+import 'package:battari/notification_service.dart';
 import 'package:battari/wait_for_call_view.dart';
 import 'package:battari/websocket_test.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
   HttpOverrides.global = MyHttpOverride();
-  runApp(const Battari());
+  runApp(ProviderScope(child: const Battari()));
 }
 
 class MyHttpOverride extends HttpOverrides {
@@ -20,14 +24,21 @@ class MyHttpOverride extends HttpOverrides {
   }
 }
 
+final navigatorKey = GlobalKey<NavigatorState>();
+
 class Battari extends StatelessWidget {
   const Battari({super.key});
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    ProviderScope.containerOf(context)
+        .read(flutterLocalNotificationsPluginProvider)
+        .init();
+    ProviderScope.containerOf(context).read(backgroundServiceProvider);
     return MaterialApp(
       title: 'Flutter Demo',
+      navigatorKey: navigatorKey,
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -48,7 +59,7 @@ class Battari extends StatelessWidget {
         cardTheme: CardTheme(),
         useMaterial3: true,
       ),
-      home: WaitForCall(),
+      home: Home(),
     );
   }
 }

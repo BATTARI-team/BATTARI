@@ -1,3 +1,4 @@
+import 'package:battari/battari_widgets.dart';
 import 'package:flutter/material.dart';
 
 const appBarHeight = 40;
@@ -13,7 +14,7 @@ class CallView extends StatelessWidget {
         SizedBox(
           height: appBarHeight.toDouble(),
         ),
-        Text('Hello, world!'),
+        BattariHeader(title: "")
       ],
     ));
   }
