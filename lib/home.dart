@@ -4,9 +4,11 @@ import 'package:battari/notification_view.dart';
 import 'package:battari/profile_view.dart';
 import 'package:battari/souguu_service.dart';
 import 'package:battari/wait_for_call_view.dart';
+import 'package:battari/websocket_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:like_button/like_button.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key});
@@ -65,7 +67,19 @@ class Home extends StatelessWidget {
               return TextButton(
                   child: Text("souguu"),
                   onPressed: () => ref.read(souguuServiceProvider).Souguu());
-            })
+            }),
+            LikeButton(
+              likeBuilder: (bool isLiked) {
+                return Icon(
+                  Icons.check,
+                );
+              },
+            ),
+            TextButton(
+              child: Text("websocket"),
+              onPressed: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => WebSocketTest())),
+            )
           ],
         ));
   }
