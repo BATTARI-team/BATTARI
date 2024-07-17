@@ -51,11 +51,14 @@ class _ProfileViewState extends State<ProfileView> {
                     Text(widget.userDescription,
                         style: TextStyle(fontSize: 15)),
                     SizedBox(
-                      height: 30,
+                      height: 20,
                     )
                   ],
                 ),
               )),
+            ),
+            SizedBox(
+              height: 15,
             ),
             if (!isFriend)
               Container(
@@ -68,12 +71,16 @@ class _ProfileViewState extends State<ProfileView> {
                         "友達申請が来ています",
                         style: TextStyle(fontSize: 20),
                       ),
+                      SizedBox(
+                        height: 40,
+                      ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           LikeButton(
                             likeBuilder: (bool isLiked) {
                               return Icon(
+                                size: 40,
                                 Icons.check,
                               );
                             },
@@ -93,8 +100,14 @@ class _ProfileViewState extends State<ProfileView> {
                               return Future.value(true);
                             },
                           ),
+                          SizedBox(
+                            width: 50,
+                          ),
                           IconButton(
-                            icon: Icon(Icons.close),
+                            icon: Icon(
+                              Icons.close,
+                              size: 40,
+                            ),
                             onPressed: () {
                               setState(() {
                                 isFriend = false;
