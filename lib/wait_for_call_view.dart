@@ -1,9 +1,10 @@
-import 'package:battari/battari_confg.dart';
+import 'package:battari/battari_config.dart';
 import 'package:battari/battari_widgets.dart';
 import 'package:battari/call_view.dart';
 import 'package:battari/call_widget.dart';
 import 'package:battari/const_value.dart';
 import 'package:battari/count_down_widget.dart';
+import 'package:battari/souguu_service.dart';
 import 'package:battari/wait_for_call_notifier_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -135,7 +136,9 @@ class _WaitForCallState extends State<WaitForCall> {
                 height: appBarHeight.toDouble(),
               ),
               SizedBox(height: 30),
-              if (!ref.watch(waitForCallNotifierProvider)) CountdownWidget(),
+              if (!ref.watch(waitForCallNotifierProvider))
+                CountDownWidget(ref.read(countdownNotifierProvider).seconds,
+                    max: ref.read(countdownNotifierProvider).max),
               _LastTalkingWidget(),
               //if (!ref.watch(isTalkingProvider)) _CancelWidget(),
               SizedBox(

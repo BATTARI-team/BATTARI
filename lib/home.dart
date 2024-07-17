@@ -1,4 +1,5 @@
 import 'package:battari/added_friend.dart';
+import 'package:battari/battari_config.dart';
 import 'package:battari/notification_service.dart';
 import 'package:battari/notification_view.dart';
 import 'package:battari/profile_view.dart';
@@ -56,11 +57,10 @@ class Home extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                         builder: (context) => ProfileView(
-                              userId: 'takutakutaku',
-                              userName: 'たくと',
-                              userIconUrl:
-                                  'https://avatars.githubusercontent.com/u/44548782?v=4',
-                              userDescription: 'ワイワイウィアワイワイわ\n温泉行きたい',
+                              userId: aiteUserId,
+                              userName: aiteUserName,
+                              userIconUrl: aiteIconUrl,
+                              userDescription: aiteDescription,
                             ))),
                 child: Text('profile')),
             Consumer(builder: (context, ref, _) {

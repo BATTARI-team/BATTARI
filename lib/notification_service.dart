@@ -1,8 +1,14 @@
+import 'package:battari/battari_config.dart';
 import 'package:battari/main.dart';
 import 'package:battari/profile_view.dart';
+import 'package:battari/souguu_service.dart';
+import 'package:battari/wait_for_call_notifier_provider.dart';
 import 'package:battari/wait_for_call_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task_platform_interface.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod/riverpod.dart';
 
 class NotificationService {
@@ -33,13 +39,15 @@ class NotificationService {
         case "friend_add":
           Navigator.of(navigatorKey.currentContext!).push(MaterialPageRoute(
               builder: (context) => ProfileView(
-                    userId: 'takutakutaku',
-                    userName: 'たくと ',
-                    userIconUrl:
-                        'https://avatars.githubusercontent.com/u/44548782?v=4',
-                    userDescription: 'userDescription',
+                    userId: aiteUserId,
+                    userName: aiteUserName,
+                    userIconUrl: aiteIconUrl,
+                    userDescription: aiteDescription,
                   )));
         case "wait_for_call_view":
+          ProviderScope.containerOf(navigatorKey.currentContext!)
+              .read(countdownNotifierProvider.notifier)
+              .startCountdown(countdown, countdown_max);
           Navigator.of(navigatorKey.currentContext!)
               .push(MaterialPageRoute(builder: (context) => WaitForCall()));
       }
@@ -61,17 +69,35 @@ class NotificationService {
 
   showCountdownNotification(String userName, int countdown, bool playSound,
       bool enableVibration) async {
+    // フォアグラウンドの場合は通知を送信しない
+    if ((await FlutterForegroundTask.isAppOnForeground)) return;
+    if (countdown == countdown_max) {
+      await flutterLocalNotificationsPlugin.show(
+        20001,
+        "$userNameと遭遇しました",
+        "",
+        NotificationDetails(
+            android: AndroidNotificationDetails('souguu_init', "遭遇通知",
+                importance: Importance.max,
+                priority: Priority.high,
+                playSound: true,
+                enableVibration: true)),
+      );
+    }
+    ;
     await flutterLocalNotificationsPlugin.show(
         20000,
         '$userNameと遭遇しました',
         '通話まで$countdown秒',
         NotificationDetails(
-            android: AndroidNotificationDetails('souguu', '遭遇通知',
-                importance: Importance.max,
-                priority: Priority.high,
-                showWhen: false,
-                playSound: playSound,
-                enableVibration: enableVibration)),
+            android: AndroidNotificationDetails(
+          'souguu',
+          '遭遇通知',
+          importance: Importance.max,
+          priority: Priority.high,
+          playSound: false,
+          enableVibration: false,
+        )),
         payload: 'wait_for_call_view');
   }
 

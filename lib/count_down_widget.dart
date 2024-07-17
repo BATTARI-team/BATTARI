@@ -1,4 +1,6 @@
+import 'package:battari/battari_config.dart';
 import 'package:battari/battari_widgets.dart';
+import 'package:battari/souguu_service.dart';
 import 'package:battari/wait_for_call_notifier_provider.dart';
 import 'package:battari/wait_for_call_view.dart';
 import 'package:flutter/material.dart';
@@ -15,9 +17,19 @@ class CountDownWidget extends ConsumerStatefulWidget {
   final bool isNeedInfence;
 
   CountDownWidget(this.seconds,
-      {super.key, this.max = 0, this.circularRadius = 100, this.lineWidth = 15, this.divider = 10, this.isNeedInfence = false}) {
+      {super.key,
+      this.max = 0,
+      this.circularRadius = 100,
+      this.lineWidth = 15,
+      this.divider = 10,
+      this.isNeedInfence = false}) {
     seconds *= divider;
-    max = seconds;
+    if (max == 0) {
+      max = seconds;
+    } else {
+      max = max * divider;
+    }
+    debugPrint("max: $max");
     const par = 30;
     if (isNeedInfence) {
       // ここで推論を行う
@@ -37,8 +49,27 @@ class _CountDownWidgetState extends ConsumerState<CountDownWidget> {
   @override
   Widget build(BuildContext context) {
     final int second = widget.seconds ~/ widget.divider;
+
     return Column(
       children: [
+        BattariHeader(title: "通話まで・・"),
+        //Consumer(builder: (context, ref, _) {
+        //  final state = ref.read(countdownNotifierProvider);
+        //  debugPrint("countdown: $state");
+        //  return Container(
+        //    decoration: BoxDecoration(color: Colors.white),
+        //    width: double.infinity,
+        //    child: Card(
+        //      color: Colors.transparent,
+        //      elevation: 0,
+        //      child: CountDownWidget(
+        //        ref.read(countdownNotifierProvider).seconds,
+        //        max: ref.read(countdownNotifierProvider).max,
+        //        isNeedInfence: true,
+        //      ),
+        //    ),
+        //  );
+        //}),
         Padding(
           padding: const EdgeInsets.all(30.0),
           child: CircularPercentIndicator(
@@ -46,7 +77,9 @@ class _CountDownWidgetState extends ConsumerState<CountDownWidget> {
             lineWidth: widget.lineWidth,
             radius: widget.circularRadius,
             percent: widget.progress,
-            center: Text("${widget.seconds}", style: const TextStyle(fontSize: 50, fontWeight: FontWeight.w500)),
+            center: Text("$second",
+                style:
+                    const TextStyle(fontSize: 50, fontWeight: FontWeight.w500)),
             backgroundColor: const Color(0xFFEAE7E5),
           ),
         ),
@@ -56,6 +89,7 @@ class _CountDownWidgetState extends ConsumerState<CountDownWidget> {
 
   @override
   void initState() {
+    debugPrint("initState");
     super.initState();
     _startCountdown();
   }
@@ -68,6 +102,8 @@ class _CountDownWidgetState extends ConsumerState<CountDownWidget> {
   }
 
   Future<void> _startCountdown() async {
+    //ref.read(countdownNotifierProvider.notifier).startCountdown(countdown);
+    debugPrint("_startcountdown: ${widget.seconds}");
     widget.progress = widget.seconds / widget.max;
     //ProviderScope.containerOf(context).watch(isTalkingProvider).debugPhysicalSizeOverride = true;
 
@@ -83,29 +119,15 @@ class _CountDownWidgetState extends ConsumerState<CountDownWidget> {
   }
 }
 
-class CountdownWidget extends StatelessWidget {
-  const CountdownWidget({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        BattariHeader(title: "通話まで・・"),
-        Container(
-          decoration: BoxDecoration(color: Colors.white),
-          width: double.infinity,
-          child: Card(
-            color: Colors.transparent,
-            elevation: 0,
-            child: CountDownWidget(
-              20,
-              isNeedInfence: true,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
+//class CountdownWidget extends ConsumerWidget {
+//  const CountdownWidget({
+//    super.key,
+//  });
+//
+//  @override
+//  Widget build(BuildContext context, ref) {
+//    return Column(
+//      children: [],
+//    );
+//  }
+//}
