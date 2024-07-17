@@ -1,46 +1,18 @@
+import 'package:battari/battari_confg.dart';
 import 'package:battari/battari_widgets.dart';
 import 'package:battari/call_view.dart';
 import 'package:battari/call_widget.dart';
 import 'package:battari/const_value.dart';
+import 'package:battari/count_down_widget.dart';
+import 'package:battari/wait_for_call_notifier_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:percent_indicator/circular_percent_indicator.dart';
-import 'package:riverpod/riverpod.dart';
 
 void startCall() {}
 
-final isTalkingProvider = StateProvider<bool>((ref) => false);
-
-class CountdownWidget extends StatelessWidget {
-  const CountdownWidget({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        BattariHeader(title: "通話まで・・"),
-        Container(
-          decoration: BoxDecoration(color: Colors.white),
-          width: double.infinity,
-          child: Card(
-            color: Colors.transparent,
-            elevation: 0,
-            child: CountDownWidget(
-              20,
-              isNeedInfence: true,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class keywordsWidget extends StatelessWidget {
+class KeywordsWidget extends StatelessWidget {
   final List<String> keywords;
-  const keywordsWidget({super.key, required this.keywords});
+  const KeywordsWidget({super.key, required this.keywords});
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -48,7 +20,7 @@ class keywordsWidget extends StatelessWidget {
         Container(
             constraints: BoxConstraints(minWidth: double.infinity),
             child: Row(
-              children: [
+              children: const [
                 Text("最後の通話", style: HeaderStyle),
                 SizedBox(
                   width: 10,
@@ -88,6 +60,7 @@ class keywordsWidget extends StatelessWidget {
   }
 }
 
+// ignore: unused_element
 class _CancelWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Row(
@@ -100,88 +73,6 @@ class _CancelWidget extends StatelessWidget {
           ))),
         ],
       );
-}
-
-class CountDownWidget extends StatefulWidget {
-  late int seconds;
-  double progress = 0.0;
-  late int max;
-  double circularRadius;
-  double lineWidth;
-  int divider = 10;
-  final bool isNeedInfence;
-
-  CountDownWidget(this.seconds,
-      {super.key,
-      this.max = 0,
-      this.circularRadius = 100,
-      this.lineWidth = 15,
-      this.divider = 10,
-      this.isNeedInfence = false}) {
-    seconds *= divider;
-    max = seconds;
-    const par = 30;
-    if (isNeedInfence) {
-      // ここで推論を行う
-      if (max > par) {
-        this.divider = 10;
-      } else
-        this.divider = (par / max).toInt() + 10;
-      debugPrint("divider: $divider");
-    }
-  }
-
-  @override
-  State<CountDownWidget> createState() => _CountDownWidgetState();
-}
-
-class _CountDownWidgetState extends State<CountDownWidget> {
-  @override
-  Widget build(BuildContext context) {
-    final int second = widget.seconds ~/ widget.divider;
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(30.0),
-          child: CircularPercentIndicator(
-            circularStrokeCap: CircularStrokeCap.round,
-            lineWidth: widget.lineWidth,
-            radius: widget.circularRadius,
-            percent: widget.progress,
-            center: Text("$second",
-                style:
-                    const TextStyle(fontSize: 50, fontWeight: FontWeight.w500)),
-            backgroundColor: const Color(0xFFEAE7E5),
-          ),
-        ),
-      ],
-    );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _startCountdown();
-  }
-
-  void updateSeconds() {
-    setState(() {
-      widget.seconds--;
-      widget.progress = widget.seconds / widget.max;
-    });
-  }
-
-  Future<void> _startCountdown() async {
-    widget.progress = widget.seconds / widget.max;
-    //ProviderScope.containerOf(context).watch(isTalkingProvider).debugPhysicalSizeOverride = true;
-
-    //#TODO ここでisTalkingをtrueにする
-    if (widget.seconds == 0) {}
-    while (widget.seconds > 0) {
-      await Future.delayed(Duration(milliseconds: 1000 ~/ widget.divider));
-      updateSeconds();
-    }
-  }
 }
 
 class _LastTalkingWidget extends StatelessWidget {
@@ -204,12 +95,12 @@ class _LastTalkingWidget extends StatelessWidget {
                 Padding(
                   padding: EdgeInsets.all(10.0),
                   child: Text(
-                    "田中太郎",
+                    aiteUserName,
                     style: TextStyle(fontSize: 25, fontWeight: FontWeight.w500),
                   ),
                 ),
                 Text(
-                  "Instagramを見ていた",
+                  souguuRiyuu,
                   style: TextStyle(fontSize: 20),
                 ),
               ],
@@ -218,7 +109,7 @@ class _LastTalkingWidget extends StatelessWidget {
         ),
       ),
       SizedBox(height: 70),
-      keywordsWidget(keywords: const ["サークル", "大学", "単位"]),
+      KeywordsWidget(keywords: keywords),
     ]);
   }
 }
@@ -244,13 +135,13 @@ class _WaitForCallState extends State<WaitForCall> {
                 height: appBarHeight.toDouble(),
               ),
               SizedBox(height: 30),
-              if (!ref.watch(isTalkingProvider)) CountdownWidget(),
+              if (!ref.watch(waitForCallNotifierProvider)) CountdownWidget(),
               _LastTalkingWidget(),
               //if (!ref.watch(isTalkingProvider)) _CancelWidget(),
               SizedBox(
                 height: 100,
               ),
-              if (ref.watch(isTalkingProvider)) CallWidget(),
+              if (ref.watch(waitForCallNotifierProvider)) CallWidget(),
             ],
           );
         }),
