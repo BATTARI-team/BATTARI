@@ -30,12 +30,9 @@ class _SpeechScreenState extends State<SpeechScreen> {
         floatingActionButtonLocation:
             FloatingActionButtonLocation.miniCenterFloat,
         floatingActionButton: AvatarGlow(
-          //endRadius: 75.0,
           animate: isListening,
           duration: const Duration(milliseconds: 2000),
           glowColor: BG_COLOR,
-          //repeatPauseDuration: const Duration(milliseconds: 100),
-          //showTwoGlows: true,
           child: GestureDetector(
             onTapDown: (details) async {
               if (!isListening) {
@@ -74,7 +71,7 @@ class _SpeechScreenState extends State<SpeechScreen> {
         appBar: AppBar(
           backgroundColor: BG_COLOR,
           title: const Text(
-            '音声を文字に変換アプリ',
+            '音声を文字起こし',
             style: TextStyle(fontWeight: FontWeight.w600, color: TEXT_COLOR),
           ),
         ),
