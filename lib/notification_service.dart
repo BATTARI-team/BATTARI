@@ -13,6 +13,9 @@ import 'package:riverpod/riverpod.dart';
 
 class NotificationService {
   int notificationId = 0;
+  final ref;
+
+  NotificationService(this.ref);
 
   final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
@@ -106,7 +109,21 @@ class NotificationService {
     debugPrint("clearCountdownNotification");
     await flutterLocalNotificationsPlugin.cancel(20000);
   }
+
+  showFriendRequestNotification() async {
+    await Future.delayed(Duration(seconds: delay_addfriend_notification));
+    await flutterLocalNotificationsPlugin.show(
+        0,
+        '$aiteUserName さんから友達申請がきました',
+        '通知をタップして友達追加を行います',
+        payload: 'friend_add',
+        NotificationDetails(
+            android: AndroidNotificationDetails('friend_add', '友達追加',
+                importance: Importance.max,
+                priority: Priority.high,
+                showWhen: false)));
+  }
 }
 
 final flutterLocalNotificationsPluginProvider =
-    Provider((ref) => NotificationService());
+    Provider((ref) => NotificationService(ref));

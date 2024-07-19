@@ -1,3 +1,4 @@
+import 'package:battari/battari_config.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class WaitForCallNotifier extends Notifier<bool> {
@@ -11,6 +12,7 @@ class WaitForCallNotifier extends Notifier<bool> {
   }
 
   void endCall() {
+    countdown = countdown_max;
     state = false;
   }
 }

@@ -1,3 +1,4 @@
+import 'package:battari/WebSocketService.dart';
 import 'package:battari/added_friend.dart';
 import 'package:battari/battari_config.dart';
 import 'package:battari/notification_service.dart';
@@ -23,20 +24,9 @@ class Home extends StatelessWidget {
             return IconButton(
                 icon: Icon(Icons.add),
                 onPressed: () async {
-                  await ref
+                  ref
                       .read(flutterLocalNotificationsPluginProvider)
-                      .flutterLocalNotificationsPlugin
-                      .show(
-                          0,
-                          'なになにさんから友達申請がきました',
-                          '通知をタップして友達追加を行います',
-                          payload: 'friend_add',
-                          NotificationDetails(
-                              android: AndroidNotificationDetails(
-                                  'friend_add', '友達追加',
-                                  importance: Importance.max,
-                                  priority: Priority.high,
-                                  showWhen: false)));
+                      .showFriendRequestNotification();
                   Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -79,7 +69,7 @@ class Home extends StatelessWidget {
               child: Text("websocket"),
               onPressed: () => Navigator.push(context,
                   MaterialPageRoute(builder: (context) => WebSocketTest())),
-            )
+            ),
           ],
         ));
   }

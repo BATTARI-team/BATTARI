@@ -4,6 +4,7 @@ import 'package:battari/background_service.dart';
 import 'package:battari/call_view.dart';
 import 'package:battari/home.dart';
 import 'package:battari/notification_service.dart';
+import 'package:battari/souguu_service.dart';
 import 'package:battari/wait_for_call_view.dart';
 import 'package:battari/websocket_test.dart';
 import 'package:flutter/material.dart';
@@ -32,6 +33,7 @@ class Battari extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    ProviderScope.containerOf(context).read(souguuServiceProvider);
     ProviderScope.containerOf(context)
         .read(flutterLocalNotificationsPluginProvider)
         .init();

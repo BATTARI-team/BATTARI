@@ -1,3 +1,4 @@
+import 'package:battari/WebSocketService.dart';
 import 'package:battari/background_service.dart';
 import 'package:battari/battari_config.dart';
 import 'package:battari/main.dart';
@@ -10,9 +11,17 @@ import 'package:riverpod/riverpod.dart';
 
 class SouguuService {
   final ProviderRef<SouguuService> ref;
-  SouguuService(this.ref);
+  SouguuService(this.ref) {
+    () async {
+      while (true) {
+        WebSocketService.WebSocketChannelHandler.stream
+            .listen((event) => Souguu());
+        await Future.delayed(Duration(milliseconds: 100));
+      }
+    }();
+  }
   void Souguu() async {
-    await Future.delayed(Duration(seconds: 3));
+    await Future.delayed(Duration(seconds: delay_souguu_notification));
     final state = ref.read(flutterLocalNotificationsPluginProvider);
     while (countdown >= 0) {
       await Future.delayed(Duration(seconds: 1));

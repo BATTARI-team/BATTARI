@@ -1,4 +1,6 @@
+import 'package:battari/wait_for_call_notifier_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class CallWidget extends StatelessWidget {
   const CallWidget({super.key});
@@ -70,13 +72,19 @@ class CallWidget extends StatelessWidget {
                     color: Colors.red),
                 child: Padding(
                   padding: EdgeInsets.all(18),
-                  child: IconButton(
-                      onPressed: () {},
-                      icon: Icon(
-                        Icons.close,
-                        size: 30,
-                        color: Colors.white,
-                      )),
+                  child: Consumer(builder: (context, ref, _) {
+                    return IconButton(
+                        onPressed: () {
+                          ref
+                              .read(waitForCallNotifierProvider.notifier)
+                              .endCall();
+                        },
+                        icon: Icon(
+                          Icons.close,
+                          size: 30,
+                          color: Colors.white,
+                        ));
+                  }),
                 ))
           ],
         )

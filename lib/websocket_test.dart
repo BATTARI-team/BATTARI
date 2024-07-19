@@ -1,3 +1,4 @@
+import 'package:battari/battari_config.dart';
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -12,7 +13,7 @@ class _WebSocketTestState extends State<WebSocketTest> {
   @override
   Widget build(BuildContext context) {
     final channel = WebSocketChannel.connect(
-      Uri.parse('ws://192.168.11.10:5050/wstest'),
+      Uri.parse('ws://$serverAddress/wstest'),
     );
 
     TextEditingController _controller = TextEditingController(text: "hello");
