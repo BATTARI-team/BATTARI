@@ -14,7 +14,7 @@ class CallView extends StatelessWidget {
         SizedBox(
           height: appBarHeight.toDouble(),
         ),
-        BattariHeader(title: "aiueo")
+        BattariHeader(title: "aiueo"),
       ],
     ));
   }

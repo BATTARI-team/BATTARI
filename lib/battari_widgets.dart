@@ -1,3 +1,4 @@
+import 'package:battari/battari_config.dart';
 import 'package:flutter/material.dart';
 
 const HeaderStyle = TextStyle(fontWeight: FontWeight.w600, fontSize: 25);
@@ -53,7 +54,7 @@ class UserIcon extends StatelessWidget {
       {super.key,
       this.height = 100,
       this.borderRadius = 100,
-      this.iconurl = "https://avatars.githubusercontent.com/u/44548782?v=4"});
+      this.iconurl = aiteIconUrl});
 
   @override
   Widget build(BuildContext context) {

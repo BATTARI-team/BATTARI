@@ -5,6 +5,7 @@ import 'package:battari/call_view.dart';
 import 'package:battari/home.dart';
 import 'package:battari/notification_service.dart';
 import 'package:battari/souguu_service.dart';
+import 'package:battari/splash.dart';
 import 'package:battari/wait_for_call_view.dart';
 import 'package:battari/websocket_test.dart';
 import 'package:flutter/material.dart';
@@ -39,9 +40,11 @@ class Battari extends StatelessWidget {
         .init();
     ProviderScope.containerOf(context).read(backgroundServiceProvider);
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       navigatorKey: navigatorKey,
       theme: ThemeData(
+        backgroundColor: Color.fromRGBO(255, 249, 231, 1),
         // This is the theme of your application.
         //
         // TRY THIS: Try running your application with "flutter run". You'll see
@@ -60,8 +63,11 @@ class Battari extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         cardTheme: CardTheme(),
         useMaterial3: true,
+        textTheme: TextTheme(
+          bodyMedium: TextStyle(color: Color.fromRGBO(0, 0, 0, 0.7)),
+        ),
       ),
-      home: Home(),
+      home: Splash(),
     );
   }
 }

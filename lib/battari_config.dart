@@ -10,11 +10,12 @@ const userName = "たくと ";
 
 //通話相手
 const aiteUserName = "たくと ";
-const aiteUserId = "takuto1127";
+const aiteUserId = "itou2525";
 const aiteDescription = "はこだて";
-const aiteIconUrl = "https://avatars.githubusercontent.com/u/44548782?v=4";
+const aiteIconUrl =
+    "https://1.bp.blogspot.com/-uUeyMgG7AWM/VqypkokxAfI/AAAAAAAABQM/D6MtVw24ONs/s1600/icon5.jpg";
 //遭遇理由
-const souguuRiyuu = "instagramを見ていた";
+const souguuRiyuu = "instagramで";
 //キーワード
 const keywords = ["サークル", "大学", "単位"];
 

@@ -22,7 +22,11 @@ class KeywordsWidget extends StatelessWidget {
             constraints: BoxConstraints(minWidth: double.infinity),
             child: Row(
               children: const [
-                Text("最後の通話", style: HeaderStyle),
+                Row(
+                  children: [
+                    Text("前回の遭遇", style: HeaderStyle),
+                  ],
+                ),
                 SizedBox(
                   width: 10,
                 ),
@@ -31,11 +35,12 @@ class KeywordsWidget extends StatelessWidget {
             )),
         Container(
           constraints: BoxConstraints(minWidth: double.infinity),
-          child: Card(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
             child: Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(12.0),
+                  padding: const EdgeInsets.all(15.0),
                   child: Text(
                     "キーワード",
                     style: TextStyle(fontSize: 20),
@@ -47,6 +52,7 @@ class KeywordsWidget extends StatelessWidget {
                     return Padding(
                       padding: const EdgeInsets.all(5.0),
                       child: Chip(
+                        backgroundColor: Color.fromRGBO(255, 211, 78, 0.6),
                         label: Text(keyword),
                       ),
                     );
@@ -76,40 +82,112 @@ class _CancelWidget extends StatelessWidget {
       );
 }
 
+class StrokedText extends StatelessWidget {
+  const StrokedText(
+    this.text, {
+    this.color,
+    this.strokeColor,
+    this.fontSize,
+    this.strokeSize,
+    super.key,
+  });
+
+  final String text;
+  final Color? color;
+  final Color? strokeColor;
+  final double? fontSize;
+  final double? strokeSize;
+
+  @override
+  Widget build(BuildContext context) {
+    final fontSize = this.fontSize ??
+        Theme.of(context).textTheme.bodyMedium?.fontSize ??
+        16.0;
+
+    return Stack(
+      children: <Widget>[
+        // Stroked text as border.
+        Text(
+          text,
+          style: TextStyle(
+            fontSize: fontSize,
+            foreground: Paint()
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = strokeSize ?? 2
+              ..color = color ?? Theme.of(context).colorScheme.primary,
+          ),
+        ),
+        // Solid text as fill.
+        Text(
+          text,
+          style: TextStyle(
+            fontSize: fontSize,
+            color: strokeColor ?? Theme.of(context).colorScheme.onPrimary,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _LastTalkingWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(children: [
-      BattariHeader(
-        title: "相手",
-        subTitle: "@takuto1127",
-      ),
+      //BattariHeader(
+      //  title: "相手",
+      //  subTitle: "@takuto1127",
+      //),
       Container(
         constraints: BoxConstraints(minWidth: double.infinity),
-        child: Card(
-          child: const Padding(
-            padding: EdgeInsets.all(12.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                UserIcon(),
-                Padding(
-                  padding: EdgeInsets.all(10.0),
-                  child: Text(
-                    aiteUserName,
-                    style: TextStyle(fontSize: 25, fontWeight: FontWeight.w500),
+        child: const Padding(
+          padding: EdgeInsets.all(12.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              UserIcon(),
+              Padding(
+                padding: EdgeInsets.all(10.0),
+                child: Text(
+                  aiteUserName,
+                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.w600),
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    souguuRiyuu,
+                    style: TextStyle(fontSize: 20),
                   ),
-                ),
-                Text(
-                  souguuRiyuu,
-                  style: TextStyle(fontSize: 20),
-                ),
-              ],
-            ),
+                  Column(
+                    children: [
+                      SizedBox(
+                        height: 3,
+                      ),
+                      Stack(
+                        children: [
+                          //StrokedText(
+                          //  "BATTARI",
+                          //  color: Colors.black,
+                          //  fontSize: 20,
+                          //),
+                          Text("BATTARI",
+                              style:
+                                  TextStyle(color: Colors.orange, fontSize: 20))
+                        ],
+                      )
+                    ],
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ),
-      SizedBox(height: 70),
+      SizedBox(height: 35),
+      Divider(),
+      SizedBox(height: 35),
       KeywordsWidget(keywords: keywords),
     ]);
   }
@@ -125,30 +203,46 @@ class WaitForCall extends StatefulWidget {
 class _WaitForCallState extends State<WaitForCall> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(basicPaddingSize),
-        child: Consumer(builder: (context, ref, _) {
-          return Column(
-            children: [
-              SizedBox(
-                height: appBarHeight.toDouble(),
-              ),
-              SizedBox(height: 30),
-              if (!ref.watch(waitForCallNotifierProvider))
-                CountDownWidget(ref.read(countdownNotifierProvider).seconds,
-                    max: ref.read(countdownNotifierProvider).max),
-              _LastTalkingWidget(),
-              //if (!ref.watch(isTalkingProvider)) _CancelWidget(),
-              SizedBox(
-                height: 100,
-              ),
-              if (ref.watch(waitForCallNotifierProvider)) CallWidget(),
-            ],
-          );
-        }),
-      ),
-    ));
+    Widget bottomBar;
+    return Consumer(builder: (context, ref, _) {
+      if (ref.watch(waitForCallNotifierProvider)) {
+        bottomBar = CallWidget();
+      } else {
+        bottomBar = SizedBox.shrink();
+      }
+      return Scaffold(
+          backgroundColor: Color.fromRGBO(255, 249, 231, 1),
+          bottomNavigationBar: bottomBar,
+          body: SingleChildScrollView(
+            child: Stack(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(basicPaddingSize),
+                  child: Stack(
+                    children: [
+                      Column(
+                        children: [
+                          SizedBox(
+                            height: appBarHeight.toDouble(),
+                          ),
+                          SizedBox(height: 30),
+                          if (!ref.watch(waitForCallNotifierProvider))
+                            CountDownWidget(
+                                ref.read(countdownNotifierProvider).seconds,
+                                max: ref.read(countdownNotifierProvider).max),
+                          _LastTalkingWidget(),
+                          //if (!ref.watch(isTalkingProvider)) _CancelWidget(),
+                          SizedBox(
+                            height: 100,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ));
+    });
   }
 }
