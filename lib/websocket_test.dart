@@ -37,40 +37,39 @@ class _WebSocketTestState extends State<WebSocketTest> {
         print("error" + e.toString());
       }
     });
+    isReconnect = false;
   }
 
-  connectWebscocket() {
+  connectWebscocket() async {
     try {
       channel = IOWebSocketChannel.connect(Uri.parse('ws://192.168.10.4:5050/ws'), headers: {
         HttpHeaders.authorizationHeader:
             // user tokenを入れる
-            'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJCQVRUQVJJLXRlYW0iLCJuYW1laWQiOiJ0YWt1dG8xMTI3IiwibmFtZSI6InRha3V0bzExMjciLCJqdGkiOiJjOWQ5MjIyYy0wNzI1LTQ3MGEtYWY0Yy0zMWIxYmMwNTcyZTgiLCJ1bmlxdWVfbmFtZSI6IjIiLCJleHAiOjE3MzAwNzI1NDV9.DiYTeemV2MetP0pejg3KcbL1HwI8Jwzn03Zh1w2DeVI'
+            'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJCQVRUQVJJLXRlYW0iLCJuYW1laWQiOiJ0YWt1dG8xMTI3IiwibmFtZSI6InRha3V0bzExMjciLCJqdGkiOiJlZTFhMGEzMi1lMTE4LTQyOTMtOTIzNC05MTQ5ODI2NzcwN2MiLCJ1bmlxdWVfbmFtZSI6IjIiLCJleHAiOjE3MzAzMjM5MjR9.D3YpMLMsPd5n4_yjDbACkvuhO-qneSW6fntpvzegGPw'
       });
-      // channel.stream.listen(
-      //   (message) {
-      //     // メッセージを受信したときの処理
-      //     print("Received: $message");
-      //     isReconnect = false;
-      //     i = 0;
-      //   },
-      //   onDone: () {
-      //     // 接続が切断されたときの処理
-      //     debugPrint("WebSocket is closed");
-      //     reconnectWebSocket();
-      //   },
-      //   onError: (error) {
-      //     // エラーが発生したときの処理
-      //     print("Error: $error");
-      //     reconnectWebSocket();
-      //   },
-      // );
+      // エラーハンドリングが特殊😭 https://github.com/dart-lang/web_socket_channel/issues/38
+      try {
+        await channel.ready;
+      } catch (e) {
+        print("readyでエラー" + e.toString());
+        reconnectWebSocket();
+      }
+      channel.stream.listen((event) {
+        print(event);
+        channel.sink.add("hello");
+        i = 0;
+      }, onError: (e) {
+        debugPrint("websocketの接続に失敗しました:" + e);
+        if (e is SocketException) {
+          debugPrint("websocketの接続に失敗しました:");
+        }
+      });
     } catch (e) {
       print("connectWebscocketでエラー" + e.toString());
+      if (e is SocketException) {
+        reconnectWebSocket();
+      }
     }
-
-    // channel.sink.done.then((value) async {
-    //   debugPrint("done");
-    // });
   }
 
   @override
