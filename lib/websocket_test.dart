@@ -78,18 +78,12 @@ class _WebSocketTestState extends State<WebSocketTest> {
     connectWebscocket();
     () async {
       _timer = Timer.periodic(Duration(seconds: 10), (timer) {
-        if (i > 3) {
-          debugPrint("WebSocket is closed");
+        if (i > 7) {
+          reconnectWebSocket();
           channel.sink.close();
           i = 0;
         }
         i++;
-        debugPrint("closeStatus ${channel.closeCode}");
-        if (channel.closeCode != null) {
-          channel.sink.close();
-          reconnectWebSocket();
-          i = 0;
-        }
       });
     }();
   }
