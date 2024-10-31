@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
 
+import 'package:battari/main.dart';
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -42,10 +43,11 @@ class _WebSocketTestState extends State<WebSocketTest> {
 
   connectWebscocket() async {
     try {
-      channel = IOWebSocketChannel.connect(Uri.parse('ws://192.168.10.4:5050/ws'), headers: {
+      channel = IOWebSocketChannel.connect(Uri.parse('ws://$IpAddress:5050/ws'), headers: {
         HttpHeaders.authorizationHeader:
             // user tokenを入れる
-            'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJCQVRUQVJJLXRlYW0iLCJuYW1laWQiOiJ0YWt1dG8xMTI3IiwibmFtZSI6InRha3V0bzExMjciLCJqdGkiOiJlZTFhMGEzMi1lMTE4LTQyOTMtOTIzNC05MTQ5ODI2NzcwN2MiLCJ1bmlxdWVfbmFtZSI6IjIiLCJleHAiOjE3MzAzMjM5MjR9.D3YpMLMsPd5n4_yjDbACkvuhO-qneSW6fntpvzegGPw'
+            //'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJCQVRUQVJJLXRlYW0iLCJuYW1laWQiOiJ0YWt1dG8xMTI3IiwibmFtZSI6InRha3V0bzExMjciLCJqdGkiOiJlZTFhMGEzMi1lMTE4LTQyOTMtOTIzNC05MTQ5ODI2NzcwN2MiLCJ1bmlxdWVfbmFtZSI6IjIiLCJleHAiOjE3MzAzMjM5MjR9.D3YpMLMsPd5n4_yjDbACkvuhO-qneSW6fntpvzegGPw'
+            'Bearer $Token'
       });
       // エラーハンドリングが特殊😭 https://github.com/dart-lang/web_socket_channel/issues/38
       try {
@@ -99,7 +101,7 @@ class _WebSocketTestState extends State<WebSocketTest> {
           onPressed: () {
             //channel.sink.add(_controller.text);
             String myJson = jsonEncode({
-              'id': 4,
+              'id': 2,
               'isWelcome': false,
               'incredients': [
                 {
