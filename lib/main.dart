@@ -1,17 +1,18 @@
 import 'package:battari/app_usage_time.dart';
+import 'package:battari/routes.dart';
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(AppUsageTime());
+  runApp(const Battari());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class Battari extends StatelessWidget {
+  const Battari({super.key});
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Flutter Demo',
       theme: ThemeData(
         // This is the theme of your application.
@@ -32,7 +33,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      routerConfig: router,
     );
   }
 }
