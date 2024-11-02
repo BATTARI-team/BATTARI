@@ -12,54 +12,65 @@ class AppUsageTime extends StatefulWidget {
 class _AppUsageState extends State<AppUsageTime> {
   List<EventUsageInfo> events = [];
   Map<String?, NetworkInfo?> _netInfoMap = Map();
+  Timer? _timer;
+  String? _lastUpdated;
+  int? _lastOpenTimeStamp; // 最新の eventType == 1 のタイムスタンプ
+  final int _targetSeconds = 10; // 300秒（5分）
 
   @override
   void initState() {
     super.initState();
-
     initUsage();
+    startTimer();
   }
 
+  // タイマーの開始
+  void startTimer() {
+    _timer = Timer.periodic(Duration(minutes: 1), (timer) async {
+      await checkAppUsage();
+      setState(() {
+        _lastUpdated = DateTime.now().toIso8601String();
+      });
+    });
+  }
+
+  // アプリ使用時間のチェック
+  Future<void> checkAppUsage() async {
+    if (_lastOpenTimeStamp != null) {
+      DateTime currentTime = DateTime.now();
+      DateTime lastOpenTime =
+          DateTime.fromMillisecondsSinceEpoch(_lastOpenTimeStamp!);
+
+      // 経過時間を秒で計算
+      int elapsedSeconds = currentTime.difference(lastOpenTime).inSeconds;
+
+      if (elapsedSeconds >= _targetSeconds) {
+        print("encountOK"); // 300秒以上経過した場合に出力
+      }
+    }
+  }
+
+  // 初期データの読み込み
   Future<void> initUsage() async {
     try {
       UsageStats.grantUsagePermission();
 
-      DateTime endDate = new DateTime.now();
+      DateTime endDate = DateTime.now();
       DateTime startDate = endDate.subtract(Duration(days: 1));
 
       List<EventUsageInfo> queryEvents =
           await UsageStats.queryEvents(startDate, endDate);
-      List<NetworkInfo> networkInfos = await UsageStats.queryNetworkUsageStats(
-        startDate,
-        endDate,
-        networkType: NetworkType.all,
-      );
 
-      Map<String?, NetworkInfo?> netInfoMap = Map.fromIterable(networkInfos,
-          key: (v) => v.packageName, value: (v) => v);
-
-      List<UsageInfo> t = await UsageStats.queryUsageStats(startDate, endDate);
-
-      for (var i in t) {
-        if (double.parse(i.totalTimeInForeground!) > 0) {
-          print(
-              DateTime.fromMillisecondsSinceEpoch(int.parse(i.firstTimeStamp!))
-                  .toIso8601String());
-
-          print(DateTime.fromMillisecondsSinceEpoch(int.parse(i.lastTimeStamp!))
-              .toIso8601String());
-
-          print(i.packageName);
-          print(DateTime.fromMillisecondsSinceEpoch(int.parse(i.lastTimeUsed!))
-              .toIso8601String());
-          print(int.parse(i.totalTimeInForeground!) / 1000 / 60);
-
-          print('-----\n');
+      // 最新の eventType == 1 イベントのタイムスタンプを取得
+      for (var event in queryEvents.reversed) {
+        if (event.eventType == '1') {
+          _lastOpenTimeStamp = int.parse(event.timeStamp!);
+          break; // 最新のイベントのみを使用するため、最初に見つかったらループを抜ける
         }
       }
+
       setState(() {
         events = queryEvents.reversed.toList();
-        _netInfoMap = netInfoMap;
       });
     } catch (err) {
       print(err);
@@ -67,42 +78,50 @@ class _AppUsageState extends State<AppUsageTime> {
   }
 
   @override
+  void dispose() {
+    _timer?.cancel(); // タイマーを解除
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     List<EventUsageInfo> filteredEvents = events
         .where((event) => event.eventType == '1' || event.eventType == '2')
         .toList();
+
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(title: const Text("Usage Stats"), actions: const [
           IconButton(
             onPressed: UsageStats.grantUsagePermission,
             icon: Icon(Icons.settings),
-          )
+          ),
         ]),
         body: RefreshIndicator(
           onRefresh: initUsage,
-          child: ListView.separated(
-            itemBuilder: (context, index) {
-              var event = filteredEvents[index];
-              var networkInfo = _netInfoMap[event.packageName];
-              return ListTile(
-                title: Text(event.packageName!),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                        "Last time used: ${DateTime.fromMillisecondsSinceEpoch(int.parse(events[index].timeStamp!)).toIso8601String()}"),
-                    networkInfo == null
-                        ? const Text("Unknown network usage")
-                        : Text("Received bytes: ${networkInfo.rxTotalBytes}\n"
-                            "Transfered bytes : ${networkInfo.txTotalBytes}"),
-                  ],
+          child: Column(
+            children: [
+              if (_lastUpdated != null)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text("最終更新: $_lastUpdated"),
                 ),
-                trailing: Text(event.eventType!),
-              );
-            },
-            separatorBuilder: (context, index) => Divider(),
-            itemCount: filteredEvents.length,
+              Expanded(
+                child: ListView.separated(
+                  itemBuilder: (context, index) {
+                    var event = filteredEvents[index];
+                    return ListTile(
+                      title: Text(event.packageName!),
+                      subtitle: Text(
+                          "最終使用時刻: ${DateTime.fromMillisecondsSinceEpoch(int.parse(events[index].timeStamp!)).toIso8601String()}"),
+                      trailing: Text(event.eventType!),
+                    );
+                  },
+                  separatorBuilder: (context, index) => Divider(),
+                  itemCount: filteredEvents.length,
+                ),
+              ),
+            ],
           ),
         ),
       ),
