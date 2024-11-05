@@ -1,9 +1,10 @@
 import 'package:battari/app_usage_time.dart';
 import 'package:battari/routes.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
-  runApp(const Battari());
+  runApp(const ProviderScope(child: Battari()));
 }
 
 class Battari extends StatelessWidget {
@@ -31,6 +32,7 @@ class Battari extends StatelessWidget {
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        dividerColor: Colors.transparent,
         useMaterial3: true,
       ),
       routerConfig: router,

@@ -1,26 +1,26 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'user_view_model.dart';
+part of 'user_form_view_model.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$userViewModelHash() => r'28cbb1c93d8438c032069ac76568f75af6152a58';
+String _$userFormViewModelHash() => r'843bb78ea1d8f94c47b305946a4ded639d0ab90b';
 
-/// See also [UserViewModel].
-@ProviderFor(UserViewModel)
-final userViewModelProvider =
-    AsyncNotifierProvider<UserViewModel, UserState?>.internal(
-  UserViewModel.new,
-  name: r'userViewModelProvider',
+/// See also [UserFormViewModel].
+@ProviderFor(UserFormViewModel)
+final userFormViewModelProvider =
+    AutoDisposeNotifierProvider<UserFormViewModel, UserFormState>.internal(
+  UserFormViewModel.new,
+  name: r'userFormViewModelProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$userViewModelHash,
+      : _$userFormViewModelHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$UserViewModel = AsyncNotifier<UserState?>;
+typedef _$UserFormViewModel = AutoDisposeNotifier<UserFormState>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

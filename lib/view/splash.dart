@@ -19,7 +19,7 @@ class _SplashState extends State<Splash> {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   context.go('/first_page');
                 });
-                return SizedBox.shrink();
+                return const SizedBox.shrink();
               } else {
                 return const Center(child: CircularProgressIndicator());
               }

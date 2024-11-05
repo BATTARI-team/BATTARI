@@ -12,7 +12,13 @@ Raw<Future<SharedPreferences>> sharedPreferences(ref) async {
 
 abstract class IUserRepository {
   Future<UserState?> get();
-  Future<UserState> save(UserState userState);
+  Future<void> save(UserState userState);
+  Future<void> clear();
+}
+
+@riverpod
+UserSharedPreferencesRepository userSharedPreferencesRepository(ref) {
+  return UserSharedPreferencesRepository(ref);
 }
 
 class UserSharedPreferencesRepository extends IUserRepository {
@@ -38,12 +44,17 @@ class UserSharedPreferencesRepository extends IUserRepository {
   }
 
   @override
-  Future<UserState> save(UserState userState) async {
+  Future<void> save(UserState userState) async {
     var reference = await ref.read(sharedPreferencesProvider);
     await reference.setString("refresh_token", userState.refreshToken);
     await reference.setString("user_id", userState.userId);
     await reference.setInt("id", userState.id);
     await reference.setString("name", userState.name);
-    return (await get())!;
+  }
+
+  @override
+  Future<void> clear() async {
+    var reference = await ref.read(sharedPreferencesProvider);
+    await reference.clear();
   }
 }
