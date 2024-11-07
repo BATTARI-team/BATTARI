@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:battari/main.dart';
 import 'package:battari/repository/user_repository.dart';
 import 'package:battari/state/user_state.dart';
+import 'package:battari/util/token_util.dart';
 import 'package:battari/view_model/user_form_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -10,7 +11,7 @@ import 'package:http/http.dart' as http;
 
 part 'user_view_model.g.dart';
 
-const IpAddress = "169.254.208.85";
+const IpAddress = "192.168.10.5";
 
 @Riverpod(keepAlive: true)
 class UserViewModel extends _$UserViewModel {
@@ -44,7 +45,33 @@ class UserViewModel extends _$UserViewModel {
     );
   }
 
-  Future<bool> login() async {
+  Future<bool> refreshUser(int userIndex) async {
+    try {
+      var token = TokenUtil.getToken();
+      String name = "";
+      int id = 0;
+      String userId = "";
+      await http.put(Uri.parse('http://$IpAddress:5050/User/GetUser?userIndex=$userIndex'), headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      }).then((value) {
+        var user = jsonDecode(value.body);
+        name = user["name"];
+        id = user["id"];
+        userId = user["userId"];
+      });
+      var user = UserState(token: token, refreshToken: TokenUtil.getRefreshToken(), name: name, id: id, userId: userId);
+      setUser(user);
+      ref.read(userSharedPreferencesRepositoryProvider).save(user);
+      return true;
+    } catch (e) {
+      debugPrint(e.toString());
+      return false;
+    }
+  }
+
+  /// return "" if login success
+  /// return error message if login failed
+  Future<String> login() async {
     int id = 0;
     String token = "";
     String refreshToken = "";
@@ -67,8 +94,7 @@ class UserViewModel extends _$UserViewModel {
         refreshToken = decoded["refreshToken"];
       });
     } catch (e) {
-      print(e);
-      return false;
+      return e.toString();
     }
     debugPrint("token: $token");
 
@@ -84,8 +110,7 @@ class UserViewModel extends _$UserViewModel {
         debugPrint("name: $name, id: ${id.toString()}");
       });
     } catch (e) {
-      print(e);
-      return false;
+      return e.toString();
     }
 
     if (token.isNotEmpty) {
@@ -101,8 +126,61 @@ class UserViewModel extends _$UserViewModel {
       ref.read(userViewModelProvider.notifier).setToken(token);
       ref.read(userViewModelProvider.notifier).setUser(user);
 
-      return true;
+      debugPrint("login success");
+
+      return "";
     }
-    return false;
+    return "ログインに失敗しました．";
+  }
+
+  Future<String> refreshToken([int? userIndexArg, String? refreshTokenArg]) async {
+    String token = "";
+    int userIndex = userIndexArg ??
+        state.maybeWhen(
+          orElse: () => 0,
+          data: (data) {
+            if (data == null) return 0;
+            return data.id;
+          },
+        );
+    String refreshToken = refreshTokenArg ??
+        state.maybeWhen(
+          orElse: () => "",
+          data: (data) {
+            if (data == null) return "";
+            return data.refreshToken;
+          },
+        );
+
+    try {
+      await http
+          .post(Uri.parse('http://$IpAddress:5050/User/RefreshToken'),
+              headers: <String, String>{
+                'Content-Type': 'application/json; charset=UTF-8',
+              },
+              body: jsonEncode(<String, Object>{
+                'refreshToken': refreshToken,
+                'userIndex': userIndex,
+              }))
+          .then((value) {
+        token = value.body;
+      });
+    } catch (e) {
+      return e.toString();
+    }
+    if (token.isNotEmpty) {
+      // 全部いけた時
+      await ref.read(userSharedPreferencesRepositoryProvider).saveToken(token);
+      ref.read(userViewModelProvider.notifier).setToken(token);
+
+      return token;
+    }
+    return "";
+  }
+
+  Future<void> loginWithUserState(UserState user) async {
+    await ref.read(userSharedPreferencesRepositoryProvider).save(user);
+    ref.read(userViewModelProvider.notifier).setToken(user.token);
+    ref.read(userViewModelProvider.notifier).setUser(user);
   }
 }
