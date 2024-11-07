@@ -14,6 +14,7 @@ class LoginView extends StatefulWidget {
 
 class _LoginViewState extends State<LoginView> {
   String error = "";
+  bool isLoading = false;
   @override
   Widget build(context) {
     GlobalKey<FormState> formKey = GlobalKey<FormState>();
@@ -25,22 +26,30 @@ class _LoginViewState extends State<LoginView> {
             const Text("ログイン"),
             BattariUserFormWidgets.BattariIdField(),
             BattariUserFormWidgets.BattariPasswordField(),
-            Consumer(builder: (context, ref, _) {
-              return TextButton(
-                onPressed: () async {
-                  var result = formKey.currentState!.validate();
-                  if (result) {
-                    formKey.currentState!.save();
-                    var isSuccess = await ref.read(userViewModelProvider.notifier).login();
-                    if (isSuccess) {
-                      context.push('/home');
-                    } else {
-                      error = "ログインに失敗しました";
-                    }
-                  }
-                },
-                child: const Text("ログイン"),
-              );
+            Consumer(builder: (__, ref, _) {
+              return (isLoading)
+                  ? const CircularProgressIndicator()
+                  : TextButton(
+                      onPressed: () async {
+                        var result = formKey.currentState!.validate();
+                        if (result) {
+                          formKey.currentState!.save();
+                          setState(() {
+                            isLoading = true;
+                          });
+                          var isSuccess = await ref.read(userViewModelProvider.notifier).login();
+                          if (isSuccess.isEmpty) {
+                            context.push('/home');
+                          } else {
+                            setState(() {
+                              error = isSuccess;
+                              isLoading = false;
+                            });
+                          }
+                        }
+                      },
+                      child: const Text("ログイン"),
+                    );
             }),
             if (error.isNotEmpty)
               Text(

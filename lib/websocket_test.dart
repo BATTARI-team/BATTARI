@@ -4,7 +4,9 @@ import 'dart:io';
 import 'dart:isolate';
 
 import 'package:battari/main.dart';
+import 'package:battari/view_model/user_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -43,6 +45,7 @@ class _WebSocketTestState extends State<WebSocketTest> {
 
   connectWebscocket() async {
     try {
+      var Token = ProviderContainer().read(userViewModelProvider).asData?.value?.token;
       channel = IOWebSocketChannel.connect(Uri.parse('ws://$IpAddress:5050/ws'), headers: {
         HttpHeaders.authorizationHeader:
             // user tokenを入れる
