@@ -39,8 +39,8 @@ class WebsocketService {
   bool _isReconnect = false;
   int _count = 0;
   Map<int, Function(String)> listeners = {};
-  final receiverStreamController = StreamController<String>.broadcast();
-  List<Function(String)> _sendListeners = [];
+  final _receiverStreamController = StreamController<String>.broadcast();
+  final _sendStreamController = StreamController<String>.broadcast();
 
   void needConnect() {
     _reconnectTimer = Timer.periodic(Duration(seconds: 10), (timer) {
@@ -64,19 +64,15 @@ class WebsocketService {
   }
 
   StreamSubscription<String> addWebsocketReceiver(Function(String) listener) {
-    return receiverStreamController.stream.listen((event) {
+    return _receiverStreamController.stream.listen((event) {
       listener(event);
     });
   }
 
-  void addWebsocketSendListener(Function(String) listener) {
-    _sendListeners.add(listener);
-  }
-
-  void removeWebsocketReceiver(int key) {}
-
-  void removeWebsocketSendListener(Function(String) listener) {
-    _sendListeners.remove(listener);
+  StreamSubscription<String> addWebsocketSendListener(Function(String) listener) {
+    return _sendStreamController.stream.listen((event) {
+      listener(event);
+    });
   }
 
   bool isRunning = false;
@@ -119,7 +115,7 @@ class WebsocketService {
       }
       channel.stream.listen((event) {
         _sendWebsocket("hello");
-        receiverStreamController.add(event);
+        _receiverStreamController.add(event);
         _count = 0;
       }, onError: (error) {
         debugPrint("websocketの接続に失敗しました: $error");
@@ -140,11 +136,9 @@ class WebsocketService {
   void _sendWebsocket(String message) async {
     try {
       channel.sink.add(message);
+      _sendStreamController.add(message);
     } catch (e) {
       print("sendWebsocketでエラー $e");
-    }
-    for (var element in _sendListeners) {
-      element(message);
     }
   }
 }

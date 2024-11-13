@@ -110,8 +110,7 @@ class _WebSocketTestState extends State<WebSocketTest> {
             final websocketService = ref.watch(websocketServiceProvider);
 
             useEffect(() {
-              final subscription = websocketService.addWebsocketReceiver((data) {
-                debugPrint(data.toString());
+              var subscription = websocketService.addWebsocketReceiver((data) {
                 messages.value = [...messages.value, data];
               });
               return () => subscription.cancel();
@@ -130,10 +129,10 @@ class _WebSocketTestState extends State<WebSocketTest> {
           HookConsumer(builder: (context, ref, _) {
             var messages = useState([]);
 
-            // useEffect(() {
-            //   ref.read(websocketServiceProvider).addWebsocketSendListener((p0) => messages.value = [...messages.value, p0]);
-            //   return null;
-            // }, [websocketService]);
+            useEffect(() {
+              var stream = ref.read(websocketServiceProvider).addWebsocketSendListener((p0) => messages.value = [...messages.value, p0]);
+              return () => stream.cancel();
+            }, [websocketService]);
 
             return Flexible(
               child: ListView.builder(
