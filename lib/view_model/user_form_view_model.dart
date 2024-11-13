@@ -1,4 +1,4 @@
-import 'package:battari/state/user_form_state.dart';
+import 'package:battari/model/state/user_form_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'user_form_view_model.g.dart';
