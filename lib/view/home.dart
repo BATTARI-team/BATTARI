@@ -1,5 +1,6 @@
 import 'package:battari/view/developer/developer_widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -9,7 +10,7 @@ class HomeView extends StatelessWidget {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: (() {
-          Navigator.of(context).pushNamed("/developer");
+          context.push('/developer');
         }),
         child: const Text("developer page"),
       ),

@@ -1,3 +1,4 @@
+import 'package:battari/repository/user_repository.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:battari/websocket_test.dart';
 import 'package:flutter/material.dart';
@@ -8,11 +9,18 @@ class DeveloperWidgets extends StatelessWidget {
   static loginedUserWidget() {
     return Consumer(
       builder: (context, ref, _) {
-        return ref.watch(userViewModelProvider).maybeWhen(
-            orElse: () => const CircularProgressIndicator(),
+        return ref.watch(userViewModelProvider).when(
+            error: (error, _) => Center(
+                  child: Text(error.toString()),
+                ),
+            loading: () => const CircularProgressIndicator(
+                  color: Colors.red,
+                ),
             data: (data) {
               if (data == null) {
-                return const CircularProgressIndicator();
+                return const CircularProgressIndicator(
+                  color: Colors.red,
+                );
               }
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -33,15 +41,20 @@ class DeveloperWidgets extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        appBar: AppBar(
+          title: Text("開発用"),
+        ),
         body: Column(
-      children: [
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) => const WebSocketTest()));
-          },
-          child: const Text("websockettest"),
-        )
-      ],
-    ));
+          children: [
+            _developerElement("websockettest", const WebSocketTest(), context),
+            TextButton(
+                child: const Text("clear shared preferences"),
+                onPressed: () => ProviderContainer().read(userSharedPreferencesRepositoryProvider).clear()),
+          ],
+        ));
+  }
+
+  Widget _developerElement(String title, Widget widget, BuildContext context) {
+    return TextButton(onPressed: (() => Navigator.of(context).push(MaterialPageRoute(builder: (context) => widget))), child: Text(title));
   }
 }

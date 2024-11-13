@@ -11,36 +11,45 @@ import 'package:http/http.dart' as http;
 
 part 'user_view_model.g.dart';
 
-const IpAddress = "192.168.10.5";
+const IpAddress = "192.168.11.12";
 
 @Riverpod(keepAlive: true)
 class UserViewModel extends _$UserViewModel {
   @override
-  FutureOr<UserState?> build() async {
+  Future<UserState?> build() async {
     var user = await ref.watch(userSharedPreferencesRepositoryProvider).get();
     return user;
   }
 
   void setToken(String token) {
-    state.maybeWhen(
-        orElse: () {},
-        data: (data) {
-          if (data == null) return;
-          state = AsyncData(data.copyWith(token: token));
-        });
+    state.maybeWhen(orElse: () {
+      debugPrint("state is null");
+    }, data: (data) {
+      debugPrint("set $token");
+      if (data == null) {
+        state = AsyncData(UserState(token: token));
+      } else
+        state = AsyncData(data.copyWith(token: token));
+    });
   }
 
   void setUser(UserState user) {
     state.maybeWhen(
-      orElse: () {},
+      orElse: () {
+        debugPrint("state is null");
+      },
       data: (data) {
-        if (data == null) return;
-        state = AsyncData(data.copyWith(
-          id: user.id,
-          userId: user.userId,
-          name: user.name,
-          token: user.token,
-        ));
+        debugPrint("set $user");
+
+        if (data == null) {
+          state = AsyncData(user);
+        } else
+          state = AsyncData(data.copyWith(
+            id: user.id,
+            userId: user.userId,
+            name: user.name,
+            token: user.token,
+          ));
       },
     );
   }
@@ -78,6 +87,7 @@ class UserViewModel extends _$UserViewModel {
     String name = "";
     var userFormState = ref.watch(userFormViewModelProvider);
     debugPrint("userFormState.BattariId: ${userFormState.BattariId}");
+    debugPrint("userFormState.Password: ${userFormState.Password}");
     try {
       await http
           .post(Uri.parse('http://$IpAddress:5050/User/Login'),
@@ -89,8 +99,11 @@ class UserViewModel extends _$UserViewModel {
                 'password': userFormState.Password,
               }))
           .then((value) {
+        debugPrint("1");
         var decoded = jsonDecode(value.body);
+        debugPrint("2");
         token = decoded["token"];
+        debugPrint("3");
         refreshToken = decoded["refreshToken"];
       });
     } catch (e) {
@@ -123,8 +136,8 @@ class UserViewModel extends _$UserViewModel {
         token: token,
       );
       await ref.read(userSharedPreferencesRepositoryProvider).save(user);
-      ref.read(userViewModelProvider.notifier).setToken(token);
-      ref.read(userViewModelProvider.notifier).setUser(user);
+      setToken(token);
+      setUser(user);
 
       debugPrint("login success");
 
@@ -153,6 +166,7 @@ class UserViewModel extends _$UserViewModel {
         );
 
     try {
+      debugPrint('http://$IpAddress:5050/User/RefreshToken');
       await http
           .post(Uri.parse('http://$IpAddress:5050/User/RefreshToken'),
               headers: <String, String>{
