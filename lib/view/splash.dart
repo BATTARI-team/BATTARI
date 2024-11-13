@@ -1,5 +1,5 @@
 import 'package:battari/repository/user_repository.dart';
-import 'package:battari/state/user_state.dart';
+import 'package:battari/model/state/user_state.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';

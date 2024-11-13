@@ -9,21 +9,21 @@ part of 'websocket_souguu_notification.dart';
 _$WebsocketSouguuNotificationImpl _$$WebsocketSouguuNotificationImplFromJson(
         Map<String, dynamic> json) =>
     _$WebsocketSouguuNotificationImpl(
-      callStartTime: DateTime.parse(json['callStartTime'] as String),
-      callId: (json['callId'] as num).toInt(),
-      callEndTime: DateTime.parse(json['callEndTime'] as String),
-      souguuReason: json['souguuReason'] as String,
-      token: json['token'] as String,
-      souguuDateTime: DateTime.parse(json['souguuDateTime'] as String),
+      callStartTime: DateTime.parse(json['CallStartTime'] as String),
+      callId: (json['CallId'] as num).toInt(),
+      callEndTime: DateTime.parse(json['CallEndTime'] as String),
+      souguuReason: json['SouguuReason'] as String,
+      token: json['Token'] as String,
+      souguuDateTime: DateTime.parse(json['SouguuDateTime'] as String),
     );
 
 Map<String, dynamic> _$$WebsocketSouguuNotificationImplToJson(
         _$WebsocketSouguuNotificationImpl instance) =>
     <String, dynamic>{
-      'callStartTime': instance.callStartTime.toIso8601String(),
-      'callId': instance.callId,
-      'callEndTime': instance.callEndTime.toIso8601String(),
-      'souguuReason': instance.souguuReason,
-      'token': instance.token,
-      'souguuDateTime': instance.souguuDateTime.toIso8601String(),
+      'CallStartTime': instance.callStartTime.toIso8601String(),
+      'CallId': instance.callId,
+      'CallEndTime': instance.callEndTime.toIso8601String(),
+      'SouguuReason': instance.souguuReason,
+      'Token': instance.token,
+      'SouguuDateTime': instance.souguuDateTime.toIso8601String(),
     };

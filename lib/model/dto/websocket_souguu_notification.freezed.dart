@@ -21,11 +21,23 @@ WebsocketSouguuNotification _$WebsocketSouguuNotificationFromJson(
 
 /// @nodoc
 mixin _$WebsocketSouguuNotification {
-  DateTime get callStartTime => throw _privateConstructorUsedError;
-  int get callId => throw _privateConstructorUsedError;
-  DateTime get callEndTime => throw _privateConstructorUsedError;
-  String get souguuReason => throw _privateConstructorUsedError;
-  String get token => throw _privateConstructorUsedError;
+// ignore: invalid_annotation_target
+  @JsonKey(name: 'CallStartTime')
+  DateTime get callStartTime =>
+      throw _privateConstructorUsedError; // ignore: invalid_annotation_target
+  @JsonKey(name: 'CallId')
+  int get callId =>
+      throw _privateConstructorUsedError; // ignore: invalid_annotation_target
+  @JsonKey(name: 'CallEndTime')
+  DateTime get callEndTime =>
+      throw _privateConstructorUsedError; // ignore: invalid_annotation_target
+  @JsonKey(name: 'SouguuReason')
+  String get souguuReason =>
+      throw _privateConstructorUsedError; // ignore: invalid_annotation_target
+  @JsonKey(name: 'Token')
+  String get token =>
+      throw _privateConstructorUsedError; // ignore: invalid_annotation_target
+  @JsonKey(name: 'SouguuDateTime')
   DateTime get souguuDateTime => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -43,12 +55,12 @@ abstract class $WebsocketSouguuNotificationCopyWith<$Res> {
           WebsocketSouguuNotification>;
   @useResult
   $Res call(
-      {DateTime callStartTime,
-      int callId,
-      DateTime callEndTime,
-      String souguuReason,
-      String token,
-      DateTime souguuDateTime});
+      {@JsonKey(name: 'CallStartTime') DateTime callStartTime,
+      @JsonKey(name: 'CallId') int callId,
+      @JsonKey(name: 'CallEndTime') DateTime callEndTime,
+      @JsonKey(name: 'SouguuReason') String souguuReason,
+      @JsonKey(name: 'Token') String token,
+      @JsonKey(name: 'SouguuDateTime') DateTime souguuDateTime});
 }
 
 /// @nodoc
@@ -111,12 +123,12 @@ abstract class _$$WebsocketSouguuNotificationImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {DateTime callStartTime,
-      int callId,
-      DateTime callEndTime,
-      String souguuReason,
-      String token,
-      DateTime souguuDateTime});
+      {@JsonKey(name: 'CallStartTime') DateTime callStartTime,
+      @JsonKey(name: 'CallId') int callId,
+      @JsonKey(name: 'CallEndTime') DateTime callEndTime,
+      @JsonKey(name: 'SouguuReason') String souguuReason,
+      @JsonKey(name: 'Token') String token,
+      @JsonKey(name: 'SouguuDateTime') DateTime souguuDateTime});
 }
 
 /// @nodoc
@@ -173,28 +185,40 @@ class __$$WebsocketSouguuNotificationImplCopyWithImpl<$Res>
 class _$WebsocketSouguuNotificationImpl
     implements _WebsocketSouguuNotification {
   const _$WebsocketSouguuNotificationImpl(
-      {required this.callStartTime,
-      required this.callId,
-      required this.callEndTime,
-      required this.souguuReason,
-      required this.token,
-      required this.souguuDateTime});
+      {@JsonKey(name: 'CallStartTime') required this.callStartTime,
+      @JsonKey(name: 'CallId') required this.callId,
+      @JsonKey(name: 'CallEndTime') required this.callEndTime,
+      @JsonKey(name: 'SouguuReason') required this.souguuReason,
+      @JsonKey(name: 'Token') required this.token,
+      @JsonKey(name: 'SouguuDateTime') required this.souguuDateTime});
 
   factory _$WebsocketSouguuNotificationImpl.fromJson(
           Map<String, dynamic> json) =>
       _$$WebsocketSouguuNotificationImplFromJson(json);
 
+// ignore: invalid_annotation_target
   @override
+  @JsonKey(name: 'CallStartTime')
   final DateTime callStartTime;
+// ignore: invalid_annotation_target
   @override
+  @JsonKey(name: 'CallId')
   final int callId;
+// ignore: invalid_annotation_target
   @override
+  @JsonKey(name: 'CallEndTime')
   final DateTime callEndTime;
+// ignore: invalid_annotation_target
   @override
+  @JsonKey(name: 'SouguuReason')
   final String souguuReason;
+// ignore: invalid_annotation_target
   @override
+  @JsonKey(name: 'Token')
   final String token;
+// ignore: invalid_annotation_target
   @override
+  @JsonKey(name: 'SouguuDateTime')
   final DateTime souguuDateTime;
 
   @override
@@ -242,28 +266,35 @@ class _$WebsocketSouguuNotificationImpl
 abstract class _WebsocketSouguuNotification
     implements WebsocketSouguuNotification {
   const factory _WebsocketSouguuNotification(
-          {required final DateTime callStartTime,
-          required final int callId,
-          required final DateTime callEndTime,
-          required final String souguuReason,
-          required final String token,
-          required final DateTime souguuDateTime}) =
-      _$WebsocketSouguuNotificationImpl;
+      {@JsonKey(name: 'CallStartTime') required final DateTime callStartTime,
+      @JsonKey(name: 'CallId') required final int callId,
+      @JsonKey(name: 'CallEndTime') required final DateTime callEndTime,
+      @JsonKey(name: 'SouguuReason') required final String souguuReason,
+      @JsonKey(name: 'Token') required final String token,
+      @JsonKey(name: 'SouguuDateTime')
+      required final DateTime
+          souguuDateTime}) = _$WebsocketSouguuNotificationImpl;
 
   factory _WebsocketSouguuNotification.fromJson(Map<String, dynamic> json) =
       _$WebsocketSouguuNotificationImpl.fromJson;
 
-  @override
+  @override // ignore: invalid_annotation_target
+  @JsonKey(name: 'CallStartTime')
   DateTime get callStartTime;
-  @override
+  @override // ignore: invalid_annotation_target
+  @JsonKey(name: 'CallId')
   int get callId;
-  @override
+  @override // ignore: invalid_annotation_target
+  @JsonKey(name: 'CallEndTime')
   DateTime get callEndTime;
-  @override
+  @override // ignore: invalid_annotation_target
+  @JsonKey(name: 'SouguuReason')
   String get souguuReason;
-  @override
+  @override // ignore: invalid_annotation_target
+  @JsonKey(name: 'Token')
   String get token;
-  @override
+  @override // ignore: invalid_annotation_target
+  @JsonKey(name: 'SouguuDateTime')
   DateTime get souguuDateTime;
   @override
   @JsonKey(ignore: true)
