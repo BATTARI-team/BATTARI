@@ -50,6 +50,8 @@ dependencies:
   go_router: ^14.3.0
   flutter_hooks: ^0.20.5
   hooks_riverpod: ^2.6.1
+  json_serializable: ^6.8.0
+  json_annotation: ^4.9.0
 
 
 dev_dependencies:
