@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:isolate';
 
 import 'package:battari/main.dart';
+import 'package:battari/service/souguu_service.dart';
 import 'package:battari/service/websocket_service.dart';
 import 'package:battari/util/token_util.dart';
 import 'package:battari/view_model/user_view_model.dart';
@@ -22,6 +23,13 @@ class WebSocketTest extends StatefulWidget {
 }
 
 class _WebSocketTestState extends State<WebSocketTest> {
+  final listenerKey = "websockettestview";
+  @override
+  void dispose() {
+    debugPrint("websocket test dispose");
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     TextEditingController _controller = TextEditingController(text: "hello");
@@ -49,6 +57,9 @@ class _WebSocketTestState extends State<WebSocketTest> {
       ),
       body: Column(
         children: [
+          Consumer(
+            builder: (context, ref, child) => Text(ref.watch(souguuServiceProvider).souguu.toString()),
+          ),
           Consumer(builder: (context, ref, _) {
             return TextButton(
               child: const Text('Send message'),
@@ -103,8 +114,7 @@ class _WebSocketTestState extends State<WebSocketTest> {
                 debugPrint(data.toString());
                 messages.value = [...messages.value, data];
               });
-              //return () => subscription.cancel();
-              return null;
+              return () => subscription.cancel();
             }, [websocketService]);
 
             return Flexible(
@@ -120,10 +130,10 @@ class _WebSocketTestState extends State<WebSocketTest> {
           HookConsumer(builder: (context, ref, _) {
             var messages = useState([]);
 
-            useEffect(() {
-              ref.read(websocketServiceProvider).addWebsocketSendListener((p0) => messages.value = [...messages.value, p0]);
-              return null;
-            }, [websocketService]);
+            // useEffect(() {
+            //   ref.read(websocketServiceProvider).addWebsocketSendListener((p0) => messages.value = [...messages.value, p0]);
+            //   return null;
+            // }, [websocketService]);
 
             return Flexible(
               child: ListView.builder(

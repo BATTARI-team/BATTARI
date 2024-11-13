@@ -11,11 +11,21 @@ import 'package:web_socket_channel/io.dart';
 
 part 'websocket_service.g.dart';
 
+class BattariWebsocketSubscription {
+  BattariWebsocketSubscription(this.key, this.listener);
+  final int key;
+  final Function(String) listener;
+
+  close() {}
+}
+
 @riverpod
 WebsocketService websocketService(Ref ref) {
   WebsocketService websocketService = WebsocketService(ref);
   ref.onDispose(() async {
-    await websocketService.cancelConnect();
+    if (websocketService.isRunning) {
+      await websocketService.cancelConnect();
+    }
   });
   return websocketService;
 }
@@ -28,7 +38,8 @@ class WebsocketService {
   late IOWebSocketChannel channel;
   bool _isReconnect = false;
   int _count = 0;
-  List<Function(String)> _listeners = [];
+  Map<int, Function(String)> listeners = {};
+  final receiverStreamController = StreamController<String>.broadcast();
   List<Function(String)> _sendListeners = [];
 
   void needConnect() {
@@ -52,12 +63,20 @@ class WebsocketService {
     _sendWebsocket(data);
   }
 
-  void addWebsocketReceiver(Function(String) listener) {
-    _listeners.add(listener);
+  StreamSubscription<String> addWebsocketReceiver(Function(String) listener) {
+    return receiverStreamController.stream.listen((event) {
+      listener(event);
+    });
   }
 
   void addWebsocketSendListener(Function(String) listener) {
     _sendListeners.add(listener);
+  }
+
+  void removeWebsocketReceiver(int key) {}
+
+  void removeWebsocketSendListener(Function(String) listener) {
+    _sendListeners.remove(listener);
   }
 
   bool isRunning = false;
@@ -100,9 +119,7 @@ class WebsocketService {
       }
       channel.stream.listen((event) {
         _sendWebsocket("hello");
-        for (var listener in _listeners) {
-          listener(event.toString());
-        }
+        receiverStreamController.add(event);
         _count = 0;
       }, onError: (error) {
         debugPrint("websocketの接続に失敗しました: $error");
