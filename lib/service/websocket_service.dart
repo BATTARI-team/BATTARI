@@ -11,9 +11,13 @@ import 'package:web_socket_channel/io.dart';
 
 part 'websocket_service.g.dart';
 
-@Riverpod(keepAlive: true)
+@riverpod
 WebsocketService websocketService(Ref ref) {
-  return WebsocketService(ref);
+  WebsocketService websocketService = WebsocketService(ref);
+  ref.onDispose(() async {
+    await websocketService.cancelConnect();
+  });
+  return websocketService;
 }
 
 class WebsocketService {
@@ -26,18 +30,6 @@ class WebsocketService {
   int _count = 0;
   List<Function(String)> _listeners = [];
   List<Function(String)> _sendListeners = [];
-  Function(String) _dealNotification = (p0) {
-    debugPrint("execute");
-    // ここで受信したデータを処理する
-    if (p0.length > 20) {
-      try {
-        var notif = WebsocketSouguuNotification.fromJson(jsonDecode(p0));
-        debugPrint("受信したデータ: ${notif.souguuReason}");
-      } catch (e) {
-        debugPrint("受信したデータ: ${e.toString()}");
-      }
-    }
-  };
 
   void needConnect() {
     _reconnectTimer = Timer.periodic(Duration(seconds: 10), (timer) {
@@ -51,7 +43,7 @@ class WebsocketService {
     _reconnectWebSocket();
   }
 
-  void cancelConnect() async {
+  Future<void> cancelConnect() async {
     _reconnectTimer.cancel();
     await channel.sink.close();
   }
@@ -120,7 +112,6 @@ class WebsocketService {
         _reconnectWebSocket();
       });
       // #TODO 遭遇サービスで定義するべき
-      _listeners.add(_dealNotification);
     } catch (e) {
       print("connectWebsocketでエラー $e");
       if (e is SocketException) {
