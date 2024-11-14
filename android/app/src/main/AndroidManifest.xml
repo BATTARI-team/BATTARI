@@ -35,16 +35,18 @@
             android:value="2" />
 
 
-				<!-- Add android:stopWithTask option only when necessary. -->
-				<service 
-						android:name="com.pravera.flutter_foreground_task.service.ForegroundService"
-						android:foregroundServiceType="dataSync|remoteMessaging" 
-						android:exported="false" />
+            <!-- Add android:stopWithTask option only when necessary. -->
+            <service 
+                    android:name="com.pravera.flutter_foreground_task.service.ForegroundService"
+                    android:foregroundServiceType="dataSync|remoteMessaging" 
+                    android:exported="false" />
     </application>
-
 			<uses-permission android:name="android.permission.INTERNET" />
 			<!-- required -->
 			<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+            <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+            <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+            <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
 			<!-- foregroundServiceType: dataSync -->
 			<uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />

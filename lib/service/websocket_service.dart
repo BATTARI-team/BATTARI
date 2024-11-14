@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
+import 'package:battari/main.dart';
 import 'package:battari/model/dto/websocket_souguu_notification.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +24,7 @@ class BattariWebsocketSubscription {
 @riverpod
 WebsocketService websocketService(Ref ref) {
   WebsocketService websocketService = WebsocketService(ref);
+  log("websocketService build");
   ref.onDispose(() async {
     if (websocketService.isRunning) {
       await websocketService.cancelConnect();
@@ -103,7 +106,8 @@ class WebsocketService {
   _connectWebsocket() async {
     try {
       String? token = "";
-      _ref.watch(userViewModelProvider).whenData((value) => token = value?.token);
+      token = Token;
+      // _ref.watch(userViewModelProvider).whenData((value) => token = value?.token);
       debugPrint("token" + token.toString());
       if (token == null) return;
 
@@ -125,6 +129,7 @@ class WebsocketService {
       channel.stream.listen((event) {
         _sendWebsocket("hello");
         _receiverStreamController.add(event);
+        print(event);
         _count = 0;
       }, onError: (error) {
         debugPrint("websocketの接続に失敗しました: $error");

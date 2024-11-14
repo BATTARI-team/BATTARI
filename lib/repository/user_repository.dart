@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:battari/model/state/user_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -17,8 +19,9 @@ abstract class IUserRepository {
   Future<void> clear();
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 UserSharedPreferencesRepository userSharedPreferencesRepository(ref) {
+  log("UserSharedPreferencesRepository build");
   return UserSharedPreferencesRepository(ref);
 }
 

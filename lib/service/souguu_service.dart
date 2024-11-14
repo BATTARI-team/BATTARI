@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:battari/model/dto/websocket_souguu_notification.dart';
 import 'package:battari/model/state/souguu_service_state.dart';
 import 'package:battari/service/websocket_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -12,24 +14,28 @@ part 'souguu_service.g.dart';
 
 @Riverpod(keepAlive: true)
 class SouguuService extends _$SouguuService {
+  ProviderSubscription? websocketProviderSubscription;
   _dealNotification(String p0) {
+    print("execute");
+    ref.listen(websocketServiceProvider, (previous, next) {});
     // ここで受信したデータを処理する
     if (p0.length > 20) {
       try {
         var notif = WebsocketSouguuNotification.fromJson(jsonDecode(p0));
         debugPrint("受信したデータ: ${notif.souguuReason}");
         ref.read(souguuServiceInfoProvider.notifier).setSouguu(notif.aiteUserId);
+        FlutterForegroundTask.launchApp();
       } catch (e) {
         debugPrint("受信したデータ: ${e.toString()}");
       }
     }
   }
 
-  ProviderSubscription? websocketProviderSubscription = ProviderContainer().listen(websocketServiceProvider, (previous, next) {});
   ProviderSubscription? souguuServiceInfoProviderSubscription;
 
   @override
   int build() {
+    log("souguu service build");
     websocketProviderSubscription = ref.listen(websocketServiceProvider, (previous, next) {});
     ref.read(websocketServiceProvider).addWebsocketReceiver(_dealNotification);
 
@@ -49,6 +55,7 @@ class SouguuService extends _$SouguuService {
   }
 
   void dispose() {
+    debugPrint("souguu service dispose");
     websocketProviderSubscription?.close();
   }
 

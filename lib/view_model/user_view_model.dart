@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:battari/main.dart';
 import 'package:battari/repository/user_repository.dart';
@@ -17,13 +18,19 @@ const IpAddress = "192.168.10.8";
 class UserViewModel extends _$UserViewModel {
   @override
   Future<UserState?> build() async {
-    var user = await ref.watch(userSharedPreferencesRepositoryProvider).get();
+    log("UserViewModel build");
+    ref.onDispose(() {
+      log("UserViewModel dispose");
+    });
+    ref.listen(userSharedPreferencesRepositoryProvider, (previous, next) {});
+    var user = await ref.read(userSharedPreferencesRepositoryProvider).get();
     return user;
   }
 
   void setToken(String token) {
+    Token = token;
     state.maybeWhen(orElse: () {
-      debugPrint("state is null");
+      state = AsyncData(UserState(token: token));
     }, data: (data) {
       debugPrint("set $token");
       if (data == null) {

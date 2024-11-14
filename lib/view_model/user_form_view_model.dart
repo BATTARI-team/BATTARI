@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:battari/model/state/user_form_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -7,6 +9,7 @@ part 'user_form_view_model.g.dart';
 class UserFormViewModel extends _$UserFormViewModel {
   @override
   UserFormState build() {
+    log("UserFormViewModel build");
     return const UserFormState();
   }
 

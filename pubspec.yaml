@@ -36,7 +36,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.6
   usage_stats: ^1.2.0
-  flutter_foreground_task: ^6.5.0
+  flutter_foreground_task: ^8.13.0
   web_socket_channel: ^2.0.0
   http: ^1.2.2
   riverpod_generator: ^2.4.0
@@ -53,6 +53,7 @@ dependencies:
   json_serializable: ^6.8.0
   json_annotation: ^4.9.0
   agora_rtc_engine: ^6.3.2
+  flutter_local_notifications: ^18.0.1
 
 
 dev_dependencies:
