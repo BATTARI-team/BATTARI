@@ -58,7 +58,7 @@ class _WebSocketTestState extends State<WebSocketTest> {
       body: Column(
         children: [
           Consumer(
-            builder: (context, ref, child) => Text(ref.watch(souguuServiceProvider).souguu.toString()),
+            builder: (context, ref, child) => Text(ref.watch(souguuServiceInfoProvider).souguu.toString()),
           ),
           Consumer(builder: (context, ref, _) {
             return TextButton(

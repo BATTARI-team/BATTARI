@@ -1,4 +1,5 @@
 import 'package:battari/repository/user_repository.dart';
+import 'package:battari/service/souguu_service.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:battari/websocket_test.dart';
 import 'package:flutter/material.dart';
@@ -50,6 +51,21 @@ class DeveloperWidgets extends StatelessWidget {
             TextButton(
                 child: const Text("clear shared preferences"),
                 onPressed: () => ProviderContainer().read(userSharedPreferencesRepositoryProvider).clear()),
+            Consumer(
+              builder: (context, ref, child) {
+                ref.watch(souguuServiceProvider);
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(ref.watch(souguuServiceProvider).souguu.toString()),
+                    TextButton(
+                      child: const Text("websocketディスコネクト"),
+                      onPressed: () => ref.read(souguuServiceProvider.notifier).disconnectWebsocket(),
+                    )
+                  ],
+                );
+              },
+            )
           ],
         ));
   }

@@ -18,6 +18,8 @@ class WebsocketSouguuNotification with _$WebsocketSouguuNotification {
     @JsonKey(name: 'Token') required String token,
     // ignore: invalid_annotation_target
     @JsonKey(name: 'SouguuDateTime') required DateTime souguuDateTime,
+    // ignore: invalid_annotation_target
+    @JsonKey(name: 'AiteUserId') required int aiteUserId,
   }) = _WebsocketSouguuNotification;
 
   factory WebsocketSouguuNotification.fromJson(Map<String, dynamic> json) => _$WebsocketSouguuNotificationFromJson(json);

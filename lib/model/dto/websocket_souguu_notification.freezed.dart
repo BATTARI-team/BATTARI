@@ -38,7 +38,10 @@ mixin _$WebsocketSouguuNotification {
   String get token =>
       throw _privateConstructorUsedError; // ignore: invalid_annotation_target
   @JsonKey(name: 'SouguuDateTime')
-  DateTime get souguuDateTime => throw _privateConstructorUsedError;
+  DateTime get souguuDateTime =>
+      throw _privateConstructorUsedError; // ignore: invalid_annotation_target
+  @JsonKey(name: 'AiteUserId')
+  int get aiteUserId => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -60,7 +63,8 @@ abstract class $WebsocketSouguuNotificationCopyWith<$Res> {
       @JsonKey(name: 'CallEndTime') DateTime callEndTime,
       @JsonKey(name: 'SouguuReason') String souguuReason,
       @JsonKey(name: 'Token') String token,
-      @JsonKey(name: 'SouguuDateTime') DateTime souguuDateTime});
+      @JsonKey(name: 'SouguuDateTime') DateTime souguuDateTime,
+      @JsonKey(name: 'AiteUserId') int aiteUserId});
 }
 
 /// @nodoc
@@ -83,6 +87,7 @@ class _$WebsocketSouguuNotificationCopyWithImpl<$Res,
     Object? souguuReason = null,
     Object? token = null,
     Object? souguuDateTime = null,
+    Object? aiteUserId = null,
   }) {
     return _then(_value.copyWith(
       callStartTime: null == callStartTime
@@ -109,6 +114,10 @@ class _$WebsocketSouguuNotificationCopyWithImpl<$Res,
           ? _value.souguuDateTime
           : souguuDateTime // ignore: cast_nullable_to_non_nullable
               as DateTime,
+      aiteUserId: null == aiteUserId
+          ? _value.aiteUserId
+          : aiteUserId // ignore: cast_nullable_to_non_nullable
+              as int,
     ) as $Val);
   }
 }
@@ -128,7 +137,8 @@ abstract class _$$WebsocketSouguuNotificationImplCopyWith<$Res>
       @JsonKey(name: 'CallEndTime') DateTime callEndTime,
       @JsonKey(name: 'SouguuReason') String souguuReason,
       @JsonKey(name: 'Token') String token,
-      @JsonKey(name: 'SouguuDateTime') DateTime souguuDateTime});
+      @JsonKey(name: 'SouguuDateTime') DateTime souguuDateTime,
+      @JsonKey(name: 'AiteUserId') int aiteUserId});
 }
 
 /// @nodoc
@@ -150,6 +160,7 @@ class __$$WebsocketSouguuNotificationImplCopyWithImpl<$Res>
     Object? souguuReason = null,
     Object? token = null,
     Object? souguuDateTime = null,
+    Object? aiteUserId = null,
   }) {
     return _then(_$WebsocketSouguuNotificationImpl(
       callStartTime: null == callStartTime
@@ -176,6 +187,10 @@ class __$$WebsocketSouguuNotificationImplCopyWithImpl<$Res>
           ? _value.souguuDateTime
           : souguuDateTime // ignore: cast_nullable_to_non_nullable
               as DateTime,
+      aiteUserId: null == aiteUserId
+          ? _value.aiteUserId
+          : aiteUserId // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
@@ -190,7 +205,8 @@ class _$WebsocketSouguuNotificationImpl
       @JsonKey(name: 'CallEndTime') required this.callEndTime,
       @JsonKey(name: 'SouguuReason') required this.souguuReason,
       @JsonKey(name: 'Token') required this.token,
-      @JsonKey(name: 'SouguuDateTime') required this.souguuDateTime});
+      @JsonKey(name: 'SouguuDateTime') required this.souguuDateTime,
+      @JsonKey(name: 'AiteUserId') required this.aiteUserId});
 
   factory _$WebsocketSouguuNotificationImpl.fromJson(
           Map<String, dynamic> json) =>
@@ -220,10 +236,14 @@ class _$WebsocketSouguuNotificationImpl
   @override
   @JsonKey(name: 'SouguuDateTime')
   final DateTime souguuDateTime;
+// ignore: invalid_annotation_target
+  @override
+  @JsonKey(name: 'AiteUserId')
+  final int aiteUserId;
 
   @override
   String toString() {
-    return 'WebsocketSouguuNotification(callStartTime: $callStartTime, callId: $callId, callEndTime: $callEndTime, souguuReason: $souguuReason, token: $token, souguuDateTime: $souguuDateTime)';
+    return 'WebsocketSouguuNotification(callStartTime: $callStartTime, callId: $callId, callEndTime: $callEndTime, souguuReason: $souguuReason, token: $token, souguuDateTime: $souguuDateTime, aiteUserId: $aiteUserId)';
   }
 
   @override
@@ -240,13 +260,15 @@ class _$WebsocketSouguuNotificationImpl
                 other.souguuReason == souguuReason) &&
             (identical(other.token, token) || other.token == token) &&
             (identical(other.souguuDateTime, souguuDateTime) ||
-                other.souguuDateTime == souguuDateTime));
+                other.souguuDateTime == souguuDateTime) &&
+            (identical(other.aiteUserId, aiteUserId) ||
+                other.aiteUserId == aiteUserId));
   }
 
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, callStartTime, callId,
-      callEndTime, souguuReason, token, souguuDateTime);
+      callEndTime, souguuReason, token, souguuDateTime, aiteUserId);
 
   @JsonKey(ignore: true)
   @override
@@ -271,9 +293,9 @@ abstract class _WebsocketSouguuNotification
       @JsonKey(name: 'CallEndTime') required final DateTime callEndTime,
       @JsonKey(name: 'SouguuReason') required final String souguuReason,
       @JsonKey(name: 'Token') required final String token,
-      @JsonKey(name: 'SouguuDateTime')
-      required final DateTime
-          souguuDateTime}) = _$WebsocketSouguuNotificationImpl;
+      @JsonKey(name: 'SouguuDateTime') required final DateTime souguuDateTime,
+      @JsonKey(name: 'AiteUserId')
+      required final int aiteUserId}) = _$WebsocketSouguuNotificationImpl;
 
   factory _WebsocketSouguuNotification.fromJson(Map<String, dynamic> json) =
       _$WebsocketSouguuNotificationImpl.fromJson;
@@ -296,6 +318,9 @@ abstract class _WebsocketSouguuNotification
   @override // ignore: invalid_annotation_target
   @JsonKey(name: 'SouguuDateTime')
   DateTime get souguuDateTime;
+  @override // ignore: invalid_annotation_target
+  @JsonKey(name: 'AiteUserId')
+  int get aiteUserId;
   @override
   @JsonKey(ignore: true)
   _$$WebsocketSouguuNotificationImplCopyWith<_$WebsocketSouguuNotificationImpl>

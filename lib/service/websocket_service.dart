@@ -27,6 +27,7 @@ WebsocketService websocketService(Ref ref) {
       await websocketService.cancelConnect();
     }
   });
+  websocketService.needConnect();
   return websocketService;
 }
 
@@ -77,13 +78,19 @@ class WebsocketService {
 
   bool isRunning = false;
 
-  void _reconnectWebSocket() {
+  _reconnectWebSocket() async {
     if (_isReconnect) return;
+    if (isRunning) return;
     _isReconnect = true;
-    Timer.periodic(Duration(seconds: 10), (timer) {
+    Timer.periodic(Duration(seconds: 10), (timer) async {
       print("現在" + timer.tick.toString());
       try {
-        _connectWebsocket();
+        if (isRunning || _isReconnect) {
+          timer.cancel();
+          return;
+        }
+        _isReconnect = true;
+        await _connectWebsocket();
         timer.cancel();
         debugPrint("WebSocket is reconnected");
       } catch (e) {
@@ -109,9 +116,11 @@ class WebsocketService {
       // エラーハンドリングが特殊😭 https://github.com/dart-lang/web_socket_channel/issues/38
       try {
         await channel.ready;
+        isRunning = true;
+        _isReconnect = false;
       } catch (e) {
         print("readyでエラー $e");
-        _reconnectWebSocket();
+        await _reconnectWebSocket();
       }
       channel.stream.listen((event) {
         _sendWebsocket("hello");
@@ -122,6 +131,7 @@ class WebsocketService {
         if (error is SocketException) {
           debugPrint("websocketの接続に失敗しました:");
         }
+        isRunning = false;
         _reconnectWebSocket();
       });
       // #TODO 遭遇サービスで定義するべき

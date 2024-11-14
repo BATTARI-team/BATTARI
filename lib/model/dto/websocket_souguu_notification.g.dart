@@ -15,6 +15,7 @@ _$WebsocketSouguuNotificationImpl _$$WebsocketSouguuNotificationImplFromJson(
       souguuReason: json['SouguuReason'] as String,
       token: json['Token'] as String,
       souguuDateTime: DateTime.parse(json['SouguuDateTime'] as String),
+      aiteUserId: (json['AiteUserId'] as num).toInt(),
     );
 
 Map<String, dynamic> _$$WebsocketSouguuNotificationImplToJson(
@@ -26,4 +27,5 @@ Map<String, dynamic> _$$WebsocketSouguuNotificationImplToJson(
       'SouguuReason': instance.souguuReason,
       'Token': instance.token,
       'SouguuDateTime': instance.souguuDateTime.toIso8601String(),
+      'AiteUserId': instance.aiteUserId,
     };
