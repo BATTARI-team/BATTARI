@@ -13,7 +13,9 @@ String _$souguuServiceHash() => r'78d21d59a9861015c8b5fca20767646daddd7306';
 final souguuServiceProvider = NotifierProvider<SouguuService, int>.internal(
   SouguuService.new,
   name: r'souguuServiceProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product') ? null : _$souguuServiceHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$souguuServiceHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -25,10 +27,13 @@ String _$souguuServiceInfoHash() => r'979eb7f640821a96b72d2270ae5f0c776cabe79c';
 ///
 /// Copied from [SouguuServiceInfo].
 @ProviderFor(SouguuServiceInfo)
-final souguuServiceInfoProvider = NotifierProvider<SouguuServiceInfo, SouguuServiceState>.internal(
+final souguuServiceInfoProvider =
+    NotifierProvider<SouguuServiceInfo, SouguuServiceState>.internal(
   SouguuServiceInfo.new,
   name: r'souguuServiceInfoProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product') ? null : _$souguuServiceInfoHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$souguuServiceInfoHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );

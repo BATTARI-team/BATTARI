@@ -32,13 +32,7 @@ class SouguuService extends _$SouguuService {
   int build() {
     websocketProviderSubscription = ref.listen(websocketServiceProvider, (previous, next) {});
     ref.read(websocketServiceProvider).addWebsocketReceiver(_dealNotification);
-    //ref.listen<SouguuServiceState>(souguuServiceProvider, (previous, next) {
-    //  if (next.souguu != 0) {
-    //    disconnectWebsocket();
-    //  } else {
-    //    websocketProviderSubscription = ProviderContainer().listen(websocketServiceProvider, (previous, next) {});
-    //  }
-    //});
+
     souguuServiceInfoProviderSubscription = ref.listen<SouguuServiceState>(souguuServiceInfoProvider, (previus, next) {
       if (next.souguu != 0) {
         disconnectWebsocket();
