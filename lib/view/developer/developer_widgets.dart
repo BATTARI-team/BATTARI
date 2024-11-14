@@ -57,7 +57,7 @@ class DeveloperWidgets extends StatelessWidget {
                 return Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(ref.watch(souguuServiceProvider).souguu.toString()),
+                    Text(ref.watch(souguuServiceInfoProvider).souguu.toString()),
                     TextButton(
                       child: const Text("websocketディスコネクト"),
                       onPressed: () => ref.read(souguuServiceProvider.notifier).disconnectWebsocket(),

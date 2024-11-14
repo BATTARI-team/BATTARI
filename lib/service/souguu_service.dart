@@ -29,7 +29,7 @@ class SouguuService extends _$SouguuService {
   ProviderSubscription? souguuServiceInfoProviderSubscription;
 
   @override
-  SouguuServiceState build() {
+  int build() {
     websocketProviderSubscription = ref.listen(websocketServiceProvider, (previous, next) {});
     ref.read(websocketServiceProvider).addWebsocketReceiver(_dealNotification);
     //ref.listen<SouguuServiceState>(souguuServiceProvider, (previous, next) {
@@ -51,7 +51,7 @@ class SouguuService extends _$SouguuService {
       }
     });
 
-    return SouguuServiceState();
+    return 0;
   }
 
   void dispose() {
