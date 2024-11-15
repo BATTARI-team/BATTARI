@@ -136,6 +136,8 @@ class _ExamplePageState extends State<ExamplePage> {
     super.dispose();
   }
 
+  ProviderSubscription? souguuServiceProviderSubscription;
+
   @override
   Widget build(BuildContext context) {
     // ** optional **
@@ -143,17 +145,15 @@ class _ExamplePageState extends State<ExamplePage> {
     // the soft back button. It only works when the service is running.
     //
     // This widget must be declared above the [Scaffold] widget.
-    return WithForegroundTask(
-      child: Scaffold(
-        appBar: _buildAppBar(),
-        body: Consumer(builder: (context, ref, _) {
-          ref.watch(souguuServiceProvider);
-          ref.listen(souguuServiceInfoProvider, (now, next) {
-            print('souguuServiceInfo: $next');
-          });
-          return _buildContent();
-        }),
-      ),
+    return Scaffold(
+      appBar: _buildAppBar(),
+      body: Consumer(builder: (context, ref, _) {
+        // souguuServiceProviderSubscription = ref.listenManual(souguuServiceProvider, (previous, next) {});
+        // ref.listen(souguuServiceInfoProvider, (now, next) {
+        //   print('souguuServiceInfo: $next');
+        // });
+        return _buildContent();
+      }),
     );
   }
 
