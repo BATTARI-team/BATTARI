@@ -38,29 +38,44 @@ class WebsocketService {
   WebsocketService(this._ref);
 
   final Ref _ref;
-  late Timer _reconnectTimer;
-  late IOWebSocketChannel channel;
+  Timer? _reconnectTimer;
+  IOWebSocketChannel? channel;
   bool _isReconnect = false;
   int _count = 0;
   Map<int, Function(String)> listeners = {};
   final _receiverStreamController = StreamController<String>.broadcast();
   final _sendStreamController = StreamController<String>.broadcast();
 
-  void needConnect() {
-    _reconnectTimer = Timer.periodic(Duration(seconds: 10), (timer) {
-      if (_count > 7) {
-        _reconnectWebSocket();
-        channel.sink.close();
-        _count = 0;
+  void _initializeTimer() {
+    //#TODO asyncにしちゃったから，ロック的なのが必要かも
+    _reconnectTimer = Timer.periodic(Duration(seconds: 10), (timer) async {
+      debugPrint("timer ");
+      debugPrint(_count.toString());
+      if (_count > 3) {
+        await _reset();
+        await _reconnectWebSocket();
       }
       _count++;
     });
-    _reconnectWebSocket();
+  }
+
+  void needConnect() async {
+    await _reconnectWebSocket();
+    _initializeTimer();
+  }
+
+  _reset() async {
+    _count = 0;
+    _isReconnect = false;
+    await cancelConnect();
   }
 
   Future<void> cancelConnect() async {
-    _reconnectTimer.cancel();
-    await channel.sink.close();
+    _reconnectTimer?.cancel();
+    _reconnectTimer = null;
+    await channel?.sink.close(null, "canceled");
+    channel = null;
+    isRunning = false;
   }
 
   void sendMessage(String data) {
@@ -82,24 +97,24 @@ class WebsocketService {
   bool isRunning = false;
 
   _reconnectWebSocket() async {
+    debugPrint("reconnect");
+    debugPrint("isRunning" + isRunning.toString());
+    debugPrint("_isReconnect" + _isReconnect.toString());
     if (_isReconnect) return;
     if (isRunning) return;
-    _isReconnect = true;
-    Timer.periodic(Duration(seconds: 10), (timer) async {
-      print("現在" + timer.tick.toString());
-      try {
-        if (isRunning || _isReconnect) {
-          timer.cancel();
-          return;
-        }
-        _isReconnect = true;
-        await _connectWebsocket();
-        timer.cancel();
-        debugPrint("WebSocket is reconnected");
-      } catch (e) {
-        print("error" + e.toString());
+    if (_reconnectTimer == null) {
+      _initializeTimer();
+    }
+    try {
+      if (isRunning || _isReconnect) {
+        return;
       }
-    });
+      _isReconnect = true;
+      await _connectWebsocket();
+      debugPrint("WebSocket is reconnected");
+    } catch (e) {
+      print("error" + e.toString());
+    }
     _isReconnect = false;
   }
 
@@ -109,7 +124,6 @@ class WebsocketService {
       token = Token;
       // _ref.watch(userViewModelProvider).whenData((value) => token = value?.token);
       debugPrint("token" + token.toString());
-      if (token == null) return;
 
       channel = IOWebSocketChannel.connect(Uri.parse('ws://$IpAddress:5050/ws'), headers: {
         'Authorization':
@@ -119,14 +133,15 @@ class WebsocketService {
       });
       // エラーハンドリングが特殊😭 https://github.com/dart-lang/web_socket_channel/issues/38
       try {
-        await channel.ready;
+        await channel?.ready;
         isRunning = true;
         _isReconnect = false;
+        debugPrint("素晴らしいね");
       } catch (e) {
         print("readyでエラー $e");
         await _reconnectWebSocket();
       }
-      channel.stream.listen((event) {
+      channel?.stream.listen((event) {
         _sendWebsocket("hello");
         _receiverStreamController.add(event);
         print(event);
@@ -150,7 +165,7 @@ class WebsocketService {
 
   void _sendWebsocket(String message) async {
     try {
-      channel.sink.add(message);
+      channel?.sink.add(message);
       _sendStreamController.add(message);
     } catch (e) {
       print("sendWebsocketでエラー $e");
