@@ -12,7 +12,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'souguu_service.g.dart';
 
-@Riverpod(keepAlive: true)
+@Riverpod(keepAlive: false)
 class SouguuService extends _$SouguuService {
   ProviderSubscription? websocketProviderSubscription;
   _dealNotification(String p0) {
@@ -24,7 +24,7 @@ class SouguuService extends _$SouguuService {
         var notif = WebsocketSouguuNotification.fromJson(jsonDecode(p0));
         debugPrint("受信したデータ: ${notif.souguuReason}");
         ref.read(souguuServiceInfoProvider.notifier).setSouguu(notif.aiteUserId);
-        FlutterForegroundTask.launchApp();
+        FlutterForegroundTask.launchApp("/call");
       } catch (e) {
         debugPrint("受信したデータ: ${e.toString()}");
       }
@@ -65,6 +65,8 @@ class SouguuService extends _$SouguuService {
   }
 }
 
+int Souguu = 0;
+
 /// 遭遇しているかなどの情報を保持するプロバイダー
 @Riverpod(keepAlive: true)
 class SouguuServiceInfo extends _$SouguuServiceInfo {
@@ -75,6 +77,8 @@ class SouguuServiceInfo extends _$SouguuServiceInfo {
 
   /// 現在遭遇しているかの情報を更新する
   void setSouguu(int? souguu) {
+    debugPrint("setSouguu $souguu");
+    Souguu = souguu ?? 100;
     state = state.copyWith(souguu: souguu ?? 0);
   }
 }

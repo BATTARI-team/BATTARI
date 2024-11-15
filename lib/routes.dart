@@ -1,3 +1,4 @@
+import 'package:battari/view/call.dart';
 import 'package:battari/view/developer/developer_widgets.dart';
 import 'package:battari/view/home.dart';
 import 'package:battari/view/instruction/first_time_view.dart';
@@ -17,5 +18,6 @@ final router = GoRouter(routes: [
   GoRoute(path: '/register', builder: (context, state) => RegisterView()),
   GoRoute(path: '/nickname', builder: (context, state) => const NicknameView()),
   GoRoute(path: '/login', builder: (context, state) => LoginView()),
-  GoRoute(path: '/home', builder: (context, state) => HomeView())
+  GoRoute(path: '/home', builder: (context, state) => HomeView()),
+  GoRoute(path: '/call', builder: (context, state) => Call()),
 ]);
