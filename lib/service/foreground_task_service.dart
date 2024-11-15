@@ -96,7 +96,7 @@ class MyTaskHandler extends TaskHandler {
     });
     Token = token;
     // providerContainer.read(userViewModelProvider.notifier).setToken(token);
-    souguuServiceProviderSubscription = providerContainer.listen(souguuServiceProvider, (value, next) {});
+    // souguuServiceProviderSubscription = providerContainer.listen(souguuServiceProvider, (value, next) {});
     http.get(Uri.parse('http://$IpAddress:5050/Developer/ClearUserOnline')).then((res) {
       log(res.body);
     });

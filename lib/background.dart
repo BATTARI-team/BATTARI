@@ -1,23 +1,12 @@
 import 'dart:io';
 
 import 'package:battari/service/foreground_task_service.dart';
+import 'package:battari/service/souguu_service.dart';
+import 'package:battari/service/websocket_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_foreground_task/models/service_request_result.dart';
-
-class ExampleApp extends StatelessWidget {
-  const ExampleApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      routes: {
-        '/': (context) => const ExamplePage(),
-      },
-      initialRoute: '/',
-    );
-  }
-}
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ExamplePage extends StatefulWidget {
   const ExamplePage({super.key});
@@ -157,7 +146,13 @@ class _ExamplePageState extends State<ExamplePage> {
     return WithForegroundTask(
       child: Scaffold(
         appBar: _buildAppBar(),
-        body: _buildContent(),
+        body: Consumer(builder: (context, ref, _) {
+          ref.watch(souguuServiceProvider);
+          ref.listen(souguuServiceInfoProvider, (now, next) {
+            print('souguuServiceInfo: $next');
+          });
+          return _buildContent();
+        }),
       ),
     );
   }
