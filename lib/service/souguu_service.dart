@@ -7,6 +7,7 @@ import 'package:battari/model/dto/websocket_souguu_notification.dart';
 import 'package:battari/model/state/souguu_service_state.dart';
 import 'package:battari/repository/user_repository.dart';
 import 'package:battari/service/websocket_service.dart';
+import 'package:battari/util/token_util.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
@@ -28,7 +29,7 @@ class SouguuService extends _$SouguuService {
         var notif = WebsocketSouguuNotification.fromJson(jsonDecode(p0));
         debugPrint("受信したデータ: ${notif.souguuReason}");
         ref.read(souguuServiceInfoProvider.notifier).setSouguu(notif.aiteUserId);
-        FlutterForegroundTask.launchApp("/call");
+        FlutterForegroundTask.launchApp("/");
       } catch (e) {
         debugPrint("受信したデータ: ${e.toString()}");
       }
@@ -80,25 +81,29 @@ class SouguuServiceInfo extends _$SouguuServiceInfo {
   SouguuServiceState build() {
     print("token from userviewmodel: ${ref.read(userViewModelProvider).asData?.value?.token}");
     print("token from Token: $Token");
-    _init();
 
     return SouguuServiceState();
   }
 
-  _init() async {
+  Future<bool> init() async {
     try {
+      debugPrint("souguu_service.dart, _init: $Token");
       var result = await http.get(Uri.parse('http://$IpAddress:5050/SouguuInfo/GetSouguuInfo'), headers: <String, String>{
         'Authorization': 'Bearer $Token',
       });
       print(result.statusCode);
       if (result.statusCode != 200) {
+        return false;
       } else {
         var souguuInfo = RestSouguuNotification.fromJson(jsonDecode(result.body));
         state = state.copyWith(souguu: souguuInfo.aiteUserId);
+        debugPrint("souguuInfo: ${souguuInfo.aiteUserId}");
+        return true;
       }
     } catch (e) {
       print("souguu_service.dart, _init: $e");
     }
+    return false;
   }
 
   /// 現在遭遇しているかの情報を更新する

@@ -30,6 +30,7 @@ class MyTaskHandler extends TaskHandler {
   final _sendStreamController = StreamController<String>.broadcast();
   late ProviderContainer providerContainer;
   ProviderSubscription? souguuServiceProviderSubscription;
+  ProviderSubscription? userViewmodelProviderSubscription;
   Future<void> cancelConnect() async {
     // _reconnectTimer.cancel();
     await channel.sink.close();
@@ -97,6 +98,7 @@ class MyTaskHandler extends TaskHandler {
       token = value.body;
     });
     Token = token;
+    userViewmodelProviderSubscription = providerContainer.listen(userViewModelProvider, (value, next) {});
     providerContainer.read(userViewModelProvider.notifier).setToken(token);
     souguuServiceProviderSubscription = providerContainer.listen(souguuServiceProvider, (value, next) {});
     // http.get(Uri.parse('http://$IpAddress:5050/Developer/ClearUserOnline')).then((res) {

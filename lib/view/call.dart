@@ -10,7 +10,7 @@ class Call extends ConsumerWidget {
       appBar: AppBar(),
       body: Column(
         children: [
-          Text("遭遇相手：${Souguu}"),
+          Text("遭遇相手：${souguuInfo.souguu}"),
           const Text('Call'),
         ],
       ),

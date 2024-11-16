@@ -7,6 +7,7 @@ import 'package:battari/model/state/user_state.dart';
 import 'package:battari/util/token_util.dart';
 import 'package:battari/view_model/user_form_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:http/http.dart' as http;
 
@@ -16,14 +17,16 @@ const IpAddress = "192.168.10.8";
 
 @Riverpod(keepAlive: true)
 class UserViewModel extends _$UserViewModel {
+  ProviderSubscription? userSharedPreferencesRepositoryProviderSubsc;
   @override
   Future<UserState?> build() async {
     log("UserViewModel build");
     ref.onDispose(() {
       log("UserViewModel dispose");
+      userSharedPreferencesRepositoryProviderSubsc?.close();
     });
-    ref.listen(userSharedPreferencesRepositoryProvider, (previous, next) {});
-    var user = await ref.read(userSharedPreferencesRepositoryProvider).get();
+    userSharedPreferencesRepositoryProviderSubsc = ref.listen(userSharedPreferencesRepositoryProvider, (previous, next) {});
+    var user = await userSharedPreferencesRepositoryProviderSubsc?.read().get();
     return user;
   }
 

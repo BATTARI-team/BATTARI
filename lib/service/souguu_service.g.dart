@@ -6,7 +6,7 @@ part of 'souguu_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$souguuServiceHash() => r'745f74db1839f9b38a79886a8318eac0218697a3';
+String _$souguuServiceHash() => r'0fc6d9b15cdc5f01e70f745d02cb9264b48a40ef';
 
 /// See also [SouguuService].
 @ProviderFor(SouguuService)
@@ -22,7 +22,7 @@ final souguuServiceProvider =
 );
 
 typedef _$SouguuService = AutoDisposeNotifier<int>;
-String _$souguuServiceInfoHash() => r'fba994040407f9748506763c78f17cc56f73a910';
+String _$souguuServiceInfoHash() => r'1b9b419677065ad72bfb4b6856193618ae820f97';
 
 /// 遭遇しているかなどの情報を保持するプロバイダー
 ///
