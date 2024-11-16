@@ -21,7 +21,7 @@ part 'souguu_service.g.dart';
 class SouguuService extends _$SouguuService {
   ProviderSubscription? websocketProviderSubscription;
   _dealNotification(String p0) {
-    logger.d("websocketで受信したデータ: $p0");
+    // logger.d("websocketで受信したデータ: $p0");
     // ここで受信したデータを処理する
     if (p0.length > 20) {
       try {
@@ -78,7 +78,6 @@ class SouguuServiceInfo extends _$SouguuServiceInfo {
 
   Future<bool> init() async {
     try {
-      debugPrint("souguu_service.dart, _init: $Token");
       var result = await http.get(Uri.parse('http://$ipAddress:5050/SouguuInfo/GetSouguuInfo'), headers: <String, String>{
         'Authorization': 'Bearer $Token',
       });

@@ -37,7 +37,6 @@ class UserViewModel extends _$UserViewModel {
     state.maybeWhen(orElse: () {
       state = AsyncData(UserState(token: token));
     }, data: (data) {
-      debugPrint("set $token");
       if (data == null) {
         state = AsyncData(UserState(token: token));
       } else {
@@ -52,8 +51,6 @@ class UserViewModel extends _$UserViewModel {
         debugPrint("state is null");
       },
       data: (data) {
-        debugPrint("set $user");
-
         if (data == null) {
           state = AsyncData(user);
         } else {
@@ -63,6 +60,7 @@ class UserViewModel extends _$UserViewModel {
             name: user.name,
             token: user.token,
           ));
+          logger.i("userが更新されました: ${user.name}");
         }
       },
     );

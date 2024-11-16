@@ -39,7 +39,6 @@ class Splash extends HookConsumerWidget {
         });
         return;
       } else {
-        debugPrint("isCall: $isCall");
         if (isCall) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             context.go('/call');
