@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:battari/logger.dart';
 import 'package:battari/main.dart';
 import 'package:battari/model/dto/rest_souguu_notification.dart';
 import 'package:battari/model/dto/websocket_souguu_notification.dart';
@@ -20,19 +21,16 @@ part 'souguu_service.g.dart';
 class SouguuService extends _$SouguuService {
   ProviderSubscription? websocketProviderSubscription;
   _dealNotification(String p0) {
-    print("$p0");
+    logger.d("websocketで受信したデータ: $p0");
     // ここで受信したデータを処理する
     if (p0.length > 20) {
       try {
         var notif = WebsocketSouguuNotification.fromJson(jsonDecode(p0));
-        debugPrint("受信したデータ: ${notif.souguuReason}");
         ref.read(souguuServiceInfoProvider.notifier).setSouguu(notif.aiteUserId);
         FlutterForegroundTask.launchApp("/");
       } catch (e) {
-        debugPrint("受信したデータ: ${e.toString()}");
+        logger.e("遭遇通知のパースに失敗しました: $e");
       }
-    } else {
-      debugPrint("p0 is too short");
     }
   }
 
@@ -70,16 +68,11 @@ class SouguuService extends _$SouguuService {
   }
 }
 
-int Souguu = 0;
-
 /// 遭遇しているかなどの情報を保持するプロバイダー
 @Riverpod(keepAlive: true)
 class SouguuServiceInfo extends _$SouguuServiceInfo {
   @override
   SouguuServiceState build() {
-    print("token from userviewmodel: ${ref.read(userViewModelProvider).asData?.value?.token}");
-    print("token from Token: $Token");
-
     return SouguuServiceState();
   }
 
@@ -89,25 +82,23 @@ class SouguuServiceInfo extends _$SouguuServiceInfo {
       var result = await http.get(Uri.parse('http://$ipAddress:5050/SouguuInfo/GetSouguuInfo'), headers: <String, String>{
         'Authorization': 'Bearer $Token',
       });
-      print(result.statusCode);
+      logger.d("souguu_service.dart, _init statuscode: ${result.statusCode}");
       if (result.statusCode != 200) {
         return false;
       } else {
         var souguuInfo = RestSouguuNotification.fromJson(jsonDecode(result.body));
         state = state.copyWith(souguu: souguuInfo.aiteUserId);
-        debugPrint("souguuInfo: ${souguuInfo.aiteUserId}");
+        logger.i("${souguuInfo.aiteUserId}と遭遇しました");
         return true;
       }
     } catch (e) {
-      print("souguu_service.dart, _init: $e");
+      logger.e("souguu_service.dart, _init: 遭遇情報の取得に失敗しました", error: e, stackTrace: StackTrace.current);
     }
     return false;
   }
 
   /// 現在遭遇しているかの情報を更新する
   void setSouguu(int? souguu) {
-    debugPrint("setSouguu $souguu");
-    Souguu = souguu ?? 100;
     state = state.copyWith(souguu: souguu ?? 0);
   }
 }

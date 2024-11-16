@@ -74,7 +74,7 @@ class _ExamplePageState extends State<ExamplePage> {
       foregroundTaskOptions: ForegroundTaskOptions(
         eventAction: ForegroundTaskEventAction.repeat(5000),
         // 自動設定は難しいので一旦切る
-        //autoRunOnBoot: true,
+        autoRunOnBoot: true,
         autoRunOnMyPackageReplaced: true,
         allowWakeLock: true,
         allowWifiLock: true,

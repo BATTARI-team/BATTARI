@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:battari/logger.dart';
 import 'package:battari/main.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:flutter/material.dart';
@@ -47,12 +48,15 @@ class WebsocketService {
 
   void _initializeTimer() {
     //#TODO asyncにしちゃったから，ロック的なのが必要かも
+    const timeout = 3;
     _reconnectTimer = Timer.periodic(const Duration(seconds: 10), (timer) async {
-      debugPrint("timer ");
-      debugPrint(_count.toString());
-      if (_count > 3) {
+      if (_count > timeout) {
+        logger.i("websocketの再接続を試みます", time: DateTime.now());
         await _reset();
         await _reconnectWebSocket();
+      }
+      if (_count > 1) {
+        debugPrint("websocketの再接続まで... ${timeout - _count}");
       }
       _count++;
     });
@@ -96,9 +100,6 @@ class WebsocketService {
   bool isRunning = false;
 
   _reconnectWebSocket() async {
-    debugPrint("reconnect");
-    debugPrint("isRunning$isRunning");
-    debugPrint("_isReconnect$_isReconnect");
     if (_isReconnect) return;
     if (isRunning) return;
     if (_reconnectTimer == null) {
@@ -110,56 +111,60 @@ class WebsocketService {
       }
       _isReconnect = true;
       await _connectWebsocket();
-      debugPrint("WebSocket is reconnected");
     } catch (e) {
-      print("error" + e.toString());
+      logger.w("websocketの接続に失敗しました", error: e, stackTrace: StackTrace.current);
+      await Future.delayed(const Duration(seconds: 3));
     }
     _isReconnect = false;
   }
 
   _connectWebsocket() async {
-    try {
-      String? token = "";
+    String? token = "";
+    token = _ref.read(userViewModelProvider).asData?.value?.token;
+    if (token == null || token.isEmpty) {
       token = Token;
-      // _ref.watch(userViewModelProvider).whenData((value) => token = value?.token);
-      debugPrint("token" + token.toString());
+    }
+    if (token.isEmpty) {
+      throw Exception("token is null");
+    }
 
+    try {
       channel = IOWebSocketChannel.connect(Uri.parse('ws://$ipAddress:5050/ws'), headers: {
         'Authorization':
             // user tokenを入れる
             //'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJCQVRUQVJJLXRlYW0iLCJuYW1laWQiOiJ0YWt1dG8xMTI3IiwibmFtZSI6InRha3V0bzExMjciLCJqdGkiOiJlZTFhMGEzMi1lMTE4LTQyOTMtOTIzNC05MTQ5ODI2NzcwN2MiLCJ1bmlxdWVfbmFtZSI6IjIiLCJleHAiOjE3MzAzMjM5MjR9.D3YpMLMsPd5n4_yjDbACkvuhO-qneSW6fntpvzegGPw'
             'Bearer $token'
       });
-      // エラーハンドリングが特殊😭 https://github.com/dart-lang/web_socket_channel/issues/38
-      try {
-        await channel?.ready;
-        isRunning = true;
-        _isReconnect = false;
-        debugPrint("素晴らしいね");
-      } catch (e) {
-        print("readyでエラー $e");
-        await _reconnectWebSocket();
-      }
-      channel?.stream.listen((event) {
-        _sendWebsocket("hello");
-        _receiverStreamController.add(event);
-        print(event);
-        _count = 0;
-      }, onError: (error) {
-        debugPrint("websocketの接続に失敗しました: $error");
-        if (error is SocketException) {
-          debugPrint("websocketの接続に失敗しました:");
-        }
-        isRunning = false;
-        _reconnectWebSocket();
-      });
-      // #TODO 遭遇サービスで定義するべき
     } catch (e) {
-      print("connectWebsocketでエラー $e");
+      logger.w("websocketの接続に失敗しました: token: $token", error: e, stackTrace: StackTrace.current);
       if (e is SocketException) {
+        await Future.delayed(const Duration(seconds: 3));
         _reconnectWebSocket();
       }
     }
+    // エラーハンドリングが特殊😭 https://github.com/dart-lang/web_socket_channel/issues/38
+    try {
+      await channel?.ready;
+      isRunning = true;
+      _isReconnect = false;
+      logger.i("websocketの接続に成功しました");
+    } catch (e) {
+      logger.w("websocketの接続に失敗しました: token: $token", error: e, stackTrace: StackTrace.current);
+      await _reconnectWebSocket();
+    }
+    channel?.stream.listen((event) {
+      _sendWebsocket("hello");
+      _receiverStreamController.add(event);
+      _count = 0;
+    }, onError: (error) async {
+      logger.w("websocketの通信が切断されました: token: $token", error: error, stackTrace: StackTrace.current);
+      isRunning = false;
+      await Future.delayed(const Duration(seconds: 3));
+      _reconnectWebSocket();
+    });
+    // #TODO 遭遇サービスで定義するべき
+    // } catch (e) {
+    // }
   }
 
   void _sendWebsocket(String message) async {
@@ -167,7 +172,7 @@ class WebsocketService {
       channel?.sink.add(message);
       _sendStreamController.add(message);
     } catch (e) {
-      print("sendWebsocketでエラー $e");
+      logger.w("websocketの接続に失敗しました: ", error: e, stackTrace: StackTrace.current);
     }
   }
 }

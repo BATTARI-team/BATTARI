@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:battari/logger.dart';
 import 'package:battari/main.dart';
 import 'package:battari/repository/user_repository.dart';
 import 'package:battari/service/souguu_service.dart';
@@ -52,7 +53,7 @@ class MyTaskHandler extends TaskHandler {
       channel.sink.add(message);
       _sendStreamController.add(message);
     } catch (e) {
-      print("sendWebsocketでエラー $e");
+      logger.w("websocketの接続に失敗しました: ", error: e, stackTrace: StackTrace.current);
     }
   }
 
@@ -78,53 +79,29 @@ class MyTaskHandler extends TaskHandler {
     providerContainer = ProviderContainer(overrides: [
       sharedPreferencesProvider.overrideWithValue(shared),
     ]);
-    print('onStart(starter: ${starter.name})');
+    logger.i("battari service started");
     String token = "";
-    await http
-        .post(Uri.parse('http://$ipAddress:5050/User/RefreshToken'),
-            headers: <String, String>{
-              'Content-Type': 'application/json; charset=UTF-8',
-            },
-            body: jsonEncode(<String, Object>{
-              'refreshToken': shared.getString("refresh_token")!,
-              'userIndex': shared.getInt('id')!,
-            }))
-        .then((value) {
-      token = value.body;
-    });
+    try {
+      await http
+          .post(Uri.parse('http://$ipAddress:5050/User/RefreshToken'),
+              headers: <String, String>{
+                'Content-Type': 'application/json; charset=UTF-8',
+              },
+              body: jsonEncode(<String, Object>{
+                'refreshToken': shared.getString("refresh_token")!,
+                'userIndex': shared.getInt('id')!,
+              }))
+          .then((value) {
+        token = value.body;
+      });
+    } catch (e) {
+      logger.e("battari service started error", error: e, stackTrace: StackTrace.current);
+    }
+    logger.i("foreground_task_service.dart : token is $token");
     Token = token;
     userViewmodelProviderSubscription = providerContainer.listen(userViewModelProvider, (value, next) {});
     providerContainer.read(userViewModelProvider.notifier).setToken(token);
     souguuServiceProviderSubscription = providerContainer.listen(souguuServiceProvider, (value, next) {});
-    // http.get(Uri.parse('http://$IpAddress:5050/Developer/ClearUserOnline')).then((res) {
-    //   log(res.body);
-    // });
-    print("tokenはこちら");
-    print(token);
-    // channel = IOWebSocketChannel.connect(Uri.parse('ws://$IpAddress:5050/ws'), headers: {
-    //   'Authorization':
-    //       // user tokenを入れる
-    //       //'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJCQVRUQVJJLXRlYW0iLCJuYW1laWQiOiJ0YWt1dG8xMTI3IiwibmFtZSI6InRha3V0bzExMjciLCJqdGkiOiJlZTFhMGEzMi1lMTE4LTQyOTMtOTIzNC05MTQ5ODI2NzcwN2MiLCJ1bmlxdWVfbmFtZSI6IjIiLCJleHAiOjE3MzAzMjM5MjR9.D3YpMLMsPd5n4_yjDbACkvuhO-qneSW6fntpvzegGPw'
-    //       'Bearer ${token}'
-    // });
-    // try {
-    //   await channel.ready;
-    //   // isRunning = true;
-    //   // _isReconnect = false;
-    // } catch (e) {
-    //   print("readyでエラー $e");
-    //   // await _reconnectWebSocket();
-    // }
-    // channel.stream.listen((event) {
-    //   _sendWebsocket("hello");
-    //   _receiverStreamController.add(event);
-    //   // _count = 0;
-    // }, onError: (error) {
-    //   debugPrint("websocketの接続に失敗しました: $error");
-    //   if (error is SocketException) {
-    //     debugPrint("websocketの接続に失敗しました:");
-    //   }
-    // });
   }
 
   // Called by eventAction in [ForegroundTaskOptions].
@@ -143,18 +120,14 @@ class MyTaskHandler extends TaskHandler {
   // Called when the task is destroyed.
   @override
   Future<void> onDestroy(DateTime timestamp) async {
-    print('onDestroy');
+    logger.i("battari service destroyed");
   }
 
   // Called when data is sent using [FlutterForegroundTask.sendDataToTask].
   @override
-  void onReceiveData(Object data) {
-    print('onReceiveData: $data');
-  }
+  void onReceiveData(Object data) {}
 
   // Called when the notification button is pressed.
   @override
-  void onNotificationButtonPressed(String id) {
-    print('onNotificationButtonPressed: $id');
-  }
+  void onNotificationButtonPressed(String id) {}
 }

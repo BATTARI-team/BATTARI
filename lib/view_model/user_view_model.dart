@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:battari/logger.dart';
 import 'package:battari/main.dart';
 import 'package:battari/repository/user_repository.dart';
 import 'package:battari/model/state/user_state.dart';
@@ -31,7 +32,7 @@ class UserViewModel extends _$UserViewModel {
   }
 
   void setToken(String token) {
-    print("setToken(userViewModel) $token");
+    logger.i("tokenが更新されました: $token");
     Token = token;
     state.maybeWhen(orElse: () {
       state = AsyncData(UserState(token: token));

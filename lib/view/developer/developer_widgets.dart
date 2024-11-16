@@ -1,9 +1,9 @@
 import 'dart:io';
 
-import 'package:battari/background.dart';
+import 'package:battari/view/developer/background.dart';
 import 'package:battari/repository/user_repository.dart';
 import 'package:battari/view_model/user_view_model.dart';
-import 'package:battari/websocket_test.dart';
+import 'package:battari/view/developer/websocket_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

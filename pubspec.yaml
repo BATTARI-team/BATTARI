@@ -54,6 +54,7 @@ dependencies:
   json_annotation: ^4.9.0
   agora_rtc_engine: ^6.3.2
   flutter_local_notifications: ^18.0.1
+  logger: ^2.4.0
 
 
 dev_dependencies:

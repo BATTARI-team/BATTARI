@@ -1,3 +1,7 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'dart:developer';
+
 import 'package:battari/repository/user_repository.dart';
 import 'package:battari/model/state/user_state.dart';
 import 'package:battari/service/souguu_service.dart';
@@ -11,7 +15,7 @@ class Splash extends HookConsumerWidget {
   const Splash({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    print("Splash build");
+    log("Splash build");
     init(context, ref);
     return const Scaffold(body: Center(child: CircularProgressIndicator()));
   }
@@ -19,7 +23,6 @@ class Splash extends HookConsumerWidget {
   Future<void> init(BuildContext context, WidgetRef ref) async {
     await Future.delayed(const Duration(seconds: 2), () {});
     var sharedPreferences = await SharedPreferences.getInstance();
-    // ignore: use_build_context_synchronously
     // この関数が終わらないと遷移しないため
     ProviderScope.containerOf(context).updateOverrides([
       sharedPreferencesProvider.overrideWithValue(sharedPreferences),
