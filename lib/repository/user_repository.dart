@@ -1,4 +1,6 @@
-import 'package:battari/state/user_state.dart';
+import 'dart:developer';
+
+import 'package:battari/model/state/user_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -6,18 +8,20 @@ import 'package:shared_preferences/shared_preferences.dart';
 part 'user_repository.g.dart';
 
 @riverpod
-Raw<Future<SharedPreferences>> sharedPreferences(ref) async {
-  return await SharedPreferences.getInstance();
+SharedPreferences sharedPreferences(ref) {
+  throw UnimplementedError();
 }
 
 abstract class IUserRepository {
   Future<UserState?> get();
   Future<void> save(UserState userState);
+  Future<void> saveToken(String token);
   Future<void> clear();
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 UserSharedPreferencesRepository userSharedPreferencesRepository(ref) {
+  log("UserSharedPreferencesRepository build");
   return UserSharedPreferencesRepository(ref);
 }
 
@@ -26,7 +30,7 @@ class UserSharedPreferencesRepository extends IUserRepository {
   UserSharedPreferencesRepository(this.ref);
   @override
   Future<UserState?> get() async {
-    var reference = await ref.read(sharedPreferencesProvider);
+    var reference = ref.read(sharedPreferencesProvider);
     String? refreshToken = reference.getString("refresh_token");
     String? userId = reference.getString("user_id");
     int? id = reference.getInt("id");
@@ -45,7 +49,7 @@ class UserSharedPreferencesRepository extends IUserRepository {
 
   @override
   Future<void> save(UserState userState) async {
-    var reference = await ref.read(sharedPreferencesProvider);
+    var reference = ref.read(sharedPreferencesProvider);
     await reference.setString("refresh_token", userState.refreshToken);
     await reference.setString("user_id", userState.userId);
     await reference.setInt("id", userState.id);
@@ -53,8 +57,14 @@ class UserSharedPreferencesRepository extends IUserRepository {
   }
 
   @override
+  Future<void> saveToken(String token) async {
+    var reference = ref.read(sharedPreferencesProvider);
+    await reference.setString("token", token);
+  }
+
+  @override
   Future<void> clear() async {
-    var reference = await ref.read(sharedPreferencesProvider);
+    var reference = ref.read(sharedPreferencesProvider);
     await reference.clear();
   }
 }

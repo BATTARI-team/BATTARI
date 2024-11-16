@@ -6,12 +6,12 @@ class AppUsageTime extends StatefulWidget {
   const AppUsageTime({super.key});
 
   @override
-  _AppUsageState createState() => _AppUsageState();
+  AppUsageState createState() => AppUsageState();
 }
 
-class _AppUsageState extends State<AppUsageTime> {
+class AppUsageState extends State<AppUsageTime> {
   List<EventUsageInfo> events = [];
-  Map<String?, NetworkInfo?> _netInfoMap = Map();
+  Map<String?, NetworkInfo?> _netInfoMap = {};
 
   @override
   void initState() {
@@ -24,34 +24,28 @@ class _AppUsageState extends State<AppUsageTime> {
     try {
       UsageStats.grantUsagePermission();
 
-      DateTime endDate = new DateTime.now();
-      DateTime startDate = endDate.subtract(Duration(days: 1));
+      DateTime endDate = DateTime.now();
+      DateTime startDate = endDate.subtract(const Duration(days: 1));
 
-      List<EventUsageInfo> queryEvents =
-          await UsageStats.queryEvents(startDate, endDate);
+      List<EventUsageInfo> queryEvents = await UsageStats.queryEvents(startDate, endDate);
       List<NetworkInfo> networkInfos = await UsageStats.queryNetworkUsageStats(
         startDate,
         endDate,
         networkType: NetworkType.all,
       );
 
-      Map<String?, NetworkInfo?> netInfoMap = Map.fromIterable(networkInfos,
-          key: (v) => v.packageName, value: (v) => v);
+      Map<String?, NetworkInfo?> netInfoMap = {for (var v in networkInfos) v.packageName: v};
 
       List<UsageInfo> t = await UsageStats.queryUsageStats(startDate, endDate);
 
       for (var i in t) {
         if (double.parse(i.totalTimeInForeground!) > 0) {
-          print(
-              DateTime.fromMillisecondsSinceEpoch(int.parse(i.firstTimeStamp!))
-                  .toIso8601String());
+          print(DateTime.fromMillisecondsSinceEpoch(int.parse(i.firstTimeStamp!)).toIso8601String());
 
-          print(DateTime.fromMillisecondsSinceEpoch(int.parse(i.lastTimeStamp!))
-              .toIso8601String());
+          print(DateTime.fromMillisecondsSinceEpoch(int.parse(i.lastTimeStamp!)).toIso8601String());
 
           print(i.packageName);
-          print(DateTime.fromMillisecondsSinceEpoch(int.parse(i.lastTimeUsed!))
-              .toIso8601String());
+          print(DateTime.fromMillisecondsSinceEpoch(int.parse(i.lastTimeUsed!)).toIso8601String());
           print(int.parse(i.totalTimeInForeground!) / 1000 / 60);
 
           print('-----\n');
@@ -68,9 +62,7 @@ class _AppUsageState extends State<AppUsageTime> {
 
   @override
   Widget build(BuildContext context) {
-    List<EventUsageInfo> filteredEvents = events
-        .where((event) => event.eventType == '1' || event.eventType == '2')
-        .toList();
+    List<EventUsageInfo> filteredEvents = events.where((event) => event.eventType == '1' || event.eventType == '2').toList();
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(title: const Text("Usage Stats"), actions: const [
@@ -90,8 +82,7 @@ class _AppUsageState extends State<AppUsageTime> {
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                        "Last time used: ${DateTime.fromMillisecondsSinceEpoch(int.parse(events[index].timeStamp!)).toIso8601String()}"),
+                    Text("Last time used: ${DateTime.fromMillisecondsSinceEpoch(int.parse(events[index].timeStamp!)).toIso8601String()}"),
                     networkInfo == null
                         ? const Text("Unknown network usage")
                         : Text("Received bytes: ${networkInfo.rxTotalBytes}\n"
@@ -101,7 +92,7 @@ class _AppUsageState extends State<AppUsageTime> {
                 trailing: Text(event.eventType!),
               );
             },
-            separatorBuilder: (context, index) => Divider(),
+            separatorBuilder: (context, index) => const Divider(),
             itemCount: filteredEvents.length,
           ),
         ),

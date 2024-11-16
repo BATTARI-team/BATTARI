@@ -1,59 +1,108 @@
 import 'dart:convert';
+import 'dart:developer';
 
+import 'package:battari/logger.dart';
 import 'package:battari/main.dart';
 import 'package:battari/repository/user_repository.dart';
-import 'package:battari/state/user_state.dart';
+import 'package:battari/model/state/user_state.dart';
+import 'package:battari/util/token_util.dart';
 import 'package:battari/view_model/user_form_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:http/http.dart' as http;
 
 part 'user_view_model.g.dart';
 
-const IpAddress = "169.254.208.85";
+const ipAddress = "192.168.10.8";
 
 @Riverpod(keepAlive: true)
 class UserViewModel extends _$UserViewModel {
+  ProviderSubscription? userSharedPreferencesRepositoryProviderSubsc;
   @override
-  FutureOr<UserState?> build() async {
-    var user = await ref.watch(userSharedPreferencesRepositoryProvider).get();
+  Future<UserState?> build() async {
+    log("UserViewModel build");
+    ref.onDispose(() {
+      log("UserViewModel dispose");
+      userSharedPreferencesRepositoryProviderSubsc?.close();
+    });
+    userSharedPreferencesRepositoryProviderSubsc = ref.listen(userSharedPreferencesRepositoryProvider, (previous, next) {});
+    var user = await userSharedPreferencesRepositoryProviderSubsc?.read().get();
     return user;
   }
 
   void setToken(String token) {
-    state.maybeWhen(
-        orElse: () {},
-        data: (data) {
-          if (data == null) return;
-          state = AsyncData(data.copyWith(token: token));
-        });
+    logger.i("tokenが更新されました: $token");
+    Token = token;
+    state.maybeWhen(orElse: () {
+      state = AsyncData(UserState(token: token));
+    }, data: (data) {
+      if (data == null) {
+        state = AsyncData(UserState(token: token));
+      } else {
+        state = AsyncData(data.copyWith(token: token));
+      }
+    });
   }
 
   void setUser(UserState user) {
     state.maybeWhen(
-      orElse: () {},
+      orElse: () {
+        debugPrint("state is null");
+      },
       data: (data) {
-        if (data == null) return;
-        state = AsyncData(data.copyWith(
-          id: user.id,
-          userId: user.userId,
-          name: user.name,
-          token: user.token,
-        ));
+        if (data == null) {
+          state = AsyncData(user);
+        } else {
+          state = AsyncData(data.copyWith(
+            id: user.id,
+            userId: user.userId,
+            name: user.name,
+            token: user.token,
+          ));
+          logger.i("userが更新されました: ${user.name}");
+        }
       },
     );
   }
 
-  Future<bool> login() async {
+  Future<bool> refreshUser(int userIndex) async {
+    try {
+      var token = TokenUtil.getToken();
+      String name = "";
+      int id = 0;
+      String userId = "";
+      await http.put(Uri.parse('http://$ipAddress:5050/User/GetUser?userIndex=$userIndex'), headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      }).then((value) {
+        var user = jsonDecode(value.body);
+        name = user["name"];
+        id = user["id"];
+        userId = user["userId"];
+      });
+      var user = UserState(token: token, refreshToken: TokenUtil.getRefreshToken(), name: name, id: id, userId: userId);
+      setUser(user);
+      ref.read(userSharedPreferencesRepositoryProvider).save(user);
+      return true;
+    } catch (e) {
+      debugPrint(e.toString());
+      return false;
+    }
+  }
+
+  /// return "" if login success
+  /// return error message if login failed
+  Future<String> login() async {
     int id = 0;
     String token = "";
     String refreshToken = "";
     String name = "";
     var userFormState = ref.watch(userFormViewModelProvider);
     debugPrint("userFormState.BattariId: ${userFormState.BattariId}");
+    debugPrint("userFormState.Password: ${userFormState.Password}");
     try {
       await http
-          .post(Uri.parse('http://$IpAddress:5050/User/Login'),
+          .post(Uri.parse('http://$ipAddress:5050/User/Login'),
               headers: <String, String>{
                 'Content-Type': 'application/json; charset=UTF-8',
               },
@@ -62,18 +111,20 @@ class UserViewModel extends _$UserViewModel {
                 'password': userFormState.Password,
               }))
           .then((value) {
+        debugPrint("1");
         var decoded = jsonDecode(value.body);
+        debugPrint("2");
         token = decoded["token"];
+        debugPrint("3");
         refreshToken = decoded["refreshToken"];
       });
     } catch (e) {
-      print(e);
-      return false;
+      return e.toString();
     }
     debugPrint("token: $token");
 
     try {
-      await http.put(Uri.parse('http://$IpAddress:5050/User/GetUserByUserId?userId=${userFormState.BattariId}'), headers: <String, String>{
+      await http.put(Uri.parse('http://$ipAddress:5050/User/GetUserByUserId?userId=${userFormState.BattariId}'), headers: <String, String>{
         'Authorization': 'Bearer $token',
       }).then((value) {
         var user = jsonDecode(value.body);
@@ -84,8 +135,7 @@ class UserViewModel extends _$UserViewModel {
         debugPrint("name: $name, id: ${id.toString()}");
       });
     } catch (e) {
-      print(e);
-      return false;
+      return e.toString();
     }
 
     if (token.isNotEmpty) {
@@ -98,11 +148,65 @@ class UserViewModel extends _$UserViewModel {
         token: token,
       );
       await ref.read(userSharedPreferencesRepositoryProvider).save(user);
-      ref.read(userViewModelProvider.notifier).setToken(token);
-      ref.read(userViewModelProvider.notifier).setUser(user);
+      setToken(token);
+      setUser(user);
 
-      return true;
+      debugPrint("login success");
+
+      return "";
     }
-    return false;
+    return "ログインに失敗しました．";
+  }
+
+  Future<String> refreshToken([int? userIndexArg, String? refreshTokenArg]) async {
+    String token = "";
+    int userIndex = userIndexArg ??
+        state.maybeWhen(
+          orElse: () => 0,
+          data: (data) {
+            if (data == null) return 0;
+            return data.id;
+          },
+        );
+    String refreshToken = refreshTokenArg ??
+        state.maybeWhen(
+          orElse: () => "",
+          data: (data) {
+            if (data == null) return "";
+            return data.refreshToken;
+          },
+        );
+
+    try {
+      debugPrint('http://$ipAddress:5050/User/RefreshToken');
+      await http
+          .post(Uri.parse('http://$ipAddress:5050/User/RefreshToken'),
+              headers: <String, String>{
+                'Content-Type': 'application/json; charset=UTF-8',
+              },
+              body: jsonEncode(<String, Object>{
+                'refreshToken': refreshToken,
+                'userIndex': userIndex,
+              }))
+          .then((value) {
+        token = value.body;
+      });
+    } catch (e) {
+      return e.toString();
+    }
+    if (token.isNotEmpty) {
+      // 全部いけた時
+      await ref.read(userSharedPreferencesRepositoryProvider).saveToken(token);
+      ref.read(userViewModelProvider.notifier).setToken(token);
+
+      return token;
+    }
+    return "";
+  }
+
+  Future<void> loginWithUserState(UserState user) async {
+    await ref.read(userSharedPreferencesRepositoryProvider).save(user);
+    ref.read(userViewModelProvider.notifier).setToken(user.token);
+    ref.read(userViewModelProvider.notifier).setUser(user);
   }
 }
