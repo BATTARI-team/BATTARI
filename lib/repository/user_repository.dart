@@ -30,7 +30,7 @@ class UserSharedPreferencesRepository extends IUserRepository {
   UserSharedPreferencesRepository(this.ref);
   @override
   Future<UserState?> get() async {
-    var reference = await ref.read(sharedPreferencesProvider);
+    var reference = ref.read(sharedPreferencesProvider);
     String? refreshToken = reference.getString("refresh_token");
     String? userId = reference.getString("user_id");
     int? id = reference.getInt("id");
@@ -49,21 +49,22 @@ class UserSharedPreferencesRepository extends IUserRepository {
 
   @override
   Future<void> save(UserState userState) async {
-    var reference = await ref.read(sharedPreferencesProvider);
+    var reference = ref.read(sharedPreferencesProvider);
     await reference.setString("refresh_token", userState.refreshToken);
     await reference.setString("user_id", userState.userId);
     await reference.setInt("id", userState.id);
     await reference.setString("name", userState.name);
   }
 
+  @override
   Future<void> saveToken(String token) async {
-    var reference = await ref.read(sharedPreferencesProvider);
+    var reference = ref.read(sharedPreferencesProvider);
     await reference.setString("token", token);
   }
 
   @override
   Future<void> clear() async {
-    var reference = await ref.read(sharedPreferencesProvider);
+    var reference = ref.read(sharedPreferencesProvider);
     await reference.clear();
   }
 }

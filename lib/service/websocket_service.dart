@@ -1,10 +1,8 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
 import 'package:battari/main.dart';
-import 'package:battari/model/dto/websocket_souguu_notification.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -37,6 +35,7 @@ WebsocketService websocketService(Ref ref) {
 class WebsocketService {
   WebsocketService(this._ref);
 
+  // ignore: unused_field
   final Ref _ref;
   Timer? _reconnectTimer;
   IOWebSocketChannel? channel;
@@ -48,7 +47,7 @@ class WebsocketService {
 
   void _initializeTimer() {
     //#TODO asyncにしちゃったから，ロック的なのが必要かも
-    _reconnectTimer = Timer.periodic(Duration(seconds: 10), (timer) async {
+    _reconnectTimer = Timer.periodic(const Duration(seconds: 10), (timer) async {
       debugPrint("timer ");
       debugPrint(_count.toString());
       if (_count > 3) {
@@ -98,8 +97,8 @@ class WebsocketService {
 
   _reconnectWebSocket() async {
     debugPrint("reconnect");
-    debugPrint("isRunning" + isRunning.toString());
-    debugPrint("_isReconnect" + _isReconnect.toString());
+    debugPrint("isRunning$isRunning");
+    debugPrint("_isReconnect$_isReconnect");
     if (_isReconnect) return;
     if (isRunning) return;
     if (_reconnectTimer == null) {
@@ -125,7 +124,7 @@ class WebsocketService {
       // _ref.watch(userViewModelProvider).whenData((value) => token = value?.token);
       debugPrint("token" + token.toString());
 
-      channel = IOWebSocketChannel.connect(Uri.parse('ws://$IpAddress:5050/ws'), headers: {
+      channel = IOWebSocketChannel.connect(Uri.parse('ws://$ipAddress:5050/ws'), headers: {
         'Authorization':
             // user tokenを入れる
             //'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJCQVRUQVJJLXRlYW0iLCJuYW1laWQiOiJ0YWt1dG8xMTI3IiwibmFtZSI6InRha3V0bzExMjciLCJqdGkiOiJlZTFhMGEzMi1lMTE4LTQyOTMtOTIzNC05MTQ5ODI2NzcwN2MiLCJ1bmlxdWVfbmFtZSI6IjIiLCJleHAiOjE3MzAzMjM5MjR9.D3YpMLMsPd5n4_yjDbACkvuhO-qneSW6fntpvzegGPw'

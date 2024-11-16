@@ -1,5 +1,4 @@
 import 'package:battari/view/instruction/register_view.dart';
-import 'package:battari/view_model/user_form_view_model.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -24,8 +23,8 @@ class _LoginViewState extends State<LoginView> {
         child: Column(
           children: [
             const Text("ログイン"),
-            BattariUserFormWidgets.BattariIdField(),
-            BattariUserFormWidgets.BattariPasswordField(),
+            BattariUserFormWidgets.battariIdField(),
+            BattariUserFormWidgets.battariPasswordField(),
             Consumer(builder: (__, ref, _) {
               return (isLoading)
                   ? const CircularProgressIndicator()

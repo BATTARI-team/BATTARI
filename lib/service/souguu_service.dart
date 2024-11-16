@@ -5,9 +5,7 @@ import 'package:battari/main.dart';
 import 'package:battari/model/dto/rest_souguu_notification.dart';
 import 'package:battari/model/dto/websocket_souguu_notification.dart';
 import 'package:battari/model/state/souguu_service_state.dart';
-import 'package:battari/repository/user_repository.dart';
 import 'package:battari/service/websocket_service.dart';
-import 'package:battari/util/token_util.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
@@ -88,7 +86,7 @@ class SouguuServiceInfo extends _$SouguuServiceInfo {
   Future<bool> init() async {
     try {
       debugPrint("souguu_service.dart, _init: $Token");
-      var result = await http.get(Uri.parse('http://$IpAddress:5050/SouguuInfo/GetSouguuInfo'), headers: <String, String>{
+      var result = await http.get(Uri.parse('http://$ipAddress:5050/SouguuInfo/GetSouguuInfo'), headers: <String, String>{
         'Authorization': 'Bearer $Token',
       });
       print(result.statusCode);

@@ -13,7 +13,7 @@ import 'package:http/http.dart' as http;
 
 part 'user_view_model.g.dart';
 
-const IpAddress = "192.168.10.8";
+const ipAddress = "192.168.10.8";
 
 @Riverpod(keepAlive: true)
 class UserViewModel extends _$UserViewModel {
@@ -39,8 +39,9 @@ class UserViewModel extends _$UserViewModel {
       debugPrint("set $token");
       if (data == null) {
         state = AsyncData(UserState(token: token));
-      } else
+      } else {
         state = AsyncData(data.copyWith(token: token));
+      }
     });
   }
 
@@ -54,13 +55,14 @@ class UserViewModel extends _$UserViewModel {
 
         if (data == null) {
           state = AsyncData(user);
-        } else
+        } else {
           state = AsyncData(data.copyWith(
             id: user.id,
             userId: user.userId,
             name: user.name,
             token: user.token,
           ));
+        }
       },
     );
   }
@@ -71,7 +73,7 @@ class UserViewModel extends _$UserViewModel {
       String name = "";
       int id = 0;
       String userId = "";
-      await http.put(Uri.parse('http://$IpAddress:5050/User/GetUser?userIndex=$userIndex'), headers: <String, String>{
+      await http.put(Uri.parse('http://$ipAddress:5050/User/GetUser?userIndex=$userIndex'), headers: <String, String>{
         'Authorization': 'Bearer $token',
       }).then((value) {
         var user = jsonDecode(value.body);
@@ -101,7 +103,7 @@ class UserViewModel extends _$UserViewModel {
     debugPrint("userFormState.Password: ${userFormState.Password}");
     try {
       await http
-          .post(Uri.parse('http://$IpAddress:5050/User/Login'),
+          .post(Uri.parse('http://$ipAddress:5050/User/Login'),
               headers: <String, String>{
                 'Content-Type': 'application/json; charset=UTF-8',
               },
@@ -123,7 +125,7 @@ class UserViewModel extends _$UserViewModel {
     debugPrint("token: $token");
 
     try {
-      await http.put(Uri.parse('http://$IpAddress:5050/User/GetUserByUserId?userId=${userFormState.BattariId}'), headers: <String, String>{
+      await http.put(Uri.parse('http://$ipAddress:5050/User/GetUserByUserId?userId=${userFormState.BattariId}'), headers: <String, String>{
         'Authorization': 'Bearer $token',
       }).then((value) {
         var user = jsonDecode(value.body);
@@ -177,9 +179,9 @@ class UserViewModel extends _$UserViewModel {
         );
 
     try {
-      debugPrint('http://$IpAddress:5050/User/RefreshToken');
+      debugPrint('http://$ipAddress:5050/User/RefreshToken');
       await http
-          .post(Uri.parse('http://$IpAddress:5050/User/RefreshToken'),
+          .post(Uri.parse('http://$ipAddress:5050/User/RefreshToken'),
               headers: <String, String>{
                 'Content-Type': 'application/json; charset=UTF-8',
               },

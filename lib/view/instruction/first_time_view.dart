@@ -1,8 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class FirstTimeView extends StatelessWidget {
+  const FirstTimeView({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,13 +18,11 @@ class FirstTimeView extends StatelessWidget {
               child: Container(
                 width: 200,
                 height: 50,
-                decoration: ShapeDecoration(
-                    shape: ContinuousRectangleBorder(
-                        borderRadius: BorderRadius.circular(16 * 2.3529))),
+                decoration: ShapeDecoration(shape: ContinuousRectangleBorder(borderRadius: BorderRadius.circular(16 * 2.3529))),
                 child: const Text("さっそくはじめる"),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             ElevatedButton(
@@ -31,9 +30,7 @@ class FirstTimeView extends StatelessWidget {
               child: Container(
                 width: 200,
                 height: 50,
-                decoration: ShapeDecoration(
-                    shape: ContinuousRectangleBorder(
-                        borderRadius: BorderRadius.circular(16 * 2.3529))),
+                decoration: ShapeDecoration(shape: ContinuousRectangleBorder(borderRadius: BorderRadius.circular(16 * 2.3529))),
                 child: const Text("ログインする"),
               ),
             )

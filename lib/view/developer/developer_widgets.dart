@@ -1,20 +1,16 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:battari/background.dart';
 import 'package:battari/repository/user_repository.dart';
-import 'package:battari/service/souguu_service.dart';
-import 'package:battari/service/websocket_service.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:battari/websocket_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:http/http.dart' as http;
 
 class DeveloperWidgets extends StatelessWidget {
+  const DeveloperWidgets({super.key});
+
   static loginedUserWidget() {
     return Consumer(
       builder: (context, ref, _) {
@@ -51,7 +47,7 @@ class DeveloperWidgets extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("開発用"),
+          title: const Text("開発用"),
         ),
         body: Column(
           children: [
@@ -82,10 +78,10 @@ class DeveloperWidgets extends StatelessWidget {
                     _initService();
                     FlutterForegroundTask.startService(notificationTitle: "battari", notificationText: "notificationText");
                   },
-                  child: Text("foreground task"));
+                  child: const Text("foreground task"));
             }),
             TextButton(
-              child: Text("button"),
+              child: const Text("button"),
               onPressed: () {},
             )
           ],

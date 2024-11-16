@@ -1,16 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
-import 'dart:io';
-import 'dart:isolate';
 
 import 'package:battari/main.dart';
 import 'package:battari/repository/user_repository.dart';
 import 'package:battari/service/souguu_service.dart';
-import 'package:battari/service/websocket_service.dart';
-import 'package:battari/util/token_util.dart';
 import 'package:battari/view_model/user_view_model.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart' show FlutterForegroundTask, TaskHandler, TaskStarter;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -39,6 +33,7 @@ class MyTaskHandler extends TaskHandler {
   int _count = 0;
   static const String incrementCountCommand = 'incrementCount';
 
+  // ignore: unused_element
   void _incrementCount() {
     _count++;
 
@@ -86,7 +81,7 @@ class MyTaskHandler extends TaskHandler {
     print('onStart(starter: ${starter.name})');
     String token = "";
     await http
-        .post(Uri.parse('http://$IpAddress:5050/User/RefreshToken'),
+        .post(Uri.parse('http://$ipAddress:5050/User/RefreshToken'),
             headers: <String, String>{
               'Content-Type': 'application/json; charset=UTF-8',
             },

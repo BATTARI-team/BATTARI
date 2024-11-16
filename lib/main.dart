@@ -3,16 +3,11 @@ import 'dart:io';
 
 import 'package:battari/model/battari_setting.dart';
 import 'package:battari/repository/user_repository.dart';
-import 'package:battari/websocket_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:http/http.dart' as http;
-import 'package:battari/app_usage_time.dart';
 import 'package:battari/routes.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MyHttpOverride extends HttpOverrides {
@@ -27,6 +22,7 @@ class MyHttpOverride extends HttpOverrides {
 
 late BattariSetting battariSetting;
 
+// ignore: non_constant_identifier_names
 String Token = "";
 
 Future<void> main() async {

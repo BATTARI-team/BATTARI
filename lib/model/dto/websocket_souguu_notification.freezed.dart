@@ -1,6 +1,6 @@
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: type=lint
+// ignore_for_file: type=lint, duplicate_ignore
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'websocket_souguu_notification.dart';
@@ -14,8 +14,7 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
-WebsocketSouguuNotification _$WebsocketSouguuNotificationFromJson(
-    Map<String, dynamic> json) {
+WebsocketSouguuNotification _$WebsocketSouguuNotificationFromJson(Map<String, dynamic> json) {
   return _WebsocketSouguuNotification.fromJson(json);
 }
 
@@ -23,39 +22,29 @@ WebsocketSouguuNotification _$WebsocketSouguuNotificationFromJson(
 mixin _$WebsocketSouguuNotification {
 // ignore: invalid_annotation_target
   @JsonKey(name: 'CallStartTime')
-  DateTime get callStartTime =>
-      throw _privateConstructorUsedError; // ignore: invalid_annotation_target
+  DateTime get callStartTime => throw _privateConstructorUsedError; // ignore: invalid_annotation_target
   @JsonKey(name: 'CallId')
-  int get callId =>
-      throw _privateConstructorUsedError; // ignore: invalid_annotation_target
+  int get callId => throw _privateConstructorUsedError; // ignore: invalid_annotation_target
   @JsonKey(name: 'CallEndTime')
-  DateTime get callEndTime =>
-      throw _privateConstructorUsedError; // ignore: invalid_annotation_target
+  DateTime get callEndTime => throw _privateConstructorUsedError; // ignore: invalid_annotation_target
   @JsonKey(name: 'SouguuReason')
-  String get souguuReason =>
-      throw _privateConstructorUsedError; // ignore: invalid_annotation_target
+  String get souguuReason => throw _privateConstructorUsedError; // ignore: invalid_annotation_target
   @JsonKey(name: 'Token')
-  String get token =>
-      throw _privateConstructorUsedError; // ignore: invalid_annotation_target
+  String get token => throw _privateConstructorUsedError; // ignore: invalid_annotation_target
   @JsonKey(name: 'SouguuDateTime')
-  DateTime get souguuDateTime =>
-      throw _privateConstructorUsedError; // ignore: invalid_annotation_target
+  DateTime get souguuDateTime => throw _privateConstructorUsedError; // ignore: invalid_annotation_target
   @JsonKey(name: 'AiteUserId')
   int get aiteUserId => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
-  $WebsocketSouguuNotificationCopyWith<WebsocketSouguuNotification>
-      get copyWith => throw _privateConstructorUsedError;
+  $WebsocketSouguuNotificationCopyWith<WebsocketSouguuNotification> get copyWith => throw _privateConstructorUsedError;
 }
 
 /// @nodoc
 abstract class $WebsocketSouguuNotificationCopyWith<$Res> {
-  factory $WebsocketSouguuNotificationCopyWith(
-          WebsocketSouguuNotification value,
-          $Res Function(WebsocketSouguuNotification) then) =
-      _$WebsocketSouguuNotificationCopyWithImpl<$Res,
-          WebsocketSouguuNotification>;
+  factory $WebsocketSouguuNotificationCopyWith(WebsocketSouguuNotification value, $Res Function(WebsocketSouguuNotification) then) =
+      _$WebsocketSouguuNotificationCopyWithImpl<$Res, WebsocketSouguuNotification>;
   @useResult
   $Res call(
       {@JsonKey(name: 'CallStartTime') DateTime callStartTime,
@@ -68,8 +57,7 @@ abstract class $WebsocketSouguuNotificationCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$WebsocketSouguuNotificationCopyWithImpl<$Res,
-        $Val extends WebsocketSouguuNotification>
+class _$WebsocketSouguuNotificationCopyWithImpl<$Res, $Val extends WebsocketSouguuNotification>
     implements $WebsocketSouguuNotificationCopyWith<$Res> {
   _$WebsocketSouguuNotificationCopyWithImpl(this._value, this._then);
 
@@ -123,11 +111,9 @@ class _$WebsocketSouguuNotificationCopyWithImpl<$Res,
 }
 
 /// @nodoc
-abstract class _$$WebsocketSouguuNotificationImplCopyWith<$Res>
-    implements $WebsocketSouguuNotificationCopyWith<$Res> {
+abstract class _$$WebsocketSouguuNotificationImplCopyWith<$Res> implements $WebsocketSouguuNotificationCopyWith<$Res> {
   factory _$$WebsocketSouguuNotificationImplCopyWith(
-          _$WebsocketSouguuNotificationImpl value,
-          $Res Function(_$WebsocketSouguuNotificationImpl) then) =
+          _$WebsocketSouguuNotificationImpl value, $Res Function(_$WebsocketSouguuNotificationImpl) then) =
       __$$WebsocketSouguuNotificationImplCopyWithImpl<$Res>;
   @override
   @useResult
@@ -143,12 +129,10 @@ abstract class _$$WebsocketSouguuNotificationImplCopyWith<$Res>
 
 /// @nodoc
 class __$$WebsocketSouguuNotificationImplCopyWithImpl<$Res>
-    extends _$WebsocketSouguuNotificationCopyWithImpl<$Res,
-        _$WebsocketSouguuNotificationImpl>
+    extends _$WebsocketSouguuNotificationCopyWithImpl<$Res, _$WebsocketSouguuNotificationImpl>
     implements _$$WebsocketSouguuNotificationImplCopyWith<$Res> {
   __$$WebsocketSouguuNotificationImplCopyWithImpl(
-      _$WebsocketSouguuNotificationImpl _value,
-      $Res Function(_$WebsocketSouguuNotificationImpl) _then)
+      _$WebsocketSouguuNotificationImpl _value, $Res Function(_$WebsocketSouguuNotificationImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -197,8 +181,7 @@ class __$$WebsocketSouguuNotificationImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$WebsocketSouguuNotificationImpl
-    implements _WebsocketSouguuNotification {
+class _$WebsocketSouguuNotificationImpl implements _WebsocketSouguuNotification {
   const _$WebsocketSouguuNotificationImpl(
       {@JsonKey(name: 'CallStartTime') required this.callStartTime,
       @JsonKey(name: 'CallId') required this.callId,
@@ -208,9 +191,7 @@ class _$WebsocketSouguuNotificationImpl
       @JsonKey(name: 'SouguuDateTime') required this.souguuDateTime,
       @JsonKey(name: 'AiteUserId') required this.aiteUserId});
 
-  factory _$WebsocketSouguuNotificationImpl.fromJson(
-          Map<String, dynamic> json) =>
-      _$$WebsocketSouguuNotificationImplFromJson(json);
+  factory _$WebsocketSouguuNotificationImpl.fromJson(Map<String, dynamic> json) => _$$WebsocketSouguuNotificationImplFromJson(json);
 
 // ignore: invalid_annotation_target
   @override
@@ -251,31 +232,24 @@ class _$WebsocketSouguuNotificationImpl
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$WebsocketSouguuNotificationImpl &&
-            (identical(other.callStartTime, callStartTime) ||
-                other.callStartTime == callStartTime) &&
+            (identical(other.callStartTime, callStartTime) || other.callStartTime == callStartTime) &&
             (identical(other.callId, callId) || other.callId == callId) &&
-            (identical(other.callEndTime, callEndTime) ||
-                other.callEndTime == callEndTime) &&
-            (identical(other.souguuReason, souguuReason) ||
-                other.souguuReason == souguuReason) &&
+            (identical(other.callEndTime, callEndTime) || other.callEndTime == callEndTime) &&
+            (identical(other.souguuReason, souguuReason) || other.souguuReason == souguuReason) &&
             (identical(other.token, token) || other.token == token) &&
-            (identical(other.souguuDateTime, souguuDateTime) ||
-                other.souguuDateTime == souguuDateTime) &&
-            (identical(other.aiteUserId, aiteUserId) ||
-                other.aiteUserId == aiteUserId));
+            (identical(other.souguuDateTime, souguuDateTime) || other.souguuDateTime == souguuDateTime) &&
+            (identical(other.aiteUserId, aiteUserId) || other.aiteUserId == aiteUserId));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, callStartTime, callId,
-      callEndTime, souguuReason, token, souguuDateTime, aiteUserId);
+  int get hashCode => Object.hash(runtimeType, callStartTime, callId, callEndTime, souguuReason, token, souguuDateTime, aiteUserId);
 
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$WebsocketSouguuNotificationImplCopyWith<_$WebsocketSouguuNotificationImpl>
-      get copyWith => __$$WebsocketSouguuNotificationImplCopyWithImpl<
-          _$WebsocketSouguuNotificationImpl>(this, _$identity);
+  _$$WebsocketSouguuNotificationImplCopyWith<_$WebsocketSouguuNotificationImpl> get copyWith =>
+      __$$WebsocketSouguuNotificationImplCopyWithImpl<_$WebsocketSouguuNotificationImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
@@ -285,8 +259,7 @@ class _$WebsocketSouguuNotificationImpl
   }
 }
 
-abstract class _WebsocketSouguuNotification
-    implements WebsocketSouguuNotification {
+abstract class _WebsocketSouguuNotification implements WebsocketSouguuNotification {
   const factory _WebsocketSouguuNotification(
       {@JsonKey(name: 'CallStartTime') required final DateTime callStartTime,
       @JsonKey(name: 'CallId') required final int callId,
@@ -294,11 +267,9 @@ abstract class _WebsocketSouguuNotification
       @JsonKey(name: 'SouguuReason') required final String souguuReason,
       @JsonKey(name: 'Token') required final String token,
       @JsonKey(name: 'SouguuDateTime') required final DateTime souguuDateTime,
-      @JsonKey(name: 'AiteUserId')
-      required final int aiteUserId}) = _$WebsocketSouguuNotificationImpl;
+      @JsonKey(name: 'AiteUserId') required final int aiteUserId}) = _$WebsocketSouguuNotificationImpl;
 
-  factory _WebsocketSouguuNotification.fromJson(Map<String, dynamic> json) =
-      _$WebsocketSouguuNotificationImpl.fromJson;
+  factory _WebsocketSouguuNotification.fromJson(Map<String, dynamic> json) = _$WebsocketSouguuNotificationImpl.fromJson;
 
   @override // ignore: invalid_annotation_target
   @JsonKey(name: 'CallStartTime')
@@ -323,6 +294,5 @@ abstract class _WebsocketSouguuNotification
   int get aiteUserId;
   @override
   @JsonKey(ignore: true)
-  _$$WebsocketSouguuNotificationImplCopyWith<_$WebsocketSouguuNotificationImpl>
-      get copyWith => throw _privateConstructorUsedError;
+  _$$WebsocketSouguuNotificationImplCopyWith<_$WebsocketSouguuNotificationImpl> get copyWith => throw _privateConstructorUsedError;
 }

@@ -22,7 +22,7 @@ final souguuServiceProvider =
 );
 
 typedef _$SouguuService = AutoDisposeNotifier<int>;
-String _$souguuServiceInfoHash() => r'1b9b419677065ad72bfb4b6856193618ae820f97';
+String _$souguuServiceInfoHash() => r'ceac21ae96e17012947dea09f5962a090374ff70';
 
 /// 遭遇しているかなどの情報を保持するプロバイダー
 ///

@@ -1,11 +1,8 @@
 import 'dart:io';
 
 import 'package:battari/service/foreground_task_service.dart';
-import 'package:battari/service/souguu_service.dart';
-import 'package:battari/service/websocket_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
-import 'package:flutter_foreground_task/models/service_request_result.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ExamplePage extends StatefulWidget {
@@ -107,7 +104,6 @@ class _ExamplePageState extends State<ExamplePage> {
   }
 
   void _onReceiveTaskData(Object data) {
-    print('onReceiveTaskData: $data');
     _taskDataListenable.value = data;
   }
 

@@ -8,7 +8,7 @@ class NicknameView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
-        children: [BattariUserFormWidgets.BattariNicknameField()],
+        children: [BattariUserFormWidgets.battariNicknameField()],
       ),
     );
   }

@@ -1,19 +1,11 @@
-import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
-import 'dart:isolate';
 
-import 'package:battari/main.dart';
 import 'package:battari/service/souguu_service.dart';
 import 'package:battari/service/websocket_service.dart';
-import 'package:battari/util/token_util.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:web_socket_channel/io.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
 
 class WebSocketTest extends StatefulWidget {
   const WebSocketTest({super.key});
@@ -32,9 +24,9 @@ class _WebSocketTestState extends State<WebSocketTest> {
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController _controller = TextEditingController(text: "hello");
+    TextEditingController controller = TextEditingController(text: "hello");
 
-    _sendMessage(WidgetRef ref, {String? message}) {
+    sendMessage(WidgetRef ref, {String? message}) {
       message ??= jsonEncode({
         'id': 2,
         'isWelcome': false,
@@ -64,7 +56,7 @@ class _WebSocketTestState extends State<WebSocketTest> {
             return TextButton(
               child: const Text('Send message'),
               onPressed: () {
-                _sendMessage(ref,
+                sendMessage(ref,
                     message: jsonEncode({
                       'id': ref.read(userViewModelProvider).asData?.value?.id,
                       'isWelcome': false,
@@ -82,7 +74,7 @@ class _WebSocketTestState extends State<WebSocketTest> {
             );
           }),
           TextFormField(
-            controller: _controller,
+            controller: controller,
             decoration: const InputDecoration(labelText: 'Send a message'),
           ),
           Consumer(builder: (context, ref, _) {
@@ -96,15 +88,16 @@ class _WebSocketTestState extends State<WebSocketTest> {
           }),
           Consumer(
             builder: (BuildContext context, WidgetRef ref, Widget? child) {
-              return TextButton(child: Text("connect websocket"), onPressed: () => ref.read(websocketServiceProvider).needConnect());
+              return TextButton(child: const Text("connect websocket"), onPressed: () => ref.read(websocketServiceProvider).needConnect());
             },
           ),
           Consumer(
             builder: (BuildContext context, WidgetRef ref, Widget? child) {
-              return TextButton(child: Text("canncel websocket"), onPressed: () => ref.read(websocketServiceProvider).cancelConnect());
+              return TextButton(
+                  child: const Text("canncel websocket"), onPressed: () => ref.read(websocketServiceProvider).cancelConnect());
             },
           ),
-          Text("受信"),
+          const Text("受信"),
           HookConsumer(builder: (context, ref, _) {
             var messages = useState([]);
             final websocketService = ref.watch(websocketServiceProvider);

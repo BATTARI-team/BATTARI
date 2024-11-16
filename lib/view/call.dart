@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class Call extends ConsumerWidget {
+  const Call({super.key});
+
   @override
   Widget build(BuildContext context, ref) {
     var souguuInfo = ref.watch(souguuServiceInfoProvider);
