@@ -5,6 +5,7 @@ import 'dart:io';
 import 'dart:isolate';
 
 import 'package:battari/main.dart';
+import 'package:battari/repository/user_repository.dart';
 import 'package:battari/service/souguu_service.dart';
 import 'package:battari/service/websocket_service.dart';
 import 'package:battari/util/token_util.dart';
@@ -82,7 +83,6 @@ class MyTaskHandler extends TaskHandler {
       sharedPreferencesProvider.overrideWithValue(shared),
     ]);
     print('onStart(starter: ${starter.name})');
-    print("refresh_token: ${shared.getString("refresh_token")}, user_id: ${shared.getInt("id")}");
     String token = "";
     await http
         .post(Uri.parse('http://$IpAddress:5050/User/RefreshToken'),
@@ -97,7 +97,7 @@ class MyTaskHandler extends TaskHandler {
       token = value.body;
     });
     Token = token;
-    // providerContainer.read(userViewModelProvider.notifier).setToken(token);
+    providerContainer.read(userViewModelProvider.notifier).setToken(token);
     souguuServiceProviderSubscription = providerContainer.listen(souguuServiceProvider, (value, next) {});
     // http.get(Uri.parse('http://$IpAddress:5050/Developer/ClearUserOnline')).then((res) {
     //   log(res.body);

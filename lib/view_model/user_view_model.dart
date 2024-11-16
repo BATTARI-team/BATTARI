@@ -28,6 +28,7 @@ class UserViewModel extends _$UserViewModel {
   }
 
   void setToken(String token) {
+    print("setToken(userViewModel) $token");
     Token = token;
     state.maybeWhen(orElse: () {
       state = AsyncData(UserState(token: token));

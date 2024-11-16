@@ -1,14 +1,19 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:battari/main.dart';
+import 'package:battari/model/dto/rest_souguu_notification.dart';
 import 'package:battari/model/dto/websocket_souguu_notification.dart';
 import 'package:battari/model/state/souguu_service_state.dart';
+import 'package:battari/repository/user_repository.dart';
 import 'package:battari/service/websocket_service.dart';
+import 'package:battari/view_model/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:http/http.dart' as http;
 
 part 'souguu_service.g.dart';
 
@@ -16,8 +21,7 @@ part 'souguu_service.g.dart';
 class SouguuService extends _$SouguuService {
   ProviderSubscription? websocketProviderSubscription;
   _dealNotification(String p0) {
-    print("execute");
-    ref.listen(websocketServiceProvider, (previous, next) {});
+    print("$p0");
     // ここで受信したデータを処理する
     if (p0.length > 20) {
       try {
@@ -28,6 +32,8 @@ class SouguuService extends _$SouguuService {
       } catch (e) {
         debugPrint("受信したデータ: ${e.toString()}");
       }
+    } else {
+      debugPrint("p0 is too short");
     }
   }
 
@@ -72,7 +78,27 @@ int Souguu = 0;
 class SouguuServiceInfo extends _$SouguuServiceInfo {
   @override
   SouguuServiceState build() {
+    print("token from userviewmodel: ${ref.read(userViewModelProvider).asData?.value?.token}");
+    print("token from Token: $Token");
+    _init();
+
     return SouguuServiceState();
+  }
+
+  _init() async {
+    try {
+      var result = await http.get(Uri.parse('http://$IpAddress:5050/SouguuInfo/GetSouguuInfo'), headers: <String, String>{
+        'Authorization': 'Bearer $Token',
+      });
+      print(result.statusCode);
+      if (result.statusCode != 200) {
+      } else {
+        var souguuInfo = RestSouguuNotification.fromJson(jsonDecode(result.body));
+        state = state.copyWith(souguu: souguuInfo.aiteUserId);
+      }
+    } catch (e) {
+      print("souguu_service.dart, _init: $e");
+    }
   }
 
   /// 現在遭遇しているかの情報を更新する
