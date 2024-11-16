@@ -27,7 +27,7 @@ class MyTaskHandler extends TaskHandler {
   late IOWebSocketChannel channel;
   final _receiverStreamController = StreamController<String>.broadcast();
   final _sendStreamController = StreamController<String>.broadcast();
-  ProviderContainer providerContainer = ProviderContainer();
+  late ProviderContainer providerContainer;
   ProviderSubscription? souguuServiceProviderSubscription;
   Future<void> cancelConnect() async {
     // _reconnectTimer.cancel();
@@ -78,7 +78,9 @@ class MyTaskHandler extends TaskHandler {
   @override
   Future<void> onStart(DateTime timestamp, TaskStarter starter) async {
     var shared = await SharedPreferences.getInstance();
-    print(shared.getString("refresh_token"));
+    providerContainer = ProviderContainer(overrides: [
+      sharedPreferencesProvider.overrideWithValue(shared),
+    ]);
     print('onStart(starter: ${starter.name})');
     print("refresh_token: ${shared.getString("refresh_token")}, user_id: ${shared.getInt("id")}");
     String token = "";

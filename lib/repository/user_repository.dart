@@ -8,8 +8,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 part 'user_repository.g.dart';
 
 @riverpod
-Raw<Future<SharedPreferences>> sharedPreferences(ref) async {
-  return await SharedPreferences.getInstance();
+SharedPreferences sharedPreferences(ref) {
+  throw UnimplementedError();
 }
 
 abstract class IUserRepository {

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:battari/model/battari_setting.dart';
+import 'package:battari/repository/user_repository.dart';
 import 'package:battari/websocket_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,6 +13,7 @@ import 'package:battari/app_usage_time.dart';
 import 'package:battari/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MyHttpOverride extends HttpOverrides {
   @override
@@ -31,7 +33,13 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   FlutterForegroundTask.initCommunicationPort();
   battariSetting = BattariSetting.fromJson(jsonDecode(await rootBundle.loadString('battari_setting.json')));
-  runApp(const ProviderScope(child: Battari()));
+  var shared = await SharedPreferences.getInstance();
+  runApp(ProviderScope(
+    overrides: [
+      sharedPreferencesProvider.overrideWithValue(shared),
+    ],
+    child: const Battari(),
+  ));
 }
 
 class Battari extends StatelessWidget {
