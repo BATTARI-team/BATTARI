@@ -26,7 +26,7 @@ final router = GoRouter(navigatorKey: navigatorKey, routes: [
   GoRoute(path: '/nickname', builder: (context, state) => const NicknameView()),
   GoRoute(path: '/login', builder: (context, state) => const LoginView()),
   GoRoute(path: '/home', builder: (context, state) => const HomeView()),
-  GoRoute(path: '/call', builder: (context, state) => const Call()),
+  GoRoute(path: '/call', builder: (context, state) => Call()),
   GoRoute(
       path: '/foreground_init',
       builder: (context, state) {
