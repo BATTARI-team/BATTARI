@@ -1,3 +1,4 @@
+import 'package:battari/model/dto/websocket_souguu_notification.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 part 'rest_souguu_notification.freezed.dart';
 part 'rest_souguu_notification.g.dart';
@@ -22,4 +23,16 @@ class RestSouguuNotification with _$RestSouguuNotification {
   }) = _WebsocketSouguuNotification;
 
   factory RestSouguuNotification.fromJson(Map<String, dynamic> json) => _$RestSouguuNotificationFromJson(json);
+
+  factory RestSouguuNotification.fromWebsocketNotification(WebsocketSouguuNotification notification) {
+    return RestSouguuNotification(
+      callStartTime: notification.callStartTime,
+      callId: notification.callId,
+      callEndTime: notification.callEndTime,
+      souguuReason: notification.souguuReason,
+      token: notification.token,
+      souguuDateTime: notification.souguuDateTime,
+      aiteUserId: notification.aiteUserId,
+    );
+  }
 }
