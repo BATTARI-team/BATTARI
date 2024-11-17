@@ -14,6 +14,8 @@ class Call extends ConsumerWidget {
       body: Column(
         children: [
           Text("遭遇相手：${souguuInfo.souguu}"),
+          Text(souguuInfo.restSouguuNotification?.token ?? ""),
+          Text("遭遇理由：${souguuInfo.restSouguuNotification?.souguuReason}"),
           const Text('Call'),
         ],
       ),

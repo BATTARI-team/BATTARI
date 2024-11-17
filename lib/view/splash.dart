@@ -53,13 +53,6 @@ class Splash extends HookConsumerWidget {
           });
         } else {
           // アプリサイドにデータを送信
-          FlutterForegroundTask.addTaskDataCallback((data) {
-            debugPrint("ここきた{}");
-            debugPrint(data.toString());
-            ProviderContainer().read(souguuServiceProvider.notifier).dealNotification(data.toString(), true);
-            ProviderContainer().read(souguuServiceProvider.notifier).disconnectWebsocket();
-            //ProviderContainer().read(souguuServiceProvider.notifier).dealNotification(data.toString());
-          });
           WidgetsBinding.instance.addPostFrameCallback((_) {
             context.go('/home');
           });

@@ -94,6 +94,7 @@ class SouguuService extends _$SouguuService {
 class SouguuServiceInfo extends _$SouguuServiceInfo {
   @override
   SouguuServiceState build() {
+    log("souguu service info build");
     return SouguuServiceState();
   }
 
