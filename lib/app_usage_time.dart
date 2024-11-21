@@ -15,7 +15,7 @@ class _AppUsageState extends State<AppUsageTime> {
   Timer? _timer;
   String? _lastUpdated;
   int? _lastOpenTimeStamp; // 最新の eventType == 1 のタイムスタンプ
-  final int _targetSeconds = 50; // 300秒（5分）
+  final int _targetSeconds = 300; // 〇〇分経過したら遭遇の〇〇を設定するところ 秒数で設定
 
   @override
   void initState() {
@@ -45,7 +45,8 @@ class _AppUsageState extends State<AppUsageTime> {
           DateTime.fromMillisecondsSinceEpoch(_lastOpenTimeStamp!);
 
       // 経過時間を秒で計算
-      int elapsedSeconds = currentTime.difference(lastOpenTime).inSeconds;
+      int elapsedSeconds =
+          (currentTime.difference(lastOpenTime).inSeconds / 60).toInt();
 
       String appName = events
               .firstWhere(
