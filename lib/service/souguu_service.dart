@@ -18,6 +18,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:http/http.dart' as http;
+import 'package:usage_stats/usage_stats.dart';
 
 part 'souguu_service.g.dart';
 
@@ -25,8 +26,11 @@ part 'souguu_service.g.dart';
 class SouguuService extends _$SouguuService {
   ProviderSubscription? websocketProviderSubscription;
   ProviderSubscription<NotificationService>? notificationServiceSubscription;
+  int? _lastOpenTimeStamp;
+  List<EventUsageInfo> _events = [];
   // ignore: unused_field
   Timer? _untilCallStartTimer;
+  Timer? _appUsageGetter;
   dealNotification(String p0, [bool fromForegroundApp = false]) async {
     // logger.d("websocketで受信したデータ: $p0");
     // ここで受信したデータを処理する
@@ -75,6 +79,7 @@ class SouguuService extends _$SouguuService {
     log("souguu service build");
     websocketProviderSubscription = ref.listen(websocketServiceProvider, (previous, next) {});
     ref.read(websocketServiceProvider).addWebsocketReceiver(dealNotification);
+    _init();
 
     souguuServiceInfoProviderSubscription = ref.listen<SouguuServiceState>(souguuServiceInfoProvider, (previus, next) {
       if (next.souguu != 0) {
@@ -87,9 +92,58 @@ class SouguuService extends _$SouguuService {
         }
       }
     });
+    _appUsageGetter = Timer.periodic(const Duration(seconds: 20), (timer) async {
+      await _checkAppUsage();
+    });
     notificationServiceSubscription = ref.listen(notificationServiceProviderProvider, (previous, next) {});
 
     return 0;
+  }
+
+  Future<void> _init() async {
+    await _initUsage();
+  }
+
+  Future<void> _checkAppUsage() async {
+    if (_lastOpenTimeStamp != null) {
+      await _initUsage();
+      DateTime currentTime = DateTime.now();
+      DateTime lastOpenTime = DateTime.fromMillisecondsSinceEpoch(_lastOpenTimeStamp!);
+
+      // 経過時間を秒で計算
+      int elapsedMinutes = (currentTime.difference(lastOpenTime).inSeconds / 60).toInt();
+      int elapsedSeconds = currentTime.difference(lastOpenTime).inSeconds.toInt();
+
+      String appName = _events.firstWhere((event) => event.timeStamp == _lastOpenTimeStamp.toString()).packageName ?? "不明なアプリ";
+
+      DateTime now = DateTime.now(); // 現在の時間を取得
+      String formattedTime = '${now.hour}:${now.minute}:${now.second}';
+
+      print("$appName:$elapsedSeconds経過"); // _targetSeconds以下なら経過秒数を表示
+    }
+  }
+
+  Future<void> _initUsage() async {
+    try {
+      UsageStats.grantUsagePermission();
+
+      DateTime endDate = DateTime.now();
+      DateTime startDate = endDate.subtract(Duration(days: 1));
+
+      List<EventUsageInfo> queryEvents = await UsageStats.queryEvents(startDate, endDate);
+
+      // 最新の eventType == 1 イベントのタイムスタンプを取得
+      for (var event in queryEvents.reversed) {
+        if (event.eventType == '1') {
+          _lastOpenTimeStamp = int.parse(event.timeStamp!);
+          break; // 最新のイベントのみを使用するため、最初に見つかったらループを抜ける
+        }
+        // print("_lastOpenTimeStamp: $_lastOpenTimeStamp");
+      }
+      _events = queryEvents.reversed.toList();
+    } catch (err) {
+      print(err);
+    }
   }
 
   void dispose() {
