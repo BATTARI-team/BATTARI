@@ -3,12 +3,25 @@ import 'dart:convert';
 import 'package:battari/main.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:http/http.dart' as http;
 
 part 'notification_service.g.dart';
+
+@pragma('vm:entry-point')
+void notificationTapBackground(NotificationResponse notificationResponse) {
+  () async {
+    if (await FlutterForegroundTask.isAppOnForeground) {
+      debugPrint("notificationTapBackground: app is on foreground");
+      return;
+    } else {
+      FlutterForegroundTask.launchApp("/");
+    }
+  }();
+}
 
 @Riverpod(keepAlive: true)
 NotificationService notificationServiceProvider(ref) => NotificationService(ref);
