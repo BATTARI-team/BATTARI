@@ -13,7 +13,6 @@ import 'package:battari/service/websocket_service.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/riverpod.dart';
@@ -26,6 +25,7 @@ part 'souguu_service.g.dart';
 class SouguuService extends _$SouguuService {
   ProviderSubscription? websocketProviderSubscription;
   ProviderSubscription<NotificationService>? notificationServiceSubscription;
+  // ignore: unused_field
   Timer? _untilCallStartTimer;
   dealNotification(String p0, [bool fromForegroundApp = false]) async {
     // logger.d("websocketで受信したデータ: $p0");
