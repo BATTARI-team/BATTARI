@@ -6,11 +6,12 @@ part 'souguu_app_incredient_model.g.dart';
 part 'souguu_app_incredient_model.freezed.dart';
 
 @freezed
-class SouguuAppIncredientModel with _$SouguuAppIncredientModel implements SouguuIncredientDataModel {
+class SouguuAppIncredientModel with _$SouguuAppIncredientModel {
   factory SouguuAppIncredientModel({
     required String type,
     required SouguuIncredientDataAppUsageModel appData,
   }) = _SouguuAppIncredientModel;
 
-  factory SouguuAppIncredientModel.fromJson(Map<String, dynamic> json) => _$SouguuAppIncredientModelFromJson(json);
+  factory SouguuAppIncredientModel.fromJson(Map<String, dynamic> json) =>
+      _$SouguuAppIncredientModelFromJson(json);
 }
