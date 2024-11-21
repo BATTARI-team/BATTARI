@@ -21,6 +21,7 @@ SouguuAppIncredientModel _$SouguuAppIncredientModelFromJson(
 
 /// @nodoc
 mixin _$SouguuAppIncredientModel {
+  String get type => throw _privateConstructorUsedError;
   SouguuIncredientDataAppUsageModel get appData =>
       throw _privateConstructorUsedError;
 
@@ -36,7 +37,7 @@ abstract class $SouguuAppIncredientModelCopyWith<$Res> {
           $Res Function(SouguuAppIncredientModel) then) =
       _$SouguuAppIncredientModelCopyWithImpl<$Res, SouguuAppIncredientModel>;
   @useResult
-  $Res call({SouguuIncredientDataAppUsageModel appData});
+  $Res call({String type, SouguuIncredientDataAppUsageModel appData});
 
   $SouguuIncredientDataAppUsageModelCopyWith<$Res> get appData;
 }
@@ -55,9 +56,14 @@ class _$SouguuAppIncredientModelCopyWithImpl<$Res,
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? type = null,
     Object? appData = null,
   }) {
     return _then(_value.copyWith(
+      type: null == type
+          ? _value.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as String,
       appData: null == appData
           ? _value.appData
           : appData // ignore: cast_nullable_to_non_nullable
@@ -84,7 +90,7 @@ abstract class _$$SouguuAppIncredientModelImplCopyWith<$Res>
       __$$SouguuAppIncredientModelImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({SouguuIncredientDataAppUsageModel appData});
+  $Res call({String type, SouguuIncredientDataAppUsageModel appData});
 
   @override
   $SouguuIncredientDataAppUsageModelCopyWith<$Res> get appData;
@@ -103,9 +109,14 @@ class __$$SouguuAppIncredientModelImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? type = null,
     Object? appData = null,
   }) {
     return _then(_$SouguuAppIncredientModelImpl(
+      type: null == type
+          ? _value.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as String,
       appData: null == appData
           ? _value.appData
           : appData // ignore: cast_nullable_to_non_nullable
@@ -117,17 +128,19 @@ class __$$SouguuAppIncredientModelImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$SouguuAppIncredientModelImpl implements _SouguuAppIncredientModel {
-  _$SouguuAppIncredientModelImpl({required this.appData});
+  _$SouguuAppIncredientModelImpl({required this.type, required this.appData});
 
   factory _$SouguuAppIncredientModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$SouguuAppIncredientModelImplFromJson(json);
 
   @override
+  final String type;
+  @override
   final SouguuIncredientDataAppUsageModel appData;
 
   @override
   String toString() {
-    return 'SouguuAppIncredientModel(appData: $appData)';
+    return 'SouguuAppIncredientModel(type: $type, appData: $appData)';
   }
 
   @override
@@ -135,12 +148,13 @@ class _$SouguuAppIncredientModelImpl implements _SouguuAppIncredientModel {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$SouguuAppIncredientModelImpl &&
+            (identical(other.type, type) || other.type == type) &&
             (identical(other.appData, appData) || other.appData == appData));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, appData);
+  int get hashCode => Object.hash(runtimeType, type, appData);
 
   @JsonKey(ignore: true)
   @override
@@ -159,12 +173,15 @@ class _$SouguuAppIncredientModelImpl implements _SouguuAppIncredientModel {
 
 abstract class _SouguuAppIncredientModel implements SouguuAppIncredientModel {
   factory _SouguuAppIncredientModel(
-          {required final SouguuIncredientDataAppUsageModel appData}) =
+          {required final String type,
+          required final SouguuIncredientDataAppUsageModel appData}) =
       _$SouguuAppIncredientModelImpl;
 
   factory _SouguuAppIncredientModel.fromJson(Map<String, dynamic> json) =
       _$SouguuAppIncredientModelImpl.fromJson;
 
+  @override
+  String get type;
   @override
   SouguuIncredientDataAppUsageModel get appData;
   @override

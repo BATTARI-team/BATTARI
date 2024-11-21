@@ -9,6 +9,7 @@ part of 'souguu_app_incredient_model.dart';
 _$SouguuAppIncredientModelImpl _$$SouguuAppIncredientModelImplFromJson(
         Map<String, dynamic> json) =>
     _$SouguuAppIncredientModelImpl(
+      type: json['type'] as String,
       appData: SouguuIncredientDataAppUsageModel.fromJson(
           json['appData'] as Map<String, dynamic>),
     );
@@ -16,5 +17,6 @@ _$SouguuAppIncredientModelImpl _$$SouguuAppIncredientModelImplFromJson(
 Map<String, dynamic> _$$SouguuAppIncredientModelImplToJson(
         _$SouguuAppIncredientModelImpl instance) =>
     <String, dynamic>{
+      'type': instance.type,
       'appData': instance.appData,
     };
