@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 
@@ -7,11 +8,14 @@ import 'package:battari/model/dto/rest_souguu_notification.dart';
 import 'package:battari/model/dto/websocket_souguu_notification.dart';
 import 'package:battari/model/state/souguu_service_state.dart';
 import 'package:battari/routes.dart';
+import 'package:battari/service/notification_service.dart';
 import 'package:battari/service/websocket_service.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:http/http.dart' as http;
@@ -21,6 +25,8 @@ part 'souguu_service.g.dart';
 @Riverpod(keepAlive: false)
 class SouguuService extends _$SouguuService {
   ProviderSubscription? websocketProviderSubscription;
+  ProviderSubscription<NotificationService>? notificationServiceSubscription;
+  Timer? _untilCallStartTimer;
   dealNotification(String p0, [bool fromForegroundApp = false]) async {
     // logger.d("websocketで受信したデータ: $p0");
     // ここで受信したデータを処理する
@@ -46,7 +52,15 @@ class SouguuService extends _$SouguuService {
             }
           }
         } else {
-          FlutterForegroundTask.launchApp("/");
+          _untilCallStartTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+            int remain =
+                ref.read(souguuServiceInfoProvider).restSouguuNotification?.callStartTime.difference(DateTime.now()).inSeconds ?? 0;
+            if (ref.read(souguuServiceInfoProvider).restSouguuNotification?.callStartTime.compareTo(DateTime.now()) == -1) {
+              timer.cancel();
+              FlutterForegroundTask.launchApp("/");
+            }
+            notificationServiceSubscription?.read().showCounter(remain, notif.aiteUserId);
+          });
         }
       } catch (e) {
         logger.e("遭遇通知のパースに失敗しました: $e", error: e, stackTrace: StackTrace.current);
@@ -73,6 +87,7 @@ class SouguuService extends _$SouguuService {
         }
       }
     });
+    notificationServiceSubscription = ref.listen(notificationServiceProviderProvider, (previous, next) {});
 
     return 0;
   }

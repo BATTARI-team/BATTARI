@@ -10,4 +10,9 @@ class SouguuServiceState with _$SouguuServiceState {
     @Default(0) int souguu,
     RestSouguuNotification? restSouguuNotification,
   }) = _SouguuServiceState;
+
+  @override
+  String toString() {
+    return 'SouguuServiceState(souguu: $souguu, restSouguuNotification: {${restSouguuNotification?.aiteUserId.toString()}, ${restSouguuNotification?.callStartTime.toString()}, ${restSouguuNotification?.callEndTime.toString()}, ${restSouguuNotification?.callId.toString()}, ${restSouguuNotification?.souguuReason.toString()}, ${restSouguuNotification?.souguuDateTime.toString()}, ${restSouguuNotification?.token.toString()}, ${restSouguuNotification?.aiteUserId.toString()}, ${restSouguuNotification?.aiteUserId.toString()})';
+  }
 }

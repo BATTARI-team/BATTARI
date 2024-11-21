@@ -1,7 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-// ignore_for_file: deprecated_member_use
-
 part of 'websocket_service.dart';
 
 // **************************************************************************
@@ -15,7 +13,9 @@ String _$websocketServiceHash() => r'43fe536cf2428343307f94ec76d74e2ff6396d11';
 final websocketServiceProvider = AutoDisposeProvider<WebsocketService>.internal(
   websocketService,
   name: r'websocketServiceProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product') ? null : _$websocketServiceHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$websocketServiceHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );

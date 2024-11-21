@@ -133,11 +133,6 @@ class _$SouguuServiceStateImpl implements _SouguuServiceState {
   final RestSouguuNotification? restSouguuNotification;
 
   @override
-  String toString() {
-    return 'SouguuServiceState(souguu: $souguu, restSouguuNotification: $restSouguuNotification)';
-  }
-
-  @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
