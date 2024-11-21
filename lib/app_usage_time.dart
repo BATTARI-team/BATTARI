@@ -15,7 +15,7 @@ class _AppUsageState extends State<AppUsageTime> {
   Timer? _timer;
   String? _lastUpdated;
   int? _lastOpenTimeStamp; // 最新の eventType == 1 のタイムスタンプ
-  final int _targetSeconds = 10; // 300秒（5分）
+  final int _targetSeconds = 50; // 300秒（5分）
 
   @override
   void initState() {
@@ -26,7 +26,7 @@ class _AppUsageState extends State<AppUsageTime> {
 
   // タイマーの開始
   void startTimer() {
-    _timer = Timer.periodic(Duration(minutes: 1), (timer) async {
+    _timer = Timer.periodic(const Duration(seconds: 15), (timer) async {
       await checkAppUsage();
       setState(() {
         _lastUpdated = DateTime.now().toIso8601String();
@@ -37,6 +37,9 @@ class _AppUsageState extends State<AppUsageTime> {
   // アプリ使用時間のチェック
   Future<void> checkAppUsage() async {
     if (_lastOpenTimeStamp != null) {
+      print("a");
+      await initUsage();
+      print("a");
       DateTime currentTime = DateTime.now();
       DateTime lastOpenTime =
           DateTime.fromMillisecondsSinceEpoch(_lastOpenTimeStamp!);
@@ -44,8 +47,19 @@ class _AppUsageState extends State<AppUsageTime> {
       // 経過時間を秒で計算
       int elapsedSeconds = currentTime.difference(lastOpenTime).inSeconds;
 
+      String appName = events
+              .firstWhere(
+                  (event) => event.timeStamp == _lastOpenTimeStamp.toString())
+              .packageName ??
+          "不明なアプリ";
+
+      DateTime now = DateTime.now(); // 現在の時間を取得
+      String formattedTime = '${now.hour}:${now.minute}:${now.second}';
+
       if (elapsedSeconds >= _targetSeconds) {
-        print("encountOK"); // 300秒以上経過した場合に出力
+        print("$appName:encountOK （時間: $formattedTime）"); // 300秒以上経過した場合に出力
+      } else {
+        print("$appName:$elapsedSeconds経過"); // _targetSeconds以下なら経過秒数を表示
       }
     }
   }
@@ -67,6 +81,7 @@ class _AppUsageState extends State<AppUsageTime> {
           _lastOpenTimeStamp = int.parse(event.timeStamp!);
           break; // 最新のイベントのみを使用するため、最初に見つかったらループを抜ける
         }
+        print("_lastOpenTimeStamp: $_lastOpenTimeStamp");
       }
 
       setState(() {
