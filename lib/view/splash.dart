@@ -7,6 +7,7 @@ import 'package:battari/model/state/user_state.dart';
 import 'package:battari/service/souguu_service.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,8 +17,15 @@ class Splash extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     log("Splash build");
-    init(context, ref);
-    return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    var initializationFuture = init(context, ref);
+    return FutureBuilder(
+        future: initializationFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          }
+          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+        });
   }
 
   Future<void> init(BuildContext context, WidgetRef ref) async {
@@ -29,6 +37,12 @@ class Splash extends HookConsumerWidget {
     ]);
     UserState? userState = await ref.read(userSharedPreferencesRepositoryProvider).get();
     debugPrint("done");
+    // 通知権限
+    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+    var android = flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+    if (android != null) {
+      await android.requestNotificationsPermission();
+    }
     if (userState != null) {
       var token = await ref.read(userViewModelProvider.notifier).refreshToken(userState.id, userState.refreshToken);
       var isCall = await ref.read(souguuServiceInfoProvider.notifier).init();
@@ -44,6 +58,7 @@ class Splash extends HookConsumerWidget {
             context.go('/call');
           });
         } else {
+          // アプリサイドにデータを送信
           WidgetsBinding.instance.addPostFrameCallback((_) {
             context.go('/home');
           });

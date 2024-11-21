@@ -1,0 +1,86 @@
+PODS:
+  - agora_rtc_engine (0.0.1):
+    - AgoraIrisRTC_macOS (= 4.3.2-build.1)
+    - AgoraRtcEngine_macOS (= 4.3.2)
+    - FlutterMacOS
+  - AgoraIrisRTC_macOS (4.3.2-build.1)
+  - AgoraRtcEngine_macOS (4.3.2):
+    - AgoraRtcEngine_macOS/AIAEC (= 4.3.2)
+    - AgoraRtcEngine_macOS/AINS (= 4.3.2)
+    - AgoraRtcEngine_macOS/AudioBeauty (= 4.3.2)
+    - AgoraRtcEngine_macOS/ClearVision (= 4.3.2)
+    - AgoraRtcEngine_macOS/ContentInspect (= 4.3.2)
+    - AgoraRtcEngine_macOS/FaceCapture (= 4.3.2)
+    - AgoraRtcEngine_macOS/FaceDetection (= 4.3.2)
+    - AgoraRtcEngine_macOS/LipSync (= 4.3.2)
+    - AgoraRtcEngine_macOS/RtcBasic (= 4.3.2)
+    - AgoraRtcEngine_macOS/ScreenCapture (= 4.3.2)
+    - AgoraRtcEngine_macOS/SpatialAudio (= 4.3.2)
+    - AgoraRtcEngine_macOS/VideoAv1CodecDec (= 4.3.2)
+    - AgoraRtcEngine_macOS/VideoAv1CodecEnc (= 4.3.2)
+    - AgoraRtcEngine_macOS/VideoCodecDec (= 4.3.2)
+    - AgoraRtcEngine_macOS/VideoCodecEnc (= 4.3.2)
+    - AgoraRtcEngine_macOS/VirtualBackground (= 4.3.2)
+    - AgoraRtcEngine_macOS/VQA (= 4.3.2)
+  - AgoraRtcEngine_macOS/AIAEC (4.3.2)
+  - AgoraRtcEngine_macOS/AINS (4.3.2)
+  - AgoraRtcEngine_macOS/AudioBeauty (4.3.2)
+  - AgoraRtcEngine_macOS/ClearVision (4.3.2)
+  - AgoraRtcEngine_macOS/ContentInspect (4.3.2)
+  - AgoraRtcEngine_macOS/FaceCapture (4.3.2)
+  - AgoraRtcEngine_macOS/FaceDetection (4.3.2)
+  - AgoraRtcEngine_macOS/LipSync (4.3.2)
+  - AgoraRtcEngine_macOS/RtcBasic (4.3.2)
+  - AgoraRtcEngine_macOS/ScreenCapture (4.3.2)
+  - AgoraRtcEngine_macOS/SpatialAudio (4.3.2)
+  - AgoraRtcEngine_macOS/VideoAv1CodecDec (4.3.2)
+  - AgoraRtcEngine_macOS/VideoAv1CodecEnc (4.3.2)
+  - AgoraRtcEngine_macOS/VideoCodecDec (4.3.2)
+  - AgoraRtcEngine_macOS/VideoCodecEnc (4.3.2)
+  - AgoraRtcEngine_macOS/VirtualBackground (4.3.2)
+  - AgoraRtcEngine_macOS/VQA (4.3.2)
+  - flutter_local_notifications (0.0.1):
+    - FlutterMacOS
+  - FlutterMacOS (1.0.0)
+  - iris_method_channel (0.0.1):
+    - FlutterMacOS
+  - shared_preferences_foundation (0.0.1):
+    - Flutter
+    - FlutterMacOS
+
+DEPENDENCIES:
+  - agora_rtc_engine (from `Flutter/ephemeral/.symlinks/plugins/agora_rtc_engine/macos`)
+  - flutter_local_notifications (from `Flutter/ephemeral/.symlinks/plugins/flutter_local_notifications/macos`)
+  - FlutterMacOS (from `Flutter/ephemeral`)
+  - iris_method_channel (from `Flutter/ephemeral/.symlinks/plugins/iris_method_channel/macos`)
+  - shared_preferences_foundation (from `Flutter/ephemeral/.symlinks/plugins/shared_preferences_foundation/darwin`)
+
+SPEC REPOS:
+  trunk:
+    - AgoraIrisRTC_macOS
+    - AgoraRtcEngine_macOS
+
+EXTERNAL SOURCES:
+  agora_rtc_engine:
+    :path: Flutter/ephemeral/.symlinks/plugins/agora_rtc_engine/macos
+  flutter_local_notifications:
+    :path: Flutter/ephemeral/.symlinks/plugins/flutter_local_notifications/macos
+  FlutterMacOS:
+    :path: Flutter/ephemeral
+  iris_method_channel:
+    :path: Flutter/ephemeral/.symlinks/plugins/iris_method_channel/macos
+  shared_preferences_foundation:
+    :path: Flutter/ephemeral/.symlinks/plugins/shared_preferences_foundation/darwin
+
+SPEC CHECKSUMS:
+  agora_rtc_engine: 4a1ade5822e2e2756d02e9f85d96c7fcf2cfce3d
+  AgoraIrisRTC_macOS: b5997a1d17bedcea8871b3c57b3768a45e940507
+  AgoraRtcEngine_macOS: 418a85d7e4a32f6314d9ced51228a330b71f8015
+  flutter_local_notifications: 7062189aabf7f50938a7b8b6614ffa97656eb0bf
+  FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
+  iris_method_channel: fba932d668df5b2a085f19bcd0b1f23d667a83cd
+  shared_preferences_foundation: fcdcbc04712aee1108ac7fda236f363274528f78
+
+PODFILE CHECKSUM: 236401fc2c932af29a9fcf0e97baeeb2d750d367
+
+COCOAPODS: 1.15.2

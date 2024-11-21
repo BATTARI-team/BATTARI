@@ -6,9 +6,12 @@ import 'package:battari/view/instruction/login_view.dart';
 import 'package:battari/view/instruction/nickname_view.dart';
 import 'package:battari/view/instruction/register_view.dart';
 import 'package:battari/view/splash.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-final router = GoRouter(routes: [
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+final router = GoRouter(navigatorKey: navigatorKey, routes: [
   GoRoute(
       path: '/',
       builder: (context, state) {
@@ -23,7 +26,7 @@ final router = GoRouter(routes: [
   GoRoute(path: '/nickname', builder: (context, state) => const NicknameView()),
   GoRoute(path: '/login', builder: (context, state) => const LoginView()),
   GoRoute(path: '/home', builder: (context, state) => const HomeView()),
-  GoRoute(path: '/call', builder: (context, state) => const Call()),
+  GoRoute(path: '/call', builder: (context, state) => Call()),
   GoRoute(
       path: '/foreground_init',
       builder: (context, state) {
