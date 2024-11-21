@@ -6,10 +6,10 @@ class AppUsageTime extends StatefulWidget {
   const AppUsageTime({super.key});
 
   @override
-  _AppUsageState createState() => _AppUsageState();
+  AppUsageState createState() => AppUsageState();
 }
 
-class _AppUsageState extends State<AppUsageTime> {
+class AppUsageState extends State<AppUsageTime> {
   List<EventUsageInfo> events = [];
   Map<String?, NetworkInfo?> _netInfoMap = Map();
   Timer? _timer;
@@ -71,6 +71,7 @@ class _AppUsageState extends State<AppUsageTime> {
       UsageStats.grantUsagePermission();
 
       DateTime endDate = DateTime.now();
+<<<<<<< HEAD:lib/app_usage_time.dart
       DateTime startDate = endDate.subtract(Duration(days: 1));
 
       List<EventUsageInfo> queryEvents =
@@ -81,6 +82,32 @@ class _AppUsageState extends State<AppUsageTime> {
         if (event.eventType == '1') {
           _lastOpenTimeStamp = int.parse(event.timeStamp!);
           break; // 最新のイベントのみを使用するため、最初に見つかったらループを抜ける
+=======
+      DateTime startDate = endDate.subtract(const Duration(days: 1));
+
+      List<EventUsageInfo> queryEvents = await UsageStats.queryEvents(startDate, endDate);
+      List<NetworkInfo> networkInfos = await UsageStats.queryNetworkUsageStats(
+        startDate,
+        endDate,
+        networkType: NetworkType.all,
+      );
+
+      Map<String?, NetworkInfo?> netInfoMap = {for (var v in networkInfos) v.packageName: v};
+
+      List<UsageInfo> t = await UsageStats.queryUsageStats(startDate, endDate);
+
+      for (var i in t) {
+        if (double.parse(i.totalTimeInForeground!) > 0) {
+          print(DateTime.fromMillisecondsSinceEpoch(int.parse(i.firstTimeStamp!)).toIso8601String());
+
+          print(DateTime.fromMillisecondsSinceEpoch(int.parse(i.lastTimeStamp!)).toIso8601String());
+
+          print(i.packageName);
+          print(DateTime.fromMillisecondsSinceEpoch(int.parse(i.lastTimeUsed!)).toIso8601String());
+          print(int.parse(i.totalTimeInForeground!) / 1000 / 60);
+
+          print('-----\n');
+>>>>>>> 16f720c23e04bbb490cbd035a868aa4d5cfe9fd0:lib/view/developer/app_usage_time.dart
         }
         print("_lastOpenTimeStamp: $_lastOpenTimeStamp");
       }
@@ -101,10 +128,14 @@ class _AppUsageState extends State<AppUsageTime> {
 
   @override
   Widget build(BuildContext context) {
+<<<<<<< HEAD:lib/app_usage_time.dart
     List<EventUsageInfo> filteredEvents = events
         .where((event) => event.eventType == '1' || event.eventType == '2')
         .toList();
 
+=======
+    List<EventUsageInfo> filteredEvents = events.where((event) => event.eventType == '1' || event.eventType == '2').toList();
+>>>>>>> 16f720c23e04bbb490cbd035a868aa4d5cfe9fd0:lib/view/developer/app_usage_time.dart
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(title: const Text("Usage Stats"), actions: const [
@@ -115,6 +146,7 @@ class _AppUsageState extends State<AppUsageTime> {
         ]),
         body: RefreshIndicator(
           onRefresh: initUsage,
+<<<<<<< HEAD:lib/app_usage_time.dart
           child: Column(
             children: [
               if (_lastUpdated != null)
@@ -138,6 +170,29 @@ class _AppUsageState extends State<AppUsageTime> {
                 ),
               ),
             ],
+=======
+          child: ListView.separated(
+            itemBuilder: (context, index) {
+              var event = filteredEvents[index];
+              var networkInfo = _netInfoMap[event.packageName];
+              return ListTile(
+                title: Text(event.packageName!),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Last time used: ${DateTime.fromMillisecondsSinceEpoch(int.parse(events[index].timeStamp!)).toIso8601String()}"),
+                    networkInfo == null
+                        ? const Text("Unknown network usage")
+                        : Text("Received bytes: ${networkInfo.rxTotalBytes}\n"
+                            "Transfered bytes : ${networkInfo.txTotalBytes}"),
+                  ],
+                ),
+                trailing: Text(event.eventType!),
+              );
+            },
+            separatorBuilder: (context, index) => const Divider(),
+            itemCount: filteredEvents.length,
+>>>>>>> 16f720c23e04bbb490cbd035a868aa4d5cfe9fd0:lib/view/developer/app_usage_time.dart
           ),
         ),
       ),

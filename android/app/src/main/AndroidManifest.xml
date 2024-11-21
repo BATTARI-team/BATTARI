@@ -33,8 +33,31 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+
+            <!-- Add android:stopWithTask option only when necessary. -->
+            <service 
+                    android:name="com.pravera.flutter_foreground_task.service.ForegroundService"
+                    android:foregroundServiceType="dataSync|remoteMessaging" 
+                    android:exported="false" />
     </application>
-    
+			<uses-permission android:name="android.permission.INTERNET" />
+			<!-- required -->
+			<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+            <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+            <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+            <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
+			<!-- foregroundServiceType: dataSync -->
+			<uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+
+			<!-- foregroundServiceType: remoteMessaging -->
+			<uses-permission android:name="android.permission.FOREGROUND_SERVICE_REMOTE_MESSAGING" />
+    <!-- Required to query activities that can process text, see:
+         https://developer.android.com/training/package-visibility?hl=en and
+         https://developer.android.com/reference/android/content/Intent#ACTION_PROCESS_TEXT.
+
+         In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin. -->
     <queries>
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT" />
