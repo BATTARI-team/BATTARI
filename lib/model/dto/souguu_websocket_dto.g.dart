@@ -12,9 +12,7 @@ _$SouguuWebsocketDtoImpl _$$SouguuWebsocketDtoImplFromJson(
       id: (json['id'] as num).toInt(),
       isWelcome: json['isWelcome'] as bool,
       incredients: (json['incredients'] as List<dynamic>)
-          .map((e) => (e as Map<String, dynamic>).map(
-                (k, e) => MapEntry(k, e as Object),
-              ))
+          .map((e) => e as Map<String, dynamic>)
           .toList(),
     );
 

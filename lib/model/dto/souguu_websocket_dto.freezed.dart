@@ -22,7 +22,7 @@ SouguuWebsocketDto _$SouguuWebsocketDtoFromJson(Map<String, dynamic> json) {
 mixin _$SouguuWebsocketDto {
   int get id => throw _privateConstructorUsedError;
   bool get isWelcome => throw _privateConstructorUsedError;
-  List<Map<String, Object>> get incredients =>
+  List<Map<String, dynamic>> get incredients =>
       throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -37,7 +37,7 @@ abstract class $SouguuWebsocketDtoCopyWith<$Res> {
           SouguuWebsocketDto value, $Res Function(SouguuWebsocketDto) then) =
       _$SouguuWebsocketDtoCopyWithImpl<$Res, SouguuWebsocketDto>;
   @useResult
-  $Res call({int id, bool isWelcome, List<Map<String, Object>> incredients});
+  $Res call({int id, bool isWelcome, List<Map<String, dynamic>> incredients});
 }
 
 /// @nodoc
@@ -69,7 +69,7 @@ class _$SouguuWebsocketDtoCopyWithImpl<$Res, $Val extends SouguuWebsocketDto>
       incredients: null == incredients
           ? _value.incredients
           : incredients // ignore: cast_nullable_to_non_nullable
-              as List<Map<String, Object>>,
+              as List<Map<String, dynamic>>,
     ) as $Val);
   }
 }
@@ -82,7 +82,7 @@ abstract class _$$SouguuWebsocketDtoImplCopyWith<$Res>
       __$$SouguuWebsocketDtoImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({int id, bool isWelcome, List<Map<String, Object>> incredients});
+  $Res call({int id, bool isWelcome, List<Map<String, dynamic>> incredients});
 }
 
 /// @nodoc
@@ -112,7 +112,7 @@ class __$$SouguuWebsocketDtoImplCopyWithImpl<$Res>
       incredients: null == incredients
           ? _value._incredients
           : incredients // ignore: cast_nullable_to_non_nullable
-              as List<Map<String, Object>>,
+              as List<Map<String, dynamic>>,
     ));
   }
 }
@@ -123,7 +123,7 @@ class _$SouguuWebsocketDtoImpl implements _SouguuWebsocketDto {
   _$SouguuWebsocketDtoImpl(
       {required this.id,
       required this.isWelcome,
-      required final List<Map<String, Object>> incredients})
+      required final List<Map<String, dynamic>> incredients})
       : _incredients = incredients;
 
   factory _$SouguuWebsocketDtoImpl.fromJson(Map<String, dynamic> json) =>
@@ -133,9 +133,9 @@ class _$SouguuWebsocketDtoImpl implements _SouguuWebsocketDto {
   final int id;
   @override
   final bool isWelcome;
-  final List<Map<String, Object>> _incredients;
+  final List<Map<String, dynamic>> _incredients;
   @override
-  List<Map<String, Object>> get incredients {
+  List<Map<String, dynamic>> get incredients {
     if (_incredients is EqualUnmodifiableListView) return _incredients;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_incredients);
@@ -182,7 +182,7 @@ abstract class _SouguuWebsocketDto implements SouguuWebsocketDto {
   factory _SouguuWebsocketDto(
           {required final int id,
           required final bool isWelcome,
-          required final List<Map<String, Object>> incredients}) =
+          required final List<Map<String, dynamic>> incredients}) =
       _$SouguuWebsocketDtoImpl;
 
   factory _SouguuWebsocketDto.fromJson(Map<String, dynamic> json) =
@@ -193,7 +193,7 @@ abstract class _SouguuWebsocketDto implements SouguuWebsocketDto {
   @override
   bool get isWelcome;
   @override
-  List<Map<String, Object>> get incredients;
+  List<Map<String, dynamic>> get incredients;
   @override
   @JsonKey(ignore: true)
   _$$SouguuWebsocketDtoImplCopyWith<_$SouguuWebsocketDtoImpl> get copyWith =>

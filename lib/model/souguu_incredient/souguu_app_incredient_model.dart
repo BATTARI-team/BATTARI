@@ -1,5 +1,4 @@
 import 'package:battari/model/souguu_incredient/souguu_incredient_data_appusage_model.dart';
-import 'package:battari/model/souguu_incredient/souguu_incredient_data_model.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'souguu_app_incredient_model.g.dart';
