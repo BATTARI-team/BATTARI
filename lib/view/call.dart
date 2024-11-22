@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:battari/logger.dart';
 import 'package:battari/main.dart';
+import 'package:battari/model/dto/rest_souguu_notification.dart';
 import 'package:battari/model/state/souguu_service_state.dart';
 import 'package:battari/model/state/user_state.dart';
 import 'package:battari/service/souguu_service.dart';
@@ -17,6 +18,7 @@ class Call extends HookConsumerWidget {
   Call({super.key});
   late RtcEngine _engine;
   Timer? _timer;
+  Timer? _callTimer;
 
   @override
   Widget build(BuildContext context, ref) {
@@ -26,10 +28,21 @@ class Call extends HookConsumerWidget {
     // 3: 通話終了
     var status = useState(0);
     var countdown = useState(0);
+    var callCountdown = useState(0);
     SouguuServiceState souguuInfo = ref.watch(souguuServiceInfoProvider);
     UserState? userState = ref.watch(userViewModelProvider).asData!.value;
     if (souguuInfo.restSouguuNotification == null || userState == null) {
-      throw Exception("restSouguuNotification is null");
+      // throw Exception("restSouguuNotification is null");
+      souguuInfo = SouguuServiceState(
+          restSouguuNotification: RestSouguuNotification(
+              callEndTime: DateTime.now().add(const Duration(seconds: 20)),
+              callId: 1,
+              aiteUserId: 6,
+              souguuDateTime: DateTime.now(),
+              callStartTime: DateTime.now().add(const Duration(seconds: 10)),
+              souguuReason: "instagramでBATTARI",
+              token: "006f1e"));
+      userState = UserState(id: 6, userId: "test", name: "test", token: "006f1e");
     }
 
     useEffect(() {
@@ -63,10 +76,19 @@ class Call extends HookConsumerWidget {
       if (status.value == 2) {
         logger.i("通話開始");
         debugPrint(souguuInfo.restSouguuNotification!.token);
+        callCountdown.value = souguuInfo.restSouguuNotification!.callEndTime.difference(DateTime.now()).inSeconds;
+        _callTimer = Timer.periodic(Duration(seconds: 1), (timer) {
+          if (callCountdown.value == 0) {
+            status.value = 3;
+            return;
+          }
+          debugPrint("a");
+          callCountdown.value = callCountdown.value - 1;
+        });
         _engine.joinChannel(
             token: souguuInfo.restSouguuNotification!.token,
             channelId: souguuInfo.restSouguuNotification!.callId.toString(),
-            uid: userState.id,
+            uid: userState!.id,
             options: const ChannelMediaOptions(
               clientRoleType: ClientRoleType.clientRoleBroadcaster,
             ));
@@ -80,17 +102,65 @@ class Call extends HookConsumerWidget {
         widget = const CircularProgressIndicator();
         break;
       case 1:
-        widget = Text("通話まであと${countdown.value}秒");
+        widget = Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Center(
+              child: Text(
+                "通話まであと",
+                style: TextStyle(fontSize: 35),
+              ),
+            ),
+            SizedBox(
+              height: 16,
+            ),
+            Center(
+                child: Text(
+              "${countdown.value}秒",
+              style: TextStyle(fontSize: 32),
+            ))
+          ],
+        );
         break;
       case 2:
-        widget = const Text("通話中");
+        widget = Column(
+          children: [
+            Center(
+              child: Text(
+                "通話中",
+                style: TextStyle(fontSize: 40),
+              ),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Center(
+              child: Text(
+                "通話終了まであと",
+                style: TextStyle(fontSize: 35),
+              ),
+            ),
+            Center(
+              child: Text(
+                "${callCountdown.value}秒",
+                style: TextStyle(fontSize: 32),
+              ),
+            )
+          ],
+        );
         break;
       default:
-        widget = const Text("Unknown status");
+        widget = Center(
+          child: const Text(
+            "通話終了",
+            style: TextStyle(fontSize: 40),
+          ),
+        );
     }
 
     return WithForegroundTask(
       child: Scaffold(
+        appBar: AppBar(),
         body: widget,
       ),
     );

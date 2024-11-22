@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:battari/view/call.dart';
 import 'package:battari/view/developer/app_usage_time.dart';
 import 'package:battari/view/developer/background.dart';
 import 'package:battari/repository/user_repository.dart';
@@ -53,13 +54,11 @@ class DeveloperWidgets extends StatelessWidget {
         body: Column(
           children: [
             _developerElement("websockettest", const WebSocketTest(), context),
-            Consumer(
-              builder: (context, ref, _) {
-                return TextButton(
-                    child: const Text("clear shared preferences"),
-                    onPressed: () => ref.read(userSharedPreferencesRepositoryProvider).clear());
-              }
-            ),
+            Consumer(builder: (context, ref, _) {
+              return TextButton(
+                  child: const Text("clear shared preferences"),
+                  onPressed: () => ref.read(userSharedPreferencesRepositoryProvider).clear());
+            }),
             // Consumer(
             //   builder: (context, ref, child) {
             //     ref.watch(souguuServiceProvider);
@@ -89,8 +88,8 @@ class DeveloperWidgets extends StatelessWidget {
               child: const Text("button"),
               onPressed: () {},
             ),
-          _developerElement("appusage", AppUsageTime(), context)
-
+            _developerElement("appusage", AppUsageTime(), context),
+            _developerElement("call", Call(), context)
           ],
         ));
   }
