@@ -75,15 +75,6 @@ class DeveloperWidgets extends StatelessWidget {
             //   },
             // ),
             _developerElement("Background", const ExamplePage(), context),
-            HookConsumer(builder: (context, ref, _) {
-              return TextButton(
-                  onPressed: () async {
-                    await _requestPermissions();
-                    _initService();
-                    FlutterForegroundTask.startService(notificationTitle: "battari", notificationText: "notificationText");
-                  },
-                  child: const Text("foreground task"));
-            }),
             TextButton(
               child: const Text("button"),
               onPressed: () {},
