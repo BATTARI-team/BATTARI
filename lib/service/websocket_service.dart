@@ -118,6 +118,7 @@ class WebsocketService {
     _isReconnect = false;
   }
 
+
   _connectWebsocket() async {
     String? token = "";
     token = _ref.read(userViewModelProvider).asData?.value?.token;
@@ -173,6 +174,9 @@ class WebsocketService {
     try {
       channel?.sink.add(message);
       _sendStreamController.add(message);
+      if(message != 'hello') {
+        logger.i("websocketにメッセージを送信しました: $message");
+      }
     } catch (e) {
       logger.w("websocketの接続に失敗しました: ", error: e, stackTrace: StackTrace.current);
     }
