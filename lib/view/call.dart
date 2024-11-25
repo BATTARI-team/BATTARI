@@ -11,6 +11,7 @@ import 'package:battari/view_model/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_ntp/flutter_ntp.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class Call extends HookConsumerWidget {
@@ -26,6 +27,7 @@ class Call extends HookConsumerWidget {
     // 3: 通話終了
     var status = useState(0);
     var countdown = useState(0);
+    int differenceFromOfficialTime = 0;
     SouguuServiceState souguuInfo = ref.watch(souguuServiceInfoProvider);
     UserState? userState = ref.watch(userViewModelProvider).asData!.value;
     if (souguuInfo.restSouguuNotification == null || userState == null) {
@@ -35,9 +37,13 @@ class Call extends HookConsumerWidget {
     useEffect(() {
       (() async {
         debugPrint("agora init");
+        var now = await FlutterNTP.now();
+        differenceFromOfficialTime = DateTime.now().difference(now).inSeconds;
         await _requestPermissionForAndroid();
         await _initAgoraEngine(souguuInfo.restSouguuNotification?.token ?? "");
-        countdown.value = souguuInfo.restSouguuNotification!.callStartTime.difference(DateTime.now()).inSeconds;
+        countdown.value = souguuInfo.restSouguuNotification!.callStartTime
+            .difference(DateTime.now().subtract(Duration(seconds: differenceFromOfficialTime)))
+            .inSeconds;
         status.value = 1;
 
         _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
