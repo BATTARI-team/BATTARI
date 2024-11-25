@@ -110,11 +110,11 @@ class MyTaskHandler extends TaskHandler {
   // - repeat(interval) : Call onRepeatEvent at milliseconds interval.
   @override
   void onRepeatEvent(DateTime timestamp) {
-    // Send data to main isolate.
-    final Map<String, dynamic> data = {
-      "timestampMillis": timestamp.millisecondsSinceEpoch,
-    };
-    FlutterForegroundTask.sendDataToMain(data);
+    // // Send data to main isolate.
+    // final Map<String, dynamic> data = {
+    //   "timestampMillis": timestamp.millisecondsSinceEpoch,
+    // };
+    // FlutterForegroundTask.sendDataToMain(data);
   }
 
   // Called when the task is destroyed.

@@ -14,7 +14,7 @@ import 'package:http/http.dart' as http;
 
 part 'user_view_model.g.dart';
 
-const ipAddress = "192.168.10.8";
+const ipAddress = "takutk.com";
 
 @Riverpod(keepAlive: true)
 class UserViewModel extends _$UserViewModel {
