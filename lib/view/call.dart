@@ -32,7 +32,7 @@ class Call extends HookConsumerWidget {
     SouguuServiceState souguuInfo = ref.watch(souguuServiceInfoProvider);
     UserState? userState = ref.watch(userViewModelProvider).asData!.value;
     if (souguuInfo.restSouguuNotification == null || userState == null) {
-      // throw Exception("restSouguuNotification is null");
+      // デフォルト値挿入
       souguuInfo = SouguuServiceState(
           restSouguuNotification: RestSouguuNotification(
               callEndTime: DateTime.now().add(const Duration(seconds: 20)),
@@ -42,7 +42,7 @@ class Call extends HookConsumerWidget {
               callStartTime: DateTime.now().add(const Duration(seconds: 10)),
               souguuReason: "instagramでBATTARI",
               token: "006f1e"));
-      userState = UserState(id: 6, userId: "test", name: "test", token: "006f1e");
+      userState = const UserState(id: 6, userId: "test", name: "test", token: "006f1e");
     }
 
     useEffect(() {
@@ -77,12 +77,11 @@ class Call extends HookConsumerWidget {
         logger.i("通話開始");
         debugPrint(souguuInfo.restSouguuNotification!.token);
         callCountdown.value = souguuInfo.restSouguuNotification!.callEndTime.difference(DateTime.now()).inSeconds;
-        _callTimer = Timer.periodic(Duration(seconds: 1), (timer) {
+        _callTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
           if (callCountdown.value == 0) {
             status.value = 3;
             return;
           }
-          debugPrint("a");
           callCountdown.value = callCountdown.value - 1;
         });
         _engine.joinChannel(
@@ -105,19 +104,19 @@ class Call extends HookConsumerWidget {
         widget = Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Center(
+            const Center(
               child: Text(
                 "通話まであと",
                 style: TextStyle(fontSize: 35),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 16,
             ),
             Center(
                 child: Text(
               "${countdown.value}秒",
-              style: TextStyle(fontSize: 32),
+              style: const TextStyle(fontSize: 32),
             ))
           ],
         );
@@ -125,16 +124,16 @@ class Call extends HookConsumerWidget {
       case 2:
         widget = Column(
           children: [
-            Center(
+            const Center(
               child: Text(
                 "通話中",
                 style: TextStyle(fontSize: 40),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
-            Center(
+            const Center(
               child: Text(
                 "通話終了まであと",
                 style: TextStyle(fontSize: 35),
@@ -143,15 +142,15 @@ class Call extends HookConsumerWidget {
             Center(
               child: Text(
                 "${callCountdown.value}秒",
-                style: TextStyle(fontSize: 32),
+                style: const TextStyle(fontSize: 32),
               ),
             )
           ],
         );
         break;
       default:
-        widget = Center(
-          child: const Text(
+        widget = const Center(
+          child: Text(
             "通話終了",
             style: TextStyle(fontSize: 40),
           ),

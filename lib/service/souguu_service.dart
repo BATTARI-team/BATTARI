@@ -52,7 +52,6 @@ class SouguuService extends _$SouguuService {
           try {
             if (fromForegroundApp) {
               router.go("/");
-              debugPrint("pushhh");
             } else {
               FlutterForegroundTask.sendDataToMain(p0);
             }
@@ -100,7 +99,7 @@ class SouguuService extends _$SouguuService {
         }
       }
     });
-    _souguuIncredientSender = Timer.periodic(const Duration(seconds: 3), (timer) {
+    _souguuIncredientSender = Timer.periodic(const Duration(minutes: 1), (timer) {
       userId ??= ref.read(userViewModelProvider).maybeWhen(
           orElse: () => null,
           data: (data) {
@@ -119,7 +118,7 @@ class SouguuService extends _$SouguuService {
         if (!websocketProviderSubscription!.closed) websocketProviderSubscription!.read().sendMessage(output);
       }
     });
-    _appUsageGetter = Timer.periodic(const Duration(seconds: 5), (timer) async {
+    _appUsageGetter = Timer.periodic(const Duration(seconds: 30), (timer) async {
       await _checkAppUsage();
     });
     notificationServiceSubscription = ref.listen(notificationServiceProviderProvider, (previous, next) {});
