@@ -8,10 +8,12 @@ import 'package:battari/model/dto/rest_souguu_notification.dart';
 import 'package:battari/model/state/souguu_service_state.dart';
 import 'package:battari/model/state/user_state.dart';
 import 'package:battari/service/souguu_service.dart';
+import 'package:battari/util/time_util.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_ntp/flutter_ntp.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class Call extends HookConsumerWidget {
@@ -28,6 +30,7 @@ class Call extends HookConsumerWidget {
     // 3: 通話終了
     var status = useState(0);
     var countdown = useState(0);
+    int differenceFromOfficialTime = 0;
     var callCountdown = useState(0);
     SouguuServiceState souguuInfo = ref.watch(souguuServiceInfoProvider);
     UserState? userState = ref.watch(userViewModelProvider).asData!.value;
@@ -50,18 +53,19 @@ class Call extends HookConsumerWidget {
         debugPrint("agora init");
         await _requestPermissionForAndroid();
         await _initAgoraEngine(souguuInfo.restSouguuNotification?.token ?? "");
-        countdown.value = souguuInfo.restSouguuNotification!.callStartTime.difference(DateTime.now()).inSeconds;
+        countdown.value = souguuInfo.restSouguuNotification!.callStartTime.difference((await TimeUtil.getOfficialTime())).inSeconds;
         status.value = 1;
 
-        _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        _timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
           if (status.value > 1) {
             timer.cancel();
           }
           // if (souguuInfo.restSouguuNotification!.callStartTime < DateTime.now()) {
-          if (souguuInfo.restSouguuNotification?.callStartTime.compareTo(DateTime.now()) == -1) {
+          var now = await TimeUtil.getOfficialTime();
+          if (souguuInfo.restSouguuNotification?.callStartTime.compareTo(now) == -1) {
             status.value = 2;
           }
-          countdown.value = souguuInfo.restSouguuNotification!.callStartTime.difference(DateTime.now()).inSeconds;
+          countdown.value = souguuInfo.restSouguuNotification!.callStartTime.difference(now).inSeconds;
         });
       })();
       // #TODO 通話終了時にエンジンを破棄する, timerを破棄
@@ -76,14 +80,17 @@ class Call extends HookConsumerWidget {
       if (status.value == 2) {
         logger.i("通話開始");
         debugPrint(souguuInfo.restSouguuNotification!.token);
-        callCountdown.value = souguuInfo.restSouguuNotification!.callEndTime.difference(DateTime.now()).inSeconds;
-        _callTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-          if (callCountdown.value == 0) {
-            status.value = 3;
-            return;
-          }
-          callCountdown.value = callCountdown.value - 1;
-        });
+        var task = () async {
+          var now = await TimeUtil.getOfficialTime();
+          callCountdown.value = souguuInfo.restSouguuNotification!.callEndTime.difference(now).inSeconds;
+          _callTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+            if (callCountdown.value == 0) {
+              status.value = 3;
+              return;
+            }
+            callCountdown.value = callCountdown.value - 1;
+          });
+        }();
         _engine.joinChannel(
             token: souguuInfo.restSouguuNotification!.token,
             channelId: souguuInfo.restSouguuNotification!.callId.toString(),
@@ -91,6 +98,7 @@ class Call extends HookConsumerWidget {
             options: const ChannelMediaOptions(
               clientRoleType: ClientRoleType.clientRoleBroadcaster,
             ));
+        Future.wait([task]);
       }
       return null;
     }, [status.value]);

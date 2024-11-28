@@ -129,6 +129,8 @@ class WebsocketService {
       throw Exception("token is null");
     }
 
+    logger.i("websocketの接続を開始します");
+
     try {
       channel = IOWebSocketChannel.connect(Uri.parse('ws://$ipAddress:5050/ws'), headers: {
         'Authorization':

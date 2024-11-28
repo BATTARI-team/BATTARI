@@ -16,6 +16,7 @@ import 'package:battari/service/websocket_service.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
+import 'package:flutter_ntp/flutter_ntp.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/riverpod.dart';
@@ -63,10 +64,23 @@ class SouguuService extends _$SouguuService {
             }
           }
         } else {
+          var now = await FlutterNTP.now();
+          var differenceFromOfficialTime = DateTime.now().difference(now).inSeconds;
+
           _untilCallStartTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-            int remain =
-                ref.read(souguuServiceInfoProvider).restSouguuNotification?.callStartTime.difference(DateTime.now()).inSeconds ?? 0;
-            if (ref.read(souguuServiceInfoProvider).restSouguuNotification?.callStartTime.compareTo(DateTime.now()) == -1) {
+            int remain = ref
+                    .read(souguuServiceInfoProvider)
+                    .restSouguuNotification
+                    ?.callStartTime
+                    .difference(DateTime.now().subtract(Duration(seconds: differenceFromOfficialTime)))
+                    .inSeconds ??
+                0;
+            if (ref
+                    .read(souguuServiceInfoProvider)
+                    .restSouguuNotification
+                    ?.callStartTime
+                    .compareTo(DateTime.now().subtract(Duration(seconds: differenceFromOfficialTime))) ==
+                -1) {
               timer.cancel();
               FlutterForegroundTask.launchApp("/");
             }
