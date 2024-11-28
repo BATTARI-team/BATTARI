@@ -9,6 +9,7 @@ import 'package:battari/view/developer/websocket_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class DeveloperWidgets extends StatelessWidget {
   const DeveloperWidgets({super.key});
@@ -53,6 +54,19 @@ class DeveloperWidgets extends StatelessWidget {
         ),
         body: Column(
           children: [
+            FutureBuilder(
+              future: () async {
+                var info = await PackageInfo.fromPlatform();
+                return info.version;
+              }(),
+              builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                if (snapshot.hasData) {
+                  return Text("version: ${snapshot.data}");
+                } else {
+                  return const CircularProgressIndicator();
+                }
+              },
+            ),
             _developerElement("websockettest", const WebSocketTest(), context),
             Consumer(builder: (context, ref, _) {
               return TextButton(
