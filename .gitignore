@@ -51,7 +51,6 @@ app.*.map.json
 **/android/local.properties
 **/android/**/GeneratedPluginRegistrant.java
 **/android/key.properties
-**/android/app/src/main/res/mipmap*/
 **/android/app/google-services.json
 *.jks
 
