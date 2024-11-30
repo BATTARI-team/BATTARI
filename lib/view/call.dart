@@ -17,7 +17,7 @@ import 'package:flutter_ntp/flutter_ntp.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class Call extends HookConsumerWidget {
+class Call extends HookConsumerWidget with WidgetsBindingObserver {
   Call({super.key});
   late RtcEngine _engine;
   Timer? _timer;
@@ -259,6 +259,24 @@ class Call extends HookConsumerWidget {
     final NotificationPermission notificationPermissionStatus = await FlutterForegroundTask.checkNotificationPermission();
     if (notificationPermissionStatus != NotificationPermission.granted) {
       await FlutterForegroundTask.requestNotificationPermission();
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    print("stete = $state");
+    switch (state) {
+      case AppLifecycleState.inactive:
+        exit(0);
+      case AppLifecycleState.paused:
+        print('停止されたときの処理');
+        break;
+      case AppLifecycleState.resumed:
+        print('再開されたときの処理');
+        break;
+      case AppLifecycleState.detached:
+        print('破棄されたときの処理');
+        break;
     }
   }
 }

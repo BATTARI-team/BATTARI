@@ -11,13 +11,13 @@ class HomeView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, ref) {
-    FlutterForegroundTask.addTaskDataCallback((data) {
-      logger.d("foreground task data: $data");
-      if (context.mounted) {
-        ref.read(souguuServiceProvider.notifier).dealNotification(data.toString(), true);
-      }
-      // ref.read(souguuServiceProvider.notifier).disconnectWebsocket();
-    });
+    // FlutterForegroundTask.addTaskDataCallback((data) {
+    //   logger.d("foreground task data: $data");
+    //   if (context.mounted) {
+    //     ref.read(souguuServiceProvider.notifier).dealNotification(data.toString(), true);
+    //   }
+    //   // ref.read(souguuServiceProvider.notifier).disconnectWebsocket();
+    // });
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: (() {

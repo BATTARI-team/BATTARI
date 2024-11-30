@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:battari/logger.dart';
 import 'package:battari/model/battari_setting.dart';
 import 'package:battari/repository/user_repository.dart';
+import 'package:battari/service/souguu_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
@@ -38,12 +40,20 @@ Future<void> main() async {
   ));
 }
 
-class Battari extends StatelessWidget {
+class Battari extends ConsumerWidget with WidgetsBindingObserver {
   const Battari({super.key});
 
   // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    FlutterForegroundTask.addTaskDataCallback((data) {
+      logger.d("foreground task data: $data");
+      logger.i("foreground task data: $data");
+      if (context.mounted) {
+        ref.read(souguuServiceProvider.notifier).dealNotification(data.toString(), true);
+      }
+      // ref.read(souguuServiceProvider.notifier).disconnectWebsocket();
+    });
     debugPrint("Battari build");
     return MaterialApp.router(
       title: 'Flutter Demo',
@@ -54,5 +64,24 @@ class Battari extends StatelessWidget {
       ),
       routerConfig: router,
     );
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    print("stete = $state");
+    switch (state) {
+      case AppLifecycleState.inactive:
+        print('非アクティブになったときの処理');
+        break;
+      case AppLifecycleState.paused:
+        print('停止されたときの処理');
+        break;
+      case AppLifecycleState.resumed:
+        print('再開されたときの処理');
+        break;
+      case AppLifecycleState.detached:
+        print('破棄されたときの処理');
+        break;
+    }
   }
 }
