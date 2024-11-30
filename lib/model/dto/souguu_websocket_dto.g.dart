@@ -11,6 +11,7 @@ _$SouguuWebsocketDtoImpl _$$SouguuWebsocketDtoImplFromJson(
     _$SouguuWebsocketDtoImpl(
       id: (json['id'] as num).toInt(),
       isWelcome: json['isWelcome'] as bool,
+      created: DateTime.parse(json['created'] as String),
       incredients: (json['incredients'] as List<dynamic>)
           .map((e) => e as Map<String, dynamic>)
           .toList(),
@@ -21,5 +22,6 @@ Map<String, dynamic> _$$SouguuWebsocketDtoImplToJson(
     <String, dynamic>{
       'id': instance.id,
       'isWelcome': instance.isWelcome,
+      'created': instance.created.toIso8601String(),
       'incredients': instance.incredients,
     };

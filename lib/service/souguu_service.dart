@@ -41,7 +41,9 @@ class SouguuService extends _$SouguuService {
 
   SouguuAppIncredientModel? appData;
   dealNotification(String p0, [bool fromForegroundApp = false]) async {
-    // logger.d("websocketで受信したデータ: $p0");
+    if (p0 != "battari") {
+      logger.d("websocketで受信したデータ: $p0");
+    }
     // ここで受信したデータを処理する
     if (p0.length > 20) {
       try {
@@ -126,7 +128,8 @@ class SouguuService extends _$SouguuService {
       if (appData != null) {
         incredients.add(appData!.toJson());
       }
-      var output = jsonEncode(SouguuWebsocketDto(id: userId!, isWelcome: false, incredients: incredients).toJson());
+      var output =
+          jsonEncode(SouguuWebsocketDto(id: userId!, isWelcome: false, incredients: incredients, created: DateTime.now()).toJson());
 
       if (websocketProviderSubscription != null) {
         if (!websocketProviderSubscription!.closed) websocketProviderSubscription!.read().sendMessage(output);
@@ -208,6 +211,9 @@ class SouguuService extends _$SouguuService {
 class SouguuServiceInfo extends _$SouguuServiceInfo {
   @override
   SouguuServiceState build() {
+    ref.onDispose(() {
+      log("souguu service info dispose");
+    });
     log("souguu service info build");
     return SouguuServiceState();
   }

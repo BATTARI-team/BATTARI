@@ -29,7 +29,6 @@ class Splash extends HookConsumerWidget {
   }
 
   Future<void> init(BuildContext context, WidgetRef ref) async {
-    await Future.delayed(const Duration(seconds: 2), () {});
     var sharedPreferences = await SharedPreferences.getInstance();
     // この関数が終わらないと遷移しないため
     ProviderScope.containerOf(context).updateOverrides([
