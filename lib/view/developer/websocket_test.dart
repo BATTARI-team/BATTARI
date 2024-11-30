@@ -28,8 +28,9 @@ class _WebSocketTestState extends State<WebSocketTest> {
 
     sendMessage(WidgetRef ref, {String? message}) {
       message ??= jsonEncode({
-        'id': 2,
+        'id': ref.read(userViewModelProvider).asData?.value?.id,
         'isWelcome': false,
+        'created': DateTime.now(),
         'incredients': [
           {
             'type': 'app',
@@ -60,6 +61,7 @@ class _WebSocketTestState extends State<WebSocketTest> {
                     message: jsonEncode({
                       'id': ref.read(userViewModelProvider).asData?.value?.id,
                       'isWelcome': false,
+                      'created': DateTime.now().toIso8601String(),
                       'incredients': [
                         {
                           'type': 'app',
