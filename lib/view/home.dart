@@ -1,3 +1,4 @@
+import 'package:battari/logger.dart';
 import 'package:battari/service/souguu_service.dart';
 import 'package:battari/view/developer/developer_widgets.dart';
 import 'package:flutter/material.dart';
@@ -11,8 +12,11 @@ class HomeView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, ref) {
     FlutterForegroundTask.addTaskDataCallback((data) {
-      ref.read(souguuServiceProvider.notifier).dealNotification(data.toString(), true);
-      ref.read(souguuServiceProvider.notifier).disconnectWebsocket();
+      logger.d("foreground task data: $data");
+      if (context.mounted) {
+        ref.read(souguuServiceProvider.notifier).dealNotification(data.toString(), true);
+      }
+      // ref.read(souguuServiceProvider.notifier).disconnectWebsocket();
     });
     return Scaffold(
       floatingActionButton: FloatingActionButton(
