@@ -21,6 +21,7 @@ BattariSetting _$BattariSettingFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$BattariSetting {
   String get appIdAgora => throw _privateConstructorUsedError;
+  SentrySetting get sentry => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -34,7 +35,9 @@ abstract class $BattariSettingCopyWith<$Res> {
           BattariSetting value, $Res Function(BattariSetting) then) =
       _$BattariSettingCopyWithImpl<$Res, BattariSetting>;
   @useResult
-  $Res call({String appIdAgora});
+  $Res call({String appIdAgora, SentrySetting sentry});
+
+  $SentrySettingCopyWith<$Res> get sentry;
 }
 
 /// @nodoc
@@ -51,13 +54,26 @@ class _$BattariSettingCopyWithImpl<$Res, $Val extends BattariSetting>
   @override
   $Res call({
     Object? appIdAgora = null,
+    Object? sentry = null,
   }) {
     return _then(_value.copyWith(
       appIdAgora: null == appIdAgora
           ? _value.appIdAgora
           : appIdAgora // ignore: cast_nullable_to_non_nullable
               as String,
+      sentry: null == sentry
+          ? _value.sentry
+          : sentry // ignore: cast_nullable_to_non_nullable
+              as SentrySetting,
     ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $SentrySettingCopyWith<$Res> get sentry {
+    return $SentrySettingCopyWith<$Res>(_value.sentry, (value) {
+      return _then(_value.copyWith(sentry: value) as $Val);
+    });
   }
 }
 
@@ -69,7 +85,10 @@ abstract class _$$BattariSettingImplCopyWith<$Res>
       __$$BattariSettingImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String appIdAgora});
+  $Res call({String appIdAgora, SentrySetting sentry});
+
+  @override
+  $SentrySettingCopyWith<$Res> get sentry;
 }
 
 /// @nodoc
@@ -84,12 +103,17 @@ class __$$BattariSettingImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? appIdAgora = null,
+    Object? sentry = null,
   }) {
     return _then(_$BattariSettingImpl(
       appIdAgora: null == appIdAgora
           ? _value.appIdAgora
           : appIdAgora // ignore: cast_nullable_to_non_nullable
               as String,
+      sentry: null == sentry
+          ? _value.sentry
+          : sentry // ignore: cast_nullable_to_non_nullable
+              as SentrySetting,
     ));
   }
 }
@@ -99,17 +123,19 @@ class __$$BattariSettingImplCopyWithImpl<$Res>
 class _$BattariSettingImpl
     with DiagnosticableTreeMixin
     implements _BattariSetting {
-  const _$BattariSettingImpl({required this.appIdAgora});
+  const _$BattariSettingImpl({required this.appIdAgora, required this.sentry});
 
   factory _$BattariSettingImpl.fromJson(Map<String, dynamic> json) =>
       _$$BattariSettingImplFromJson(json);
 
   @override
   final String appIdAgora;
+  @override
+  final SentrySetting sentry;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'BattariSetting(appIdAgora: $appIdAgora)';
+    return 'BattariSetting(appIdAgora: $appIdAgora, sentry: $sentry)';
   }
 
   @override
@@ -117,7 +143,8 @@ class _$BattariSettingImpl
     super.debugFillProperties(properties);
     properties
       ..add(DiagnosticsProperty('type', 'BattariSetting'))
-      ..add(DiagnosticsProperty('appIdAgora', appIdAgora));
+      ..add(DiagnosticsProperty('appIdAgora', appIdAgora))
+      ..add(DiagnosticsProperty('sentry', sentry));
   }
 
   @override
@@ -126,12 +153,13 @@ class _$BattariSettingImpl
         (other.runtimeType == runtimeType &&
             other is _$BattariSettingImpl &&
             (identical(other.appIdAgora, appIdAgora) ||
-                other.appIdAgora == appIdAgora));
+                other.appIdAgora == appIdAgora) &&
+            (identical(other.sentry, sentry) || other.sentry == sentry));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, appIdAgora);
+  int get hashCode => Object.hash(runtimeType, appIdAgora, sentry);
 
   @JsonKey(ignore: true)
   @override
@@ -149,14 +177,17 @@ class _$BattariSettingImpl
 }
 
 abstract class _BattariSetting implements BattariSetting {
-  const factory _BattariSetting({required final String appIdAgora}) =
-      _$BattariSettingImpl;
+  const factory _BattariSetting(
+      {required final String appIdAgora,
+      required final SentrySetting sentry}) = _$BattariSettingImpl;
 
   factory _BattariSetting.fromJson(Map<String, dynamic> json) =
       _$BattariSettingImpl.fromJson;
 
   @override
   String get appIdAgora;
+  @override
+  SentrySetting get sentry;
   @override
   @JsonKey(ignore: true)
   _$$BattariSettingImplCopyWith<_$BattariSettingImpl> get copyWith =>

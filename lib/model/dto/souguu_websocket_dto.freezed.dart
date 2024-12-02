@@ -22,6 +22,7 @@ SouguuWebsocketDto _$SouguuWebsocketDtoFromJson(Map<String, dynamic> json) {
 mixin _$SouguuWebsocketDto {
   int get id => throw _privateConstructorUsedError;
   bool get isWelcome => throw _privateConstructorUsedError;
+  DateTime get created => throw _privateConstructorUsedError;
   List<Map<String, dynamic>> get incredients =>
       throw _privateConstructorUsedError;
 
@@ -37,7 +38,11 @@ abstract class $SouguuWebsocketDtoCopyWith<$Res> {
           SouguuWebsocketDto value, $Res Function(SouguuWebsocketDto) then) =
       _$SouguuWebsocketDtoCopyWithImpl<$Res, SouguuWebsocketDto>;
   @useResult
-  $Res call({int id, bool isWelcome, List<Map<String, dynamic>> incredients});
+  $Res call(
+      {int id,
+      bool isWelcome,
+      DateTime created,
+      List<Map<String, dynamic>> incredients});
 }
 
 /// @nodoc
@@ -55,6 +60,7 @@ class _$SouguuWebsocketDtoCopyWithImpl<$Res, $Val extends SouguuWebsocketDto>
   $Res call({
     Object? id = null,
     Object? isWelcome = null,
+    Object? created = null,
     Object? incredients = null,
   }) {
     return _then(_value.copyWith(
@@ -66,6 +72,10 @@ class _$SouguuWebsocketDtoCopyWithImpl<$Res, $Val extends SouguuWebsocketDto>
           ? _value.isWelcome
           : isWelcome // ignore: cast_nullable_to_non_nullable
               as bool,
+      created: null == created
+          ? _value.created
+          : created // ignore: cast_nullable_to_non_nullable
+              as DateTime,
       incredients: null == incredients
           ? _value.incredients
           : incredients // ignore: cast_nullable_to_non_nullable
@@ -82,7 +92,11 @@ abstract class _$$SouguuWebsocketDtoImplCopyWith<$Res>
       __$$SouguuWebsocketDtoImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({int id, bool isWelcome, List<Map<String, dynamic>> incredients});
+  $Res call(
+      {int id,
+      bool isWelcome,
+      DateTime created,
+      List<Map<String, dynamic>> incredients});
 }
 
 /// @nodoc
@@ -98,6 +112,7 @@ class __$$SouguuWebsocketDtoImplCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? isWelcome = null,
+    Object? created = null,
     Object? incredients = null,
   }) {
     return _then(_$SouguuWebsocketDtoImpl(
@@ -109,6 +124,10 @@ class __$$SouguuWebsocketDtoImplCopyWithImpl<$Res>
           ? _value.isWelcome
           : isWelcome // ignore: cast_nullable_to_non_nullable
               as bool,
+      created: null == created
+          ? _value.created
+          : created // ignore: cast_nullable_to_non_nullable
+              as DateTime,
       incredients: null == incredients
           ? _value._incredients
           : incredients // ignore: cast_nullable_to_non_nullable
@@ -123,6 +142,7 @@ class _$SouguuWebsocketDtoImpl implements _SouguuWebsocketDto {
   _$SouguuWebsocketDtoImpl(
       {required this.id,
       required this.isWelcome,
+      required this.created,
       required final List<Map<String, dynamic>> incredients})
       : _incredients = incredients;
 
@@ -133,6 +153,8 @@ class _$SouguuWebsocketDtoImpl implements _SouguuWebsocketDto {
   final int id;
   @override
   final bool isWelcome;
+  @override
+  final DateTime created;
   final List<Map<String, dynamic>> _incredients;
   @override
   List<Map<String, dynamic>> get incredients {
@@ -143,7 +165,7 @@ class _$SouguuWebsocketDtoImpl implements _SouguuWebsocketDto {
 
   @override
   String toString() {
-    return 'SouguuWebsocketDto(id: $id, isWelcome: $isWelcome, incredients: $incredients)';
+    return 'SouguuWebsocketDto(id: $id, isWelcome: $isWelcome, created: $created, incredients: $incredients)';
   }
 
   @override
@@ -154,13 +176,14 @@ class _$SouguuWebsocketDtoImpl implements _SouguuWebsocketDto {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.isWelcome, isWelcome) ||
                 other.isWelcome == isWelcome) &&
+            (identical(other.created, created) || other.created == created) &&
             const DeepCollectionEquality()
                 .equals(other._incredients, _incredients));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, isWelcome,
+  int get hashCode => Object.hash(runtimeType, id, isWelcome, created,
       const DeepCollectionEquality().hash(_incredients));
 
   @JsonKey(ignore: true)
@@ -182,6 +205,7 @@ abstract class _SouguuWebsocketDto implements SouguuWebsocketDto {
   factory _SouguuWebsocketDto(
           {required final int id,
           required final bool isWelcome,
+          required final DateTime created,
           required final List<Map<String, dynamic>> incredients}) =
       _$SouguuWebsocketDtoImpl;
 
@@ -192,6 +216,8 @@ abstract class _SouguuWebsocketDto implements SouguuWebsocketDto {
   int get id;
   @override
   bool get isWelcome;
+  @override
+  DateTime get created;
   @override
   List<Map<String, dynamic>> get incredients;
   @override

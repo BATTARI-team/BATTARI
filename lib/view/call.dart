@@ -14,9 +14,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_ntp/flutter_ntp.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class Call extends HookConsumerWidget {
+class Call extends HookConsumerWidget with WidgetsBindingObserver {
   Call({super.key});
   late RtcEngine _engine;
   Timer? _timer;
@@ -49,33 +50,53 @@ class Call extends HookConsumerWidget {
     }
 
     useEffect(() {
-      (() async {
-        debugPrint("agora init");
-        await _requestPermissionForAndroid();
-        await _initAgoraEngine(souguuInfo.restSouguuNotification?.token ?? "");
-        countdown.value = souguuInfo.restSouguuNotification!.callStartTime.difference((await TimeUtil.getOfficialTime())).inSeconds;
-        status.value = 1;
-
-        _timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
-          if (status.value > 1) {
-            timer.cancel();
-          }
-          // if (souguuInfo.restSouguuNotification!.callStartTime < DateTime.now()) {
+      Future.wait([
+        (() async {
+          debugPrint("agora init");
+          await _initAgoraEngine(souguuInfo.restSouguuNotification?.token ?? "");
+          debugPrint("token : ${souguuInfo.restSouguuNotification?.token}");
+          await _requestPermissionForAndroid();
           var now = await TimeUtil.getOfficialTime();
-          if (souguuInfo.restSouguuNotification?.callStartTime.compareTo(now) == -1) {
+          if (souguuInfo.restSouguuNotification!.callStartTime.compareTo(now) == -1) {
             status.value = 2;
+          } else {
+            bool lock = true;
+            WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+              countdown.value = souguuInfo.restSouguuNotification!.callStartTime.difference((now)).inSeconds;
+              status.value = 1;
+              lock = false;
+            });
+            while (lock) {
+              await Future.delayed(const Duration(milliseconds: 100));
+            }
+
+            _timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+              debugPrint("timer");
+
+              // if (souguuInfo.restSouguuNotification!.callStartTime < DateTime.now()) {
+              var now = await TimeUtil.getOfficialTime();
+              debugPrint(souguuInfo.restSouguuNotification?.callStartTime.toString());
+              countdown.value = souguuInfo.restSouguuNotification!.callStartTime.difference(now).inSeconds;
+              if (souguuInfo.restSouguuNotification?.callStartTime.compareTo(now) == -1) {
+                status.value = 2;
+                lock = false;
+                timer.cancel();
+              }
+            });
           }
-          countdown.value = souguuInfo.restSouguuNotification!.callStartTime.difference(now).inSeconds;
-        });
-      })();
+        })()
+      ]);
       // #TODO 通話終了時にエンジンを破棄する, timerを破棄
       return () {
         //_engine.destroy();
         _timer?.cancel();
+        _engine.leaveChannel();
+        _engine.disableAudio();
       };
     }, []);
 
     // 通話開始時に通話に参加
+    // 通話ステータスが変わった時に実行される
     useEffect(() {
       if (status.value == 2) {
         logger.i("通話開始");
@@ -83,22 +104,32 @@ class Call extends HookConsumerWidget {
         var task = () async {
           var now = await TimeUtil.getOfficialTime();
           callCountdown.value = souguuInfo.restSouguuNotification!.callEndTime.difference(now).inSeconds;
-          _callTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-            if (callCountdown.value == 0) {
+          _callTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+            debugPrint("callTimer");
+            if (callCountdown.value <= 0 || status.value == 3 || souguuInfo.restSouguuNotification!.callEndTime.compareTo(now) == -1) {
+              debugPrint("aaaaaaaaaaa tuuwasyuuryou");
+              bool lock = true;
               status.value = 3;
-              return;
+              timer.cancel();
+            } else {
+              callCountdown.value = callCountdown.value - 1;
             }
-            callCountdown.value = callCountdown.value - 1;
           });
         }();
-        _engine.joinChannel(
-            token: souguuInfo.restSouguuNotification!.token,
-            channelId: souguuInfo.restSouguuNotification!.callId.toString(),
-            uid: userState!.id,
-            options: const ChannelMediaOptions(
-              clientRoleType: ClientRoleType.clientRoleBroadcaster,
-            ));
+        Future.wait([
+          _engine.joinChannel(
+              token: souguuInfo.restSouguuNotification!.token,
+              channelId: souguuInfo.restSouguuNotification!.callId.toString(),
+              uid: userState!.id,
+              options: const ChannelMediaOptions(
+                clientRoleType: ClientRoleType.clientRoleBroadcaster,
+              ))
+        ]);
         Future.wait([task]);
+      } else if (status.value == 3) {
+        _callTimer?.cancel();
+        logger.i("通話終了");
+        //#TODO ホーム画面に遷移
       }
       return null;
     }, [status.value]);
@@ -157,11 +188,20 @@ class Call extends HookConsumerWidget {
         );
         break;
       default:
-        widget = const Center(
-          child: Text(
-            "通話終了",
-            style: TextStyle(fontSize: 40),
-          ),
+        widget = Column(
+          children: [
+            const Center(
+              child: Text(
+                "通話終了",
+                style: TextStyle(fontSize: 40),
+              ),
+            ),
+            ElevatedButton(
+                onPressed: () {
+                  context.go("/");
+                },
+                child: const Text("ホームに戻る"))
+          ],
         );
     }
 
@@ -219,6 +259,24 @@ class Call extends HookConsumerWidget {
     final NotificationPermission notificationPermissionStatus = await FlutterForegroundTask.checkNotificationPermission();
     if (notificationPermissionStatus != NotificationPermission.granted) {
       await FlutterForegroundTask.requestNotificationPermission();
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    print("stete = $state");
+    switch (state) {
+      case AppLifecycleState.inactive:
+        exit(0);
+      case AppLifecycleState.paused:
+        print('停止されたときの処理');
+        break;
+      case AppLifecycleState.resumed:
+        print('再開されたときの処理');
+        break;
+      case AppLifecycleState.detached:
+        print('破棄されたときの処理');
+        break;
     }
   }
 }
