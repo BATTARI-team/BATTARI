@@ -31,11 +31,11 @@ String Token = "";
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   FlutterForegroundTask.initCommunicationPort();
-  battariSetting = BattariSetting.fromJson(jsonDecode(await rootBundle.loadString('battari_setting.json')));
+  battariSetting = BattariSetting.fromJson(
+      jsonDecode(await rootBundle.loadString('battari_setting.json')));
   var shared = await SharedPreferences.getInstance();
   await SentryFlutter.init((options) {
     options.dsn = battariSetting.sentry.dsn;
-    options.debug = true;
     options.tracesSampleRate = 1.0;
   },
       appRunner: () => runApp(ProviderScope(
@@ -68,7 +68,9 @@ class Battari extends ConsumerWidget with WidgetsBindingObserver {
       logger.d("foreground task data: $data");
       logger.i("foreground task data: $data");
       if (context.mounted) {
-        ref.read(souguuServiceProvider.notifier).dealNotification(data.toString(), true);
+        ref
+            .read(souguuServiceProvider.notifier)
+            .dealNotification(data.toString(), true);
       }
       // ref.read(souguuServiceProvider.notifier).disconnectWebsocket();
     });
