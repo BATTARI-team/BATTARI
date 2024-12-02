@@ -57,6 +57,7 @@ dependencies:
   logger: ^2.4.0
   flutter_ntp: ^0.0.2
   package_info_plus: ^8.0.2
+  sentry_flutter: ^8.10.1
 
 
 dev_dependencies:
