@@ -20,16 +20,11 @@ void startCallback() {
 
 class MyTaskHandler extends TaskHandler {
   // Called when the task is started.
-  late IOWebSocketChannel channel;
   final _receiverStreamController = StreamController<String>.broadcast();
   final _sendStreamController = StreamController<String>.broadcast();
   late ProviderContainer providerContainer;
   ProviderSubscription? souguuServiceProviderSubscription;
   ProviderSubscription? userViewmodelProviderSubscription;
-  Future<void> cancelConnect() async {
-    // _reconnectTimer.cancel();
-    await channel.sink.close();
-  }
 
   int _count = 0;
   static const String incrementCountCommand = 'incrementCount';
@@ -46,19 +41,6 @@ class MyTaskHandler extends TaskHandler {
 
     // Send data to main isolate.
     FlutterForegroundTask.sendDataToMain(_count);
-  }
-
-  void _sendWebsocket(String message) async {
-    try {
-      channel.sink.add(message);
-      _sendStreamController.add(message);
-    } catch (e) {
-      logger.w("websocketの接続に失敗しました: ", error: e, stackTrace: StackTrace.current);
-    }
-  }
-
-  void sendMessage(String data) {
-    _sendWebsocket(data);
   }
 
   StreamSubscription<String> addWebsocketReceiver(Function(String) listener) {

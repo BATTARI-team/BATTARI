@@ -58,6 +58,7 @@ dependencies:
   flutter_ntp: ^0.0.2
   package_info_plus: ^8.0.2
   sentry_flutter: ^8.10.1
+  screen_state: ^4.0.0
 
 
 dev_dependencies:
