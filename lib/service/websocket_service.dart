@@ -50,6 +50,7 @@ class WebsocketService {
     //#TODO asyncにしちゃったから，ロック的なのが必要かも
     const timeout = 3;
     _reconnectTimer = Timer.periodic(const Duration(seconds: 10), (timer) async {
+      if (!isRunning) return;
       if (_count > timeout) {
         logger.i("websocketの再接続を試みます", time: DateTime.now());
         await _reset();
@@ -77,6 +78,7 @@ class WebsocketService {
     _reconnectTimer?.cancel();
     _reconnectTimer = null;
     await channel?.sink.close(null, "canceled");
+    await channel?.sink.close();
     channel = null;
     isRunning = false;
   }
@@ -117,7 +119,6 @@ class WebsocketService {
     }
     _isReconnect = false;
   }
-
 
   _connectWebsocket() async {
     String? token = "";
@@ -173,8 +174,8 @@ class WebsocketService {
   void _sendWebsocket(String message) async {
     try {
       channel?.sink.add(message);
-      _sendStreamController.add(message);
-      if(message != 'hello') {
+      _sendStreamController.isClosed ? _sendStreamController.add(message) : null;
+      if (message != 'hello') {
         logger.i("websocketにメッセージを送信しました: $message");
       }
     } catch (e) {
