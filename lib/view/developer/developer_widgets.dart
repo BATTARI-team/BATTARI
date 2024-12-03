@@ -57,7 +57,7 @@ class DeveloperWidgets extends StatelessWidget {
             FutureBuilder(
               future: () async {
                 var info = await PackageInfo.fromPlatform();
-                return info.version;
+                return "${info.version}+${info.buildNumber}";
               }(),
               builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
                 if (snapshot.hasData) {
