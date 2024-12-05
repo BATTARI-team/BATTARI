@@ -35,6 +35,8 @@ class UserSharedPreferencesRepository extends IUserRepository {
     String? userId = reference.getString("user_id");
     int? id = reference.getInt("id");
     String? name = reference.getString("name");
+    double? houseLatitude = reference.getDouble("house_latitude");
+    double? houseLongitude = reference.getDouble("house_longitude");
 
     if (refreshToken == null || userId == null || id == null || name == null) {
       return null;
@@ -44,6 +46,8 @@ class UserSharedPreferencesRepository extends IUserRepository {
       userId: userId,
       id: id,
       name: name,
+      houseLatitude: houseLatitude ?? 0,
+      houseLongitude: houseLongitude ?? 0,
     );
   }
 
@@ -54,6 +58,8 @@ class UserSharedPreferencesRepository extends IUserRepository {
     await reference.setString("user_id", userState.userId);
     await reference.setInt("id", userState.id);
     await reference.setString("name", userState.name);
+    await reference.setDouble("house_latitude", userState.houseLatitude);
+    await reference.setDouble("house_longitude", userState.houseLongitude);
   }
 
   @override
