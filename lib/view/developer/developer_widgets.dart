@@ -4,6 +4,7 @@ import 'package:battari/view/call.dart';
 import 'package:battari/view/developer/app_usage_time.dart';
 import 'package:battari/view/developer/background.dart';
 import 'package:battari/repository/user_repository.dart';
+import 'package:battari/view/instruction/setting_home_view.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:battari/view/developer/websocket_test.dart';
 import 'package:flutter/material.dart';
@@ -94,7 +95,9 @@ class DeveloperWidgets extends StatelessWidget {
               onPressed: () {},
             ),
             _developerElement("appusage", AppUsageTime(), context),
-            _developerElement("call", Call(), context)
+            _developerElement("call", Call(), context),
+          _developerElement("settings_home", SettingHomeView(), context),
+
           ],
         ));
   }
