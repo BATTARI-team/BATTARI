@@ -14,9 +14,15 @@ class _SettingHomeViewState extends State<SettingHomeView> {
       body: Column(
         children: [
           const Text('Setting Home View'),
+          const Text("please set allow location service(always)"),
           TextButton(onPressed: () async {
-            var currentLocation = await Geolocator.requestPermission();
-            debugPrint(currentLocation.toString());
+            var isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
+            debugPrint(isLocationServiceEnabled.toString());
+            if(isLocationServiceEnabled) {
+              var position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+              debugPrint(position.toString());
+            }
+
           },child:const Text(
             "こを自宅として登録する"),)
         ],
