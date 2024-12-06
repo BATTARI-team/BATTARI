@@ -66,6 +66,20 @@ class UserViewModel extends _$UserViewModel {
     );
   }
 
+  Future<void> setHome(double latitude, double longitude) async {
+    var user = state.maybeWhen(
+      orElse: () => null,
+      data: (data) {
+        return data;
+      },
+    );
+    if (user == null) {
+      return;
+    }
+    ref.read(userSharedPreferencesRepositoryProvider).saveHome(latitude, longitude);
+    state = AsyncData(user.copyWith(houseLatitude: latitude, houseLongitude: longitude));
+  }
+
   Future<bool> refreshUser(int userIndex) async {
     try {
       var token = TokenUtil.getToken();

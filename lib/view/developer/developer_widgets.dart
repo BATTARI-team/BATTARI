@@ -39,7 +39,8 @@ class DeveloperWidgets extends StatelessWidget {
                   Text("ユーザーID: ${data.id}"),
                   Text(
                     "トークン:${data.token}",
-                  )
+                  ),
+                  Text("緯度:${data.houseLatitude}, 経度:${data.houseLongitude}")
                 ],
               );
             });
