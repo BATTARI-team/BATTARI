@@ -10,6 +10,7 @@ import 'package:battari/model/dto/websocket_souguu_notification.dart';
 import 'package:battari/model/souguu_incredient/souguu_app_incredient_model.dart';
 import 'package:battari/model/souguu_incredient/souguu_incredient_data_appusage_model.dart';
 import 'package:battari/model/state/souguu_service_state.dart';
+import 'package:battari/model/state/user_state.dart';
 import 'package:battari/routes.dart';
 import 'package:battari/service/notification_service.dart';
 import 'package:battari/service/websocket_service.dart';
@@ -18,6 +19,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_ntp/flutter_ntp.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -38,10 +40,12 @@ class SouguuService extends _$SouguuService {
   Timer? _untilCallStartTimer;
   Timer? _appUsageGetter;
   Timer? _souguuIncredientSender;
+  Timer? _isHomeGetterTimer;
 
   int? userId;
 
   StreamSubscription<ScreenStateEvent>? _screenStateEventSubscription;
+  bool isHome = false;
 
   SouguuAppIncredientModel? appData;
   dealNotification(String p0, [bool fromForegroundApp = false]) async {
@@ -108,9 +112,17 @@ class SouguuService extends _$SouguuService {
 
   ProviderSubscription? souguuServiceInfoProviderSubscription;
 
+  // 遭遇したい時
   void _setWebsocketProviderSubs() {
-    websocketProviderSubscription = ref.listen(websocketServiceProvider, (previous, next) {});
-    ref.read(websocketServiceProvider).addWebsocketReceiver(dealNotification);
+    if (websocketProviderSubscription == null) {
+      websocketProviderSubscription = ref.listen(websocketServiceProvider, (previous, next) {});
+      ref.read(websocketServiceProvider).addWebsocketReceiver(dealNotification);
+    }
+  }
+
+  final int distanceHome = 10;
+  bool _isHome(Position position, UserState user) {
+    return Geolocator.distanceBetween(position.latitude, position.longitude, user.houseLatitude, user.houseLongitude) < distanceHome;
   }
 
   @override
@@ -118,22 +130,32 @@ class SouguuService extends _$SouguuService {
     log("souguu service build");
     _init();
     _setWebsocketProviderSubs();
-
-    souguuServiceInfoProviderSubscription = ref.listen<SouguuServiceState>(souguuServiceInfoProvider, (previus, next) {
-      // if (next.souguu != 0) {
-      //   disconnectWebsocket();
-      // } else {
-      //   //　遭遇状態から抜けたら再接続
-      //   // なんか違う気がする12/02
-      //   // if (websocketProviderSubscription != null) {
-      //   //   websocketProviderSubscription = ProviderContainer()
-      //   //       .listen(websocketServiceProvider, (previous, next) {});
-      //   //   ref
-      //   //       .read(websocketServiceProvider)
-      //   //       .addWebsocketReceiver((p0) => dealNotification(p0));
-      //   // }
-      // }
+    _isHomeGetterTimer = Timer.periodic(const Duration(seconds: 120), (timer) async {
+      var user = ref.read(userViewModelProvider).maybeWhen(
+          orElse: () => null,
+          data: (data) {
+            if (data == null) return null;
+            return data;
+          });
+      if (user == null) {
+        isHome = false;
+        return;
+      }
+      var position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      //if (position.latitude == user.houseLatitude && position.longitude == user.houseLongitude) {
+      if (_isHome(position, user)) {
+        if (isHome == false) {
+          isHome = true;
+          _setWebsocketProviderSubs();
+        }
+      } else {
+        if (isHome == true) {
+          isHome = false;
+          disconnectWebsocket();
+        }
+      }
     });
+    souguuServiceInfoProviderSubscription = ref.listen<SouguuServiceState>(souguuServiceInfoProvider, (previus, next) {});
     _screenStateEventSubscription = Screen().screenStateStream.listen((ScreenStateEvent data) {
       if (data == ScreenStateEvent.SCREEN_ON) {
         // 画面がONになった時の処理
@@ -233,6 +255,7 @@ class SouguuService extends _$SouguuService {
     websocketProviderSubscription?.close();
   }
 
+  //遭遇できなくなったら実行する
   void disconnectWebsocket() async {
     await websocketProviderSubscription?.read().cancelConnect();
     websocketProviderSubscription?.close();
