@@ -16,12 +16,15 @@ import 'package:battari/service/websocket_service.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
+import 'package:flutter_ntp/flutter_ntp.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:http/http.dart' as http;
+import 'package:screen_state/screen_state.dart';
 import 'package:usage_stats/usage_stats.dart';
+import 'package:http/http.dart' as http;
 
 part 'souguu_service.g.dart';
 
@@ -38,9 +41,13 @@ class SouguuService extends _$SouguuService {
 
   int? userId;
 
+  StreamSubscription<ScreenStateEvent>? _screenStateEventSubscription;
+
   SouguuAppIncredientModel? appData;
   dealNotification(String p0, [bool fromForegroundApp = false]) async {
-    // logger.d("websocketで受信したデータ: $p0");
+    if (p0 != "battari") {
+      logger.d("websocketで受信したデータ: $p0");
+    }
     // ここで受信したデータを処理する
     if (p0.length > 20) {
       try {
@@ -50,6 +57,7 @@ class SouguuService extends _$SouguuService {
             .setSouguu(notif.aiteUserId, restSouguuNotification: RestSouguuNotification.fromWebsocketNotification(notif));
         if (await FlutterForegroundTask.isAppOnForeground) {
           try {
+            logger.i("foreground, fromForegroundApp: $fromForegroundApp");
             if (fromForegroundApp) {
               router.go("/");
             } else {
@@ -63,14 +71,33 @@ class SouguuService extends _$SouguuService {
             }
           }
         } else {
+          logger.i("background");
+          var now = await FlutterNTP.now();
+          var differenceFromOfficialTime = DateTime.now().difference(now).inSeconds;
+
           _untilCallStartTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-            int remain =
-                ref.read(souguuServiceInfoProvider).restSouguuNotification?.callStartTime.difference(DateTime.now()).inSeconds ?? 0;
-            if (ref.read(souguuServiceInfoProvider).restSouguuNotification?.callStartTime.compareTo(DateTime.now()) == -1) {
+            int remain = ref
+                    .read(souguuServiceInfoProvider)
+                    .restSouguuNotification
+                    ?.callStartTime
+                    .difference(DateTime.now().subtract(Duration(seconds: differenceFromOfficialTime)))
+                    .inSeconds ??
+                0;
+            if (ref
+                    .read(souguuServiceInfoProvider)
+                    .restSouguuNotification
+                    ?.callStartTime
+                    .compareTo(DateTime.now().subtract(Duration(seconds: differenceFromOfficialTime))) ==
+                -1) {
               timer.cancel();
               FlutterForegroundTask.launchApp("/");
+              Future.delayed(const Duration(seconds: 1), () {
+                FlutterForegroundTask.sendDataToMain(p0);
+              });
             }
-            notificationServiceSubscription?.read().showCounter(remain, notif.aiteUserId);
+            if (notificationServiceSubscription != null && !notificationServiceSubscription!.closed) {
+              notificationServiceSubscription?.read().showCounter(remain, notif.aiteUserId);
+            }
           });
         }
       } catch (e) {
@@ -81,22 +108,45 @@ class SouguuService extends _$SouguuService {
 
   ProviderSubscription? souguuServiceInfoProviderSubscription;
 
+  void _setWebsocketProviderSubs() {
+    websocketProviderSubscription = ref.listen(websocketServiceProvider, (previous, next) {});
+    ref.read(websocketServiceProvider).addWebsocketReceiver(dealNotification);
+  }
+
   @override
   int build() {
     log("souguu service build");
-    websocketProviderSubscription = ref.listen(websocketServiceProvider, (previous, next) {});
-    ref.read(websocketServiceProvider).addWebsocketReceiver(dealNotification);
     _init();
+    _setWebsocketProviderSubs();
 
     souguuServiceInfoProviderSubscription = ref.listen<SouguuServiceState>(souguuServiceInfoProvider, (previus, next) {
-      if (next.souguu != 0) {
-        disconnectWebsocket();
-      } else {
-        //　遭遇状態から抜けたら再接続
+      // if (next.souguu != 0) {
+      //   disconnectWebsocket();
+      // } else {
+      //   //　遭遇状態から抜けたら再接続
+      //   // なんか違う気がする12/02
+      //   // if (websocketProviderSubscription != null) {
+      //   //   websocketProviderSubscription = ProviderContainer()
+      //   //       .listen(websocketServiceProvider, (previous, next) {});
+      //   //   ref
+      //   //       .read(websocketServiceProvider)
+      //   //       .addWebsocketReceiver((p0) => dealNotification(p0));
+      //   // }
+      // }
+    });
+    _screenStateEventSubscription = Screen().screenStateStream.listen((ScreenStateEvent data) {
+      if (data == ScreenStateEvent.SCREEN_ON) {
+        // 画面がONになった時の処理
+        logger.i("screen on");
         if (websocketProviderSubscription != null) {
-          websocketProviderSubscription = ProviderContainer().listen(websocketServiceProvider, (previous, next) {});
-          ref.read(websocketServiceProvider).addWebsocketReceiver((p0) => dealNotification(p0));
+          ref.read(websocketServiceProvider).needConnect();
+        } else {
+          _setWebsocketProviderSubs();
         }
+      } else if (data == ScreenStateEvent.SCREEN_OFF) {
+        // 画面がOFFになった時の処理
+        logger.i("screen off");
+        disconnectWebsocket();
       }
     });
     _souguuIncredientSender = Timer.periodic(const Duration(minutes: 1), (timer) {
@@ -112,7 +162,8 @@ class SouguuService extends _$SouguuService {
       if (appData != null) {
         incredients.add(appData!.toJson());
       }
-      var output = jsonEncode(SouguuWebsocketDto(id: userId!, isWelcome: false, incredients: incredients).toJson());
+      var output =
+          jsonEncode(SouguuWebsocketDto(id: userId!, isWelcome: false, incredients: incredients, created: DateTime.now()).toJson());
 
       if (websocketProviderSubscription != null) {
         if (!websocketProviderSubscription!.closed) websocketProviderSubscription!.read().sendMessage(output);
@@ -137,13 +188,14 @@ class SouguuService extends _$SouguuService {
       DateTime lastOpenTime = DateTime.fromMillisecondsSinceEpoch(_lastOpenTimeStamp!);
 
       // 経過時間を秒で計算
-      int elapsedMinutes = (currentTime.difference(lastOpenTime).inSeconds / 60).toInt();
+      // ignore: unused_local_variable
+      // #TODO
+      int elapsedMinutes = currentTime.difference(lastOpenTime).inSeconds ~/ 60;
       int elapsedSeconds = currentTime.difference(lastOpenTime).inSeconds.toInt();
 
       String appName = _events.firstWhere((event) => event.timeStamp == _lastOpenTimeStamp.toString()).packageName ?? "不明なアプリ";
 
       DateTime now = DateTime.now(); // 現在の時間を取得
-      String formattedTime = '${now.hour}:${now.minute}:${now.second}';
 
       print("$appName:$elapsedSeconds経過"); // _targetSeconds以下なら経過秒数を表示
       appData =
@@ -182,10 +234,13 @@ class SouguuService extends _$SouguuService {
   }
 
   void disconnectWebsocket() async {
-    // websocketProviderSubscription?.close();
+    await websocketProviderSubscription?.read().cancelConnect();
+    websocketProviderSubscription?.close();
 
-    // await websocketProviderSubscription?.read().cancelConnect();
-    // websocketProviderSubscription = null;
+    await http.get(Uri.parse('http://$ipAddress:5050/SouguuInfo/ClearSouguuIncredient'), headers: <String, String>{
+      'Authorization': 'Bearer $Token',
+    });
+    websocketProviderSubscription = null;
   }
 }
 
@@ -194,6 +249,9 @@ class SouguuService extends _$SouguuService {
 class SouguuServiceInfo extends _$SouguuServiceInfo {
   @override
   SouguuServiceState build() {
+    ref.onDispose(() {
+      log("souguu service info dispose");
+    });
     log("souguu service info build");
     return SouguuServiceState();
   }

@@ -2,6 +2,8 @@
 
 import 'dart:developer';
 
+import 'package:battari/logger.dart';
+import 'package:battari/main.dart';
 import 'package:battari/repository/user_repository.dart';
 import 'package:battari/model/state/user_state.dart';
 import 'package:battari/service/souguu_service.dart';
@@ -10,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Splash extends HookConsumerWidget {
@@ -29,7 +32,6 @@ class Splash extends HookConsumerWidget {
   }
 
   Future<void> init(BuildContext context, WidgetRef ref) async {
-    await Future.delayed(const Duration(seconds: 2), () {});
     var sharedPreferences = await SharedPreferences.getInstance();
     // この関数が終わらないと遷移しないため
     ProviderScope.containerOf(context).updateOverrides([
@@ -37,6 +39,7 @@ class Splash extends HookConsumerWidget {
     ]);
     UserState? userState = await ref.read(userSharedPreferencesRepositoryProvider).get();
     debugPrint("done");
+
     // 通知権限
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
     var android = flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
