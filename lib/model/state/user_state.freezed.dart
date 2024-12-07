@@ -21,6 +21,8 @@ mixin _$UserState {
   String get userId => throw _privateConstructorUsedError;
   int get id => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
+  double get houseLatitude => throw _privateConstructorUsedError;
+  double get houseLongitude => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $UserStateCopyWith<UserState> get copyWith =>
@@ -33,7 +35,13 @@ abstract class $UserStateCopyWith<$Res> {
       _$UserStateCopyWithImpl<$Res, UserState>;
   @useResult
   $Res call(
-      {String token, String refreshToken, String userId, int id, String name});
+      {String token,
+      String refreshToken,
+      String userId,
+      int id,
+      String name,
+      double houseLatitude,
+      double houseLongitude});
 }
 
 /// @nodoc
@@ -54,6 +62,8 @@ class _$UserStateCopyWithImpl<$Res, $Val extends UserState>
     Object? userId = null,
     Object? id = null,
     Object? name = null,
+    Object? houseLatitude = null,
+    Object? houseLongitude = null,
   }) {
     return _then(_value.copyWith(
       token: null == token
@@ -76,6 +86,14 @@ class _$UserStateCopyWithImpl<$Res, $Val extends UserState>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
+      houseLatitude: null == houseLatitude
+          ? _value.houseLatitude
+          : houseLatitude // ignore: cast_nullable_to_non_nullable
+              as double,
+      houseLongitude: null == houseLongitude
+          ? _value.houseLongitude
+          : houseLongitude // ignore: cast_nullable_to_non_nullable
+              as double,
     ) as $Val);
   }
 }
@@ -89,7 +107,13 @@ abstract class _$$UserStateImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String token, String refreshToken, String userId, int id, String name});
+      {String token,
+      String refreshToken,
+      String userId,
+      int id,
+      String name,
+      double houseLatitude,
+      double houseLongitude});
 }
 
 /// @nodoc
@@ -108,6 +132,8 @@ class __$$UserStateImplCopyWithImpl<$Res>
     Object? userId = null,
     Object? id = null,
     Object? name = null,
+    Object? houseLatitude = null,
+    Object? houseLongitude = null,
   }) {
     return _then(_$UserStateImpl(
       token: null == token
@@ -130,6 +156,14 @@ class __$$UserStateImplCopyWithImpl<$Res>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
+      houseLatitude: null == houseLatitude
+          ? _value.houseLatitude
+          : houseLatitude // ignore: cast_nullable_to_non_nullable
+              as double,
+      houseLongitude: null == houseLongitude
+          ? _value.houseLongitude
+          : houseLongitude // ignore: cast_nullable_to_non_nullable
+              as double,
     ));
   }
 }
@@ -142,7 +176,9 @@ class _$UserStateImpl implements _UserState {
       this.refreshToken = "",
       this.userId = "",
       this.id = 0,
-      this.name = ""});
+      this.name = "",
+      this.houseLatitude = 0,
+      this.houseLongitude = 0});
 
   @override
   @JsonKey()
@@ -159,10 +195,16 @@ class _$UserStateImpl implements _UserState {
   @override
   @JsonKey()
   final String name;
+  @override
+  @JsonKey()
+  final double houseLatitude;
+  @override
+  @JsonKey()
+  final double houseLongitude;
 
   @override
   String toString() {
-    return 'UserState(token: $token, refreshToken: $refreshToken, userId: $userId, id: $id, name: $name)';
+    return 'UserState(token: $token, refreshToken: $refreshToken, userId: $userId, id: $id, name: $name, houseLatitude: $houseLatitude, houseLongitude: $houseLongitude)';
   }
 
   @override
@@ -175,12 +217,16 @@ class _$UserStateImpl implements _UserState {
                 other.refreshToken == refreshToken) &&
             (identical(other.userId, userId) || other.userId == userId) &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.name, name) || other.name == name));
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.houseLatitude, houseLatitude) ||
+                other.houseLatitude == houseLatitude) &&
+            (identical(other.houseLongitude, houseLongitude) ||
+                other.houseLongitude == houseLongitude));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, token, refreshToken, userId, id, name);
+  int get hashCode => Object.hash(runtimeType, token, refreshToken, userId, id,
+      name, houseLatitude, houseLongitude);
 
   @JsonKey(ignore: true)
   @override
@@ -195,7 +241,9 @@ abstract class _UserState implements UserState {
       final String refreshToken,
       final String userId,
       final int id,
-      final String name}) = _$UserStateImpl;
+      final String name,
+      final double houseLatitude,
+      final double houseLongitude}) = _$UserStateImpl;
 
   @override
   String get token;
@@ -207,6 +255,10 @@ abstract class _UserState implements UserState {
   int get id;
   @override
   String get name;
+  @override
+  double get houseLatitude;
+  @override
+  double get houseLongitude;
   @override
   @JsonKey(ignore: true)
   _$$UserStateImplCopyWith<_$UserStateImpl> get copyWith =>
