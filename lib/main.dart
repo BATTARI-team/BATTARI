@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:battari/firebase_options.dart';
 import 'package:battari/model/battari_setting.dart';
 import 'package:battari/repository/user_repository.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
@@ -28,8 +30,13 @@ String Token = "";
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   FlutterForegroundTask.initCommunicationPort();
-  battariSetting = BattariSetting.fromJson(jsonDecode(await rootBundle.loadString('battari_setting.json')));
+  battariSetting = BattariSetting.fromJson(
+      jsonDecode(await rootBundle.loadString('battari_setting.json')));
   var shared = await SharedPreferences.getInstance();
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(ProviderScope(
     overrides: [
       sharedPreferencesProvider.overrideWithValue(shared),

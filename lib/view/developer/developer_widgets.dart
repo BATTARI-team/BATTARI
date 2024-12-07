@@ -4,6 +4,7 @@ import 'package:battari/view/call.dart';
 import 'package:battari/view/developer/app_usage_time.dart';
 import 'package:battari/view/developer/background.dart';
 import 'package:battari/repository/user_repository.dart';
+import 'package:battari/view/developer/cloud_storage_test.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:battari/view/developer/websocket_test.dart';
 import 'package:flutter/material.dart';
@@ -71,7 +72,9 @@ class DeveloperWidgets extends StatelessWidget {
             Consumer(builder: (context, ref, _) {
               return TextButton(
                   child: const Text("clear shared preferences"),
-                  onPressed: () => ref.read(userSharedPreferencesRepositoryProvider).clear());
+                  onPressed: () => ref
+                      .read(userSharedPreferencesRepositoryProvider)
+                      .clear());
             }),
             // Consumer(
             //   builder: (context, ref, child) {
@@ -94,20 +97,25 @@ class DeveloperWidgets extends StatelessWidget {
               onPressed: () {},
             ),
             _developerElement("appusage", AppUsageTime(), context),
-            _developerElement("call", Call(), context)
+            _developerElement("call", Call(), context),
+            _developerElement("cloud storage", CloudStorageTest(), context)
           ],
         ));
   }
 
   Widget _developerElement(String title, Widget widget, BuildContext context) {
-    return TextButton(onPressed: (() => Navigator.of(context).push(MaterialPageRoute(builder: (context) => widget))), child: Text(title));
+    return TextButton(
+        onPressed: (() => Navigator.of(context)
+            .push(MaterialPageRoute(builder: (context) => widget))),
+        child: Text(title));
   }
 
   Future<void> _requestPermissions() async {
     // Android 13+, you need to allow notification permission to display foreground service notification.
     //
     // iOS: If you need notification, ask for permission.
-    final NotificationPermission notificationPermission = await FlutterForegroundTask.checkNotificationPermission();
+    final NotificationPermission notificationPermission =
+        await FlutterForegroundTask.checkNotificationPermission();
     if (notificationPermission != NotificationPermission.granted) {
       await FlutterForegroundTask.requestNotificationPermission();
     }
@@ -139,7 +147,8 @@ class DeveloperWidgets extends StatelessWidget {
       androidNotificationOptions: AndroidNotificationOptions(
         channelId: 'foreground_service',
         channelName: 'Foreground Service Notification',
-        channelDescription: 'This notification appears when the foreground service is running.',
+        channelDescription:
+            'This notification appears when the foreground service is running.',
         onlyAlertOnce: true,
       ),
       iosNotificationOptions: const IOSNotificationOptions(
