@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:http/http.dart' as http;
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 part 'user_view_model.g.dart';
 
@@ -85,6 +86,7 @@ class UserViewModel extends _$UserViewModel {
       ref.read(userSharedPreferencesRepositoryProvider).save(user);
       return true;
     } catch (e) {
+      await Sentry.captureException(e, stackTrace: StackTrace.current, hint: Hint.withMap({"message": "refresh user failed"}));
       debugPrint(e.toString());
       return false;
     }
@@ -119,6 +121,7 @@ class UserViewModel extends _$UserViewModel {
         refreshToken = decoded["refreshToken"];
       });
     } catch (e) {
+      await Sentry.captureException(e, stackTrace: StackTrace.current, hint: Hint.withMap({"message": "login failed"}));
       return e.toString();
     }
     debugPrint("token: $token");
@@ -133,8 +136,14 @@ class UserViewModel extends _$UserViewModel {
         id = user["id"];
 
         debugPrint("name: $name, id: ${id.toString()}");
+        Sentry.configureScope((p0) {
+          if (p0.user != null) {
+            p0.user!.copyWith(id: id.toString(), username: userFormState.BattariId);
+          }
+        });
       });
     } catch (e) {
+      await Sentry.captureException(e, stackTrace: StackTrace.current, hint: Hint.withMap({"message": "get user by user id failed"}));
       return e.toString();
     }
 
@@ -152,6 +161,7 @@ class UserViewModel extends _$UserViewModel {
       setUser(user);
 
       debugPrint("login success");
+      await Sentry.captureMessage("$id logged in");
 
       return "";
     }
@@ -192,12 +202,14 @@ class UserViewModel extends _$UserViewModel {
         token = value.body;
       });
     } catch (e) {
+      await Sentry.captureException(e, stackTrace: StackTrace.current, hint: Hint.withMap({"message": "refresh token failed"}));
       return e.toString();
     }
     if (token.isNotEmpty) {
       // 全部いけた時
       await ref.read(userSharedPreferencesRepositoryProvider).saveToken(token);
       ref.read(userViewModelProvider.notifier).setToken(token);
+      await Sentry.captureMessage("$userIndex refreshed token");
 
       return token;
     }
