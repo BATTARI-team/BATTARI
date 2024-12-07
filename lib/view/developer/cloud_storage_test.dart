@@ -94,7 +94,9 @@ class _CloudStorageTestState extends State<CloudStorageTest> {
                         // ファイルの存在を確認
                         if (file.existsSync()) {
                           await iconRef.putFile(file);
-                          String downloadUrl = await iconRef.getDownloadURL();
+                          String downloadUrl =
+                              (await iconRef.getDownloadURL()).split('&').first;
+
                           debugPrint('Uploaded URL: $downloadUrl');
                         }
                       }
