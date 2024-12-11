@@ -37,6 +37,7 @@ class SouguuService extends _$SouguuService {
   List<EventUsageInfo> _events = [];
   // ignore: unused_field
   Timer? _untilCallStartTimer;
+  Timer? _refreshTokenTimer;
   Timer? _appUsageGetter;
   Timer? _souguuIncredientSender;
 
@@ -137,6 +138,14 @@ class SouguuService extends _$SouguuService {
       //   //       .addWebsocketReceiver((p0) => dealNotification(p0));
       //   // }
       // }
+    });
+    _refreshTokenTimer = Timer.periodic(const Duration(hours: 3), (timer) async {
+      await ref.read(userViewModelProvider).maybeWhen(
+          orElse: () => null,
+          data: (data) async {
+            if (data == null) return;
+            await ref.read(userViewModelProvider.notifier).refreshToken();
+          });
     });
     _screenStateEventSubscription = Screen().screenStateStream.listen((ScreenStateEvent data) {
       if (data == ScreenStateEvent.SCREEN_ON) {
