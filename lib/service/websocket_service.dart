@@ -8,6 +8,7 @@ import 'package:battari/view_model/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:web_socket_channel/io.dart';
 
 part 'websocket_service.g.dart';
@@ -48,7 +49,7 @@ class WebsocketService {
 
   void _initializeTimer() {
     //#TODO asyncにしちゃったから，ロック的なのが必要かも
-    const timeout = 3;
+    const timeout = 4;
     _reconnectTimer = Timer.periodic(const Duration(seconds: 10), (timer) async {
       if (!isRunning) return;
       if (_count > timeout) {
@@ -58,6 +59,7 @@ class WebsocketService {
       }
       if (_count > 1) {
         debugPrint("websocketの再接続まで... ${timeout - _count}");
+        await Sentry.captureMessage("websocketの再接続まで... ${timeout - _count}");
       }
       _count++;
     });
@@ -79,6 +81,7 @@ class WebsocketService {
     _reconnectTimer = null;
     await channel?.sink.close(null, "canceled");
     await channel?.sink.close();
+    await Sentry.captureMessage("websocket canceled");
     channel = null;
     isRunning = false;
   }
@@ -115,6 +118,7 @@ class WebsocketService {
       await _connectWebsocket();
     } catch (e) {
       logger.w("websocketの接続に失敗しました", error: e, stackTrace: StackTrace.current);
+      await Sentry.captureException(e, stackTrace: StackTrace.current, hint: Hint.withMap({"message": "websocketの接続に失敗しました"}));
       await Future.delayed(const Duration(seconds: 3));
     }
     _isReconnect = false;
@@ -141,6 +145,7 @@ class WebsocketService {
       });
     } catch (e) {
       logger.w("websocketの接続に失敗しました: token: $token", error: e, stackTrace: StackTrace.current);
+      await Sentry.captureException(e, stackTrace: StackTrace.current, hint: Hint.withMap({"message": "websocketの接続に失敗しました"}));
       if (e is SocketException) {
         await Future.delayed(const Duration(seconds: 3));
         _reconnectWebSocket();
@@ -154,6 +159,7 @@ class WebsocketService {
       logger.i("websocketの接続に成功しました");
     } catch (e) {
       logger.w("websocketの接続に失敗しました: token: $token", error: e, stackTrace: StackTrace.current);
+      await Sentry.captureException(e, stackTrace: StackTrace.current, hint: Hint.withMap({"message": "websocketの接続に失敗しました"}));
       await _reconnectWebSocket();
     }
     channel?.stream.listen((event) {
@@ -162,6 +168,7 @@ class WebsocketService {
       _count = 0;
     }, onError: (error) async {
       logger.w("websocketの通信が切断されました: token: $token", error: error, stackTrace: StackTrace.current);
+      await Sentry.captureException(error, stackTrace: StackTrace.current, hint: Hint.withMap({"message": "websocketの通信が切断されました"}));
       isRunning = false;
       await Future.delayed(const Duration(seconds: 3));
       _reconnectWebSocket();
@@ -180,6 +187,7 @@ class WebsocketService {
       }
     } catch (e) {
       logger.w("websocketの接続に失敗しました: ", error: e, stackTrace: StackTrace.current);
+      await Sentry.captureException(e, stackTrace: StackTrace.current, hint: Hint.withMap({"message": "websocketの通信が切断されました"}));
     }
   }
 }

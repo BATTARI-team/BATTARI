@@ -25,6 +25,8 @@ import 'package:riverpod/riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:http/http.dart' as http;
 import 'package:screen_state/screen_state.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:usage_stats/usage_stats.dart';
 import 'package:http/http.dart' as http;
 
@@ -38,6 +40,7 @@ class SouguuService extends _$SouguuService {
   List<EventUsageInfo> _events = [];
   // ignore: unused_field
   Timer? _untilCallStartTimer;
+  Timer? _refreshTokenTimer;
   Timer? _appUsageGetter;
   Timer? _souguuIncredientSender;
   Timer? _isHomeGetterTimer;
@@ -51,6 +54,7 @@ class SouguuService extends _$SouguuService {
   dealNotification(String p0, [bool fromForegroundApp = false]) async {
     if (p0 != "battari") {
       logger.d("websocketで受信したデータ: $p0");
+      await Sentry.captureMessage("websocketで受信したデータ: $p0", level: SentryLevel.debug);
     }
     // ここで受信したデータを処理する
     if (p0.length > 20) {
@@ -70,6 +74,7 @@ class SouguuService extends _$SouguuService {
             // navigatorKey.currentContext!.pushReplacementNamed("/call");
           } catch (e) {
             logger.e("画面遷移に失敗しました： $e", error: e, stackTrace: StackTrace.current);
+            await Sentry.captureException(e, stackTrace: StackTrace.current);
             if (!fromForegroundApp) {
               FlutterForegroundTask.sendDataToMain(p0);
             }
@@ -106,7 +111,28 @@ class SouguuService extends _$SouguuService {
         }
       } catch (e) {
         logger.e("遭遇通知のパースに失敗しました: $e", error: e, stackTrace: StackTrace.current);
+        await Sentry.captureException(e, stackTrace: StackTrace.current);
       }
+    }
+  }
+
+  Future<void> _refreshToken() async {
+    var shared = await SharedPreferences.getInstance();
+    try {
+      await http
+          .post(Uri.parse('http://$ipAddress:5050/User/RefreshToken'),
+              headers: <String, String>{
+                'Content-Type': 'application/json; charset=UTF-8',
+              },
+              body: jsonEncode(<String, Object>{
+                'refreshToken': shared.getString("refresh_token")!,
+                'userIndex': shared.getInt('id')!,
+              }))
+          .then((value) {
+        Token = value.body;
+      });
+    } catch (e) {
+      logger.e("battari service started error", error: e, stackTrace: StackTrace.current);
     }
   }
 
@@ -116,6 +142,7 @@ class SouguuService extends _$SouguuService {
   void _setWebsocketProviderSubs() {
     if (websocketProviderSubscription == null) {
       websocketProviderSubscription = ref.listen(websocketServiceProvider, (previous, next) {});
+      _refreshToken();
       ref.read(websocketServiceProvider).addWebsocketReceiver(dealNotification);
     }
   }
@@ -156,6 +183,9 @@ class SouguuService extends _$SouguuService {
       }
     });
     souguuServiceInfoProviderSubscription = ref.listen<SouguuServiceState>(souguuServiceInfoProvider, (previus, next) {});
+    _refreshTokenTimer = Timer.periodic(const Duration(hours: 3), (timer) async {
+      await _refreshToken();
+    });
     _screenStateEventSubscription = Screen().screenStateStream.listen((ScreenStateEvent data) {
       if (data == ScreenStateEvent.SCREEN_ON) {
         // 画面がONになった時の処理
@@ -246,6 +276,7 @@ class SouguuService extends _$SouguuService {
       }
       _events = queryEvents.reversed.toList();
     } catch (err) {
+      await Sentry.captureException(err, stackTrace: StackTrace.current);
       print(err);
     }
   }
@@ -259,6 +290,7 @@ class SouguuService extends _$SouguuService {
   void disconnectWebsocket() async {
     await websocketProviderSubscription?.read().cancelConnect();
     websocketProviderSubscription?.close();
+    await Sentry.captureMessage("websocket disconnected", level: SentryLevel.debug);
 
     await http.get(Uri.parse('http://$ipAddress:5050/SouguuInfo/ClearSouguuIncredient'), headers: <String, String>{
       'Authorization': 'Bearer $Token',
@@ -295,6 +327,7 @@ class SouguuServiceInfo extends _$SouguuServiceInfo {
       }
     } catch (e) {
       logger.e("souguu_service.dart, _init: 遭遇情報の取得に失敗しました", error: e, stackTrace: StackTrace.current);
+      await Sentry.captureException(e, stackTrace: StackTrace.current);
     }
     return false;
   }
