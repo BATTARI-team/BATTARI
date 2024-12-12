@@ -111,5 +111,5 @@ class MyTaskHandler extends TaskHandler {
 
   // Called when the notification button is pressed.
   @override
-  void onNotificationButtonPressed(String id) {}
+  void onNotificationButtonPressed(String id) async {
 }
