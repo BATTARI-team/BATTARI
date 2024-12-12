@@ -24,6 +24,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:http/http.dart' as http;
 import 'package:screen_state/screen_state.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:usage_stats/usage_stats.dart';
 import 'package:http/http.dart' as http;
 
@@ -37,6 +38,7 @@ class SouguuService extends _$SouguuService {
   List<EventUsageInfo> _events = [];
   // ignore: unused_field
   Timer? _untilCallStartTimer;
+  Timer? _refreshTokenTimer;
   Timer? _appUsageGetter;
   Timer? _souguuIncredientSender;
 
@@ -110,10 +112,31 @@ class SouguuService extends _$SouguuService {
     }
   }
 
+  Future<void> _refreshToken() async {
+    var shared = await SharedPreferences.getInstance();
+    try {
+      await http
+          .post(Uri.parse('http://$ipAddress:5050/User/RefreshToken'),
+              headers: <String, String>{
+                'Content-Type': 'application/json; charset=UTF-8',
+              },
+              body: jsonEncode(<String, Object>{
+                'refreshToken': shared.getString("refresh_token")!,
+                'userIndex': shared.getInt('id')!,
+              }))
+          .then((value) {
+        Token = value.body;
+      });
+    } catch (e) {
+      logger.e("battari service started error", error: e, stackTrace: StackTrace.current);
+    }
+  }
+
   ProviderSubscription? souguuServiceInfoProviderSubscription;
 
   void _setWebsocketProviderSubs() {
     websocketProviderSubscription = ref.listen(websocketServiceProvider, (previous, next) {});
+    _refreshToken();
     ref.read(websocketServiceProvider).addWebsocketReceiver(dealNotification);
   }
 
@@ -137,6 +160,9 @@ class SouguuService extends _$SouguuService {
       //   //       .addWebsocketReceiver((p0) => dealNotification(p0));
       //   // }
       // }
+    });
+    _refreshTokenTimer = Timer.periodic(const Duration(hours: 3), (timer) async {
+      await _refreshToken();
     });
     _screenStateEventSubscription = Screen().screenStateStream.listen((ScreenStateEvent data) {
       if (data == ScreenStateEvent.SCREEN_ON) {
