@@ -11,6 +11,7 @@ import 'package:battari/model/souguu_incredient/souguu_app_incredient_model.dart
 import 'package:battari/model/souguu_incredient/souguu_incredient_data_appusage_model.dart';
 import 'package:battari/model/state/souguu_service_state.dart';
 import 'package:battari/model/state/user_state.dart';
+import 'package:battari/repository/user_repository.dart';
 import 'package:battari/routes.dart';
 import 'package:battari/service/notification_service.dart';
 import 'package:battari/service/websocket_service.dart';
@@ -48,7 +49,9 @@ class SouguuService extends _$SouguuService {
   int? userId;
 
   StreamSubscription<ScreenStateEvent>? _screenStateEventSubscription;
+
   bool isHome = false;
+  bool isLock = false;
 
   SouguuAppIncredientModel? appData;
   dealNotification(String p0, [bool fromForegroundApp = false]) async {
@@ -160,45 +163,39 @@ class SouguuService extends _$SouguuService {
   }
 
   final int distanceHome = 10;
-  bool _isHome(Position position, UserState user) {
-    return Geolocator.distanceBetween(position.latitude, position.longitude,
-            user.houseLatitude, user.houseLongitude) <
+  Future<bool> _isHome(Position position, UserState user) async {
+    var user = await ref.read(userSharedPreferencesRepositoryProvider).get();
+    var _isHome = Geolocator.distanceBetween(
+            position.latitude,
+            position.longitude,
+            user != null ? user.houseLatitude : 0,
+            user != null ? user.houseLongitude : 0) <
         distanceHome;
+    //logger.d(
+    //    "distance: ${Geolocator.distanceBetween(position.latitude, position.longitude, user.houseLatitude, user.houseLongitude)}, position.latitude: ${position.latitude}, position.long: ${position.longitude}, user.houseLatitude: ${user.houseLatitude}, user.houseLong: ${user.houseLongitude}, result is : $_isHome");
+    return _isHome;
+  }
+
+  bool isConnectOk() {
+    logger.d(
+        "isConnectOk: ${isHome && !isLock}, isHome: $isHome, isLock: $isLock");
+    return (isHome && !isLock);
   }
 
   @override
   int build() {
     log("souguu service build");
-    _init();
-    _setWebsocketProviderSubs();
 
-    _isHomeGetterTimer =
-        Timer.periodic(const Duration(seconds: 120), (timer) async {
-      var user = ref.read(userViewModelProvider).maybeWhen(
-          orElse: () => null,
-          data: (data) {
-            if (data == null) return null;
-            return data;
-          });
-      if (user == null) {
-        isHome = false;
-        return;
-      }
-      var position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
-      //if (position.latitude == user.houseLatitude && position.longitude == user.houseLongitude) {
-      if (_isHome(position, user)) {
-        if (isHome == false) {
-          isHome = true;
-          _setWebsocketProviderSubs();
-        }
-      } else {
-        if (isHome == true) {
-          isHome = false;
-          disconnectWebsocket();
-        }
-      }
-    });
+    _init();
+
+    if (isConnectOk()) {
+      _setWebsocketProviderSubs();
+    }
+
+    _isHomeGetterTimer = Timer.periodic(
+        const Duration(seconds: 120), (timer) async => _isHomeGetter());
+    _isHomeGetter();
+    //#TODO 大体タイマーは役割が一緒だからそれらの関数をインターフェースかしたい
 
     souguuServiceInfoProviderSubscription = ref.listen<SouguuServiceState>(
         souguuServiceInfoProvider, (previus, next) {});
@@ -213,13 +210,17 @@ class SouguuService extends _$SouguuService {
       if (data == ScreenStateEvent.SCREEN_ON) {
         // 画面がONになった時の処理
         logger.i("screen on");
-        if (websocketProviderSubscription != null) {
-          ref.read(websocketServiceProvider).needConnect();
-        } else {
-          _setWebsocketProviderSubs();
+        isLock = false;
+        if (isConnectOk()) {
+          if (websocketProviderSubscription != null) {
+            ref.read(websocketServiceProvider).needConnect();
+          } else {
+            _setWebsocketProviderSubs();
+          }
         }
       } else if (data == ScreenStateEvent.SCREEN_OFF) {
         // 画面がOFFになった時の処理
+        isLock = true;
         logger.i("screen off");
         disconnectWebsocket();
       }
@@ -265,6 +266,42 @@ class SouguuService extends _$SouguuService {
 
   Future<void> _init() async {
     await _initUsage();
+  }
+
+  void _isHomeGetter() async {
+    var user = ref.read(userViewModelProvider).maybeWhen(
+        orElse: () => null,
+        data: (data) {
+          if (data == null) return null;
+          return data;
+        });
+    if (user == null) {
+      logger.d('user is null');
+      isHome = false;
+      return;
+    }
+    var position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    //if (position.latitude == user.houseLatitude && position.longitude == user.houseLongitude) {
+    if ((await _isHome(position, user))) {
+      logger.d('isHome: $isHome');
+      if (isHome == false) {
+        isHome = true;
+
+        if (isConnectOk()) {
+          if (websocketProviderSubscription != null) {
+            ref.read(websocketServiceProvider).needConnect();
+          } else {
+            _setWebsocketProviderSubs();
+          }
+        }
+      }
+    } else {
+      if (isHome == true) {
+        isHome = false;
+        disconnectWebsocket();
+      }
+    }
   }
 
   Future<void> _checkAppUsage() async {
