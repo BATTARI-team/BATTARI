@@ -14,6 +14,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:usage_stats/usage_stats.dart';
 
 class Splash extends HookConsumerWidget {
   const Splash({super.key});
@@ -52,6 +53,7 @@ class Splash extends HookConsumerWidget {
     if (android != null) {
       await android.requestNotificationsPermission();
     }
+    UsageStats.grantUsagePermission();
     if (userState != null) {
       var token = '';
       bool isCall = false;
