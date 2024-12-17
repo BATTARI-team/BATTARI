@@ -25,11 +25,9 @@ class Splash extends HookConsumerWidget {
         future: initializationFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            return const Scaffold(
-                body: Center(child: CircularProgressIndicator()));
+            return const Scaffold(body: Center(child: CircularProgressIndicator()));
           }
-          return const Scaffold(
-              body: Center(child: CircularProgressIndicator()));
+          return const Scaffold(body: Center(child: CircularProgressIndicator()));
         });
   }
 
@@ -39,16 +37,12 @@ class Splash extends HookConsumerWidget {
     ProviderScope.containerOf(context).updateOverrides([
       sharedPreferencesProvider.overrideWithValue(sharedPreferences),
     ]);
-    UserState? userState =
-        await ref.read(userSharedPreferencesRepositoryProvider).get();
+    UserState? userState = await ref.read(userSharedPreferencesRepositoryProvider).get();
     debugPrint("done");
 
     // 通知権限
-    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-        FlutterLocalNotificationsPlugin();
-    var android =
-        flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
+    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+    var android = flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
     if (android != null) {
       await android.requestNotificationsPermission();
     }
@@ -56,14 +50,15 @@ class Splash extends HookConsumerWidget {
       var token = '';
       bool isCall = false;
 
-      tokenAsync() async => token = await ref
-          .read(userViewModelProvider.notifier)
-          .refreshToken(userState.id, userState.refreshToken);
-      isCallAsync() async =>
-          isCall = await ref.read(souguuServiceInfoProvider.notifier).init();
+      var transaction = Sentry.startTransaction("Splash.init", "Splash.init/userstate!=null");
 
-      await Future.wait([tokenAsync(), isCallAsync()]);
+      transaction.startChild("get token");
+      token = await ref.read(userViewModelProvider.notifier).refreshToken(userState.id, userState.refreshToken);
+      transaction.startChild("get souguuInfo");
+      isCall = await ref.read(souguuServiceInfoProvider.notifier).init();
 
+      logger.d("splash done");
+      transaction.finish();
       if (token.isEmpty) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           context.go('/login');

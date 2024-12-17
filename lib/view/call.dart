@@ -46,40 +46,41 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
               callStartTime: DateTime.now().add(const Duration(seconds: 10)),
               souguuReason: "instagramでBATTARI",
               token: "006f1e"));
-      userState = const UserState(id: 6, userId: "test", name: "test", token: "006f1e");
+      userState =
+          const UserState(id: 6, userId: "test", name: "test", token: "006f1e");
     }
 
     useEffect(() {
       Future.wait([
         (() async {
           debugPrint("agora init");
-          await _initAgoraEngine(souguuInfo.restSouguuNotification?.token ?? "");
+          await _initAgoraEngine(
+              souguuInfo.restSouguuNotification?.token ?? "");
           debugPrint("token : ${souguuInfo.restSouguuNotification?.token}");
           await _requestPermissionForAndroid();
           var now = await TimeUtil.getOfficialTime();
-          if (souguuInfo.restSouguuNotification!.callStartTime.compareTo(now) == -1) {
+          if (souguuInfo.restSouguuNotification!.callStartTime.compareTo(now) ==
+              -1) {
             status.value = 2;
           } else {
-            bool lock = true;
-            WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-              countdown.value = souguuInfo.restSouguuNotification!.callStartTime.difference((now)).inSeconds;
-              status.value = 1;
-              lock = false;
-            });
-            while (lock) {
-              await Future.delayed(const Duration(milliseconds: 100));
-            }
+            countdown.value = souguuInfo.restSouguuNotification!.callStartTime
+                .difference((now))
+                .inSeconds;
+            status.value = 1;
 
             _timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
               debugPrint("timer");
 
-              // if (souguuInfo.restSouguuNotification!.callStartTime < DateTime.now()) {
               var now = await TimeUtil.getOfficialTime();
-              debugPrint(souguuInfo.restSouguuNotification?.callStartTime.toString());
-              countdown.value = souguuInfo.restSouguuNotification!.callStartTime.difference(now).inSeconds;
-              if (souguuInfo.restSouguuNotification?.callStartTime.compareTo(now) == -1) {
+              debugPrint(
+                  souguuInfo.restSouguuNotification?.callStartTime.toString());
+              countdown.value = souguuInfo.restSouguuNotification!.callStartTime
+                  .difference(now)
+                  .inSeconds;
+              if (souguuInfo.restSouguuNotification?.callStartTime
+                      .compareTo(now) ==
+                  -1) {
                 status.value = 2;
-                lock = false;
                 timer.cancel();
               }
             });
@@ -90,8 +91,6 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
       return () {
         //_engine.destroy();
         _timer?.cancel();
-        _engine.leaveChannel();
-        _engine.disableAudio();
       };
     }, []);
 
@@ -103,13 +102,23 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
         debugPrint(souguuInfo.restSouguuNotification!.token);
         var task = () async {
           var now = await TimeUtil.getOfficialTime();
-          callCountdown.value = souguuInfo.restSouguuNotification!.callEndTime.difference(now).inSeconds;
-          _callTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+          callCountdown.value = souguuInfo.restSouguuNotification!.callEndTime
+              .difference(now)
+              .inSeconds;
+          _callTimer =
+              Timer.periodic(const Duration(seconds: 1), (timer) async {
             debugPrint("callTimer");
-            if (callCountdown.value <= 0 || status.value == 3 || souguuInfo.restSouguuNotification!.callEndTime.compareTo(now) == -1) {
+            if (callCountdown.value <= 0 ||
+                status.value == 3 ||
+                souguuInfo.restSouguuNotification!.callEndTime.compareTo(now) ==
+                    -1) {
               debugPrint("aaaaaaaaaaa tuuwasyuuryou");
               bool lock = true;
               status.value = 3;
+
+              _engine.leaveChannel();
+              _engine.disableAudio();
+              _callTimer?.cancel();
               timer.cancel();
             } else {
               callCountdown.value = callCountdown.value - 1;
@@ -127,7 +136,6 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
         ]);
         Future.wait([task]);
       } else if (status.value == 3) {
-        _callTimer?.cancel();
         logger.i("通話終了");
         //#TODO ホーム画面に遷移
       }
@@ -216,13 +224,17 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
   Future<void> _initAgoraEngine(String token) async {
     _engine = createAgoraRtcEngine();
     logger.d("appId: ${battariSetting.appIdAgora}");
-    await _engine
-        .initialize(RtcEngineContext(appId: battariSetting.appIdAgora, channelProfile: ChannelProfileType.channelProfileCommunication));
+    await _engine.initialize(RtcEngineContext(
+        appId: battariSetting.appIdAgora,
+        channelProfile: ChannelProfileType.channelProfileCommunication));
     _engine.registerEventHandler(RtcEngineEventHandler(
       onError: ((err, msg) => logger.e("onError: $err, $msg")),
-      onJoinChannelSuccess: (connection, elapsed) => debugPrint("onJoinChannelSuccess: ${connection.channelId}, $elapsed"),
-      onUserJoined: (connection, remoteUid, elapsed) => debugPrint("onUserJoined: $connection, $remoteUid, $elapsed"),
-      onUserOffline: (remoteUid, reason, a) => debugPrint("onUserOffline: $remoteUid, $reason"),
+      onJoinChannelSuccess: (connection, elapsed) =>
+          debugPrint("onJoinChannelSuccess: ${connection.channelId}, $elapsed"),
+      onUserJoined: (connection, remoteUid, elapsed) =>
+          debugPrint("onUserJoined: $connection, $remoteUid, $elapsed"),
+      onUserOffline: (remoteUid, reason, a) =>
+          debugPrint("onUserOffline: $remoteUid, $reason"),
     ));
     await _engine.enableWebSdkInteroperability(true);
     await _engine.enableAudio();
@@ -256,7 +268,8 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
     }
 
     // Android 13 and higher, you need to allow notification permission to expose foreground service notification.
-    final NotificationPermission notificationPermissionStatus = await FlutterForegroundTask.checkNotificationPermission();
+    final NotificationPermission notificationPermissionStatus =
+        await FlutterForegroundTask.checkNotificationPermission();
     if (notificationPermissionStatus != NotificationPermission.granted) {
       await FlutterForegroundTask.requestNotificationPermission();
     }
