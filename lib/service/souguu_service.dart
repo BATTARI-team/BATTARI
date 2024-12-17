@@ -42,6 +42,9 @@ class SouguuService extends _$SouguuService {
   Timer? _appUsageGetter;
   Timer? _souguuIncredientSender;
 
+  final souguuMaterialDuration = const Duration(seconds: 10);
+  final appUsageDuration = const Duration(seconds: 10);
+
   int? userId;
 
   StreamSubscription<ScreenStateEvent>? _screenStateEventSubscription;
@@ -179,7 +182,7 @@ class SouguuService extends _$SouguuService {
         disconnectWebsocket();
       }
     });
-    _souguuIncredientSender = Timer.periodic(const Duration(minutes: 1), (timer) {
+    _souguuIncredientSender = Timer.periodic(souguuMaterialDuration, (timer) {
       userId ??= ref.read(userViewModelProvider).maybeWhen(
           orElse: () => null,
           data: (data) {
@@ -199,7 +202,7 @@ class SouguuService extends _$SouguuService {
         if (!websocketProviderSubscription!.closed) websocketProviderSubscription!.read().sendMessage(output);
       }
     });
-    _appUsageGetter = Timer.periodic(const Duration(seconds: 30), (timer) async {
+    _appUsageGetter = Timer.periodic(appUsageDuration, (timer) async {
       await _checkAppUsage();
     });
     notificationServiceSubscription = ref.listen(notificationServiceProviderProvider, (previous, next) {});
@@ -293,7 +296,7 @@ class SouguuServiceInfo extends _$SouguuServiceInfo {
       var result = await http.get(Uri.parse('http://$ipAddress:5050/SouguuInfo/GetSouguuInfo'), headers: <String, String>{
         'Authorization': 'Bearer $Token',
       });
-      logger.d("souguu_service.dart, _init statuscode: ${result.statusCode}");
+      logger.d("souguu_service.dart, _init statuscode: ${result.statusCode}, token: $Token");
       if (result.statusCode != 200) {
         return false;
       } else {
@@ -306,6 +309,7 @@ class SouguuServiceInfo extends _$SouguuServiceInfo {
       logger.e("souguu_service.dart, _init: 遭遇情報の取得に失敗しました", error: e, stackTrace: StackTrace.current);
       await Sentry.captureException(e, stackTrace: StackTrace.current);
     }
+    logger.d("init done");
     return false;
   }
 
