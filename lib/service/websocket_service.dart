@@ -1,15 +1,18 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
 import 'package:battari/logger.dart';
 import 'package:battari/main.dart';
+import 'package:battari/repository/user_repository.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:web_socket_channel/io.dart';
+import 'package:http/http.dart' as http;
 
 part 'websocket_service.g.dart';
 
@@ -129,8 +132,28 @@ class WebsocketService {
     token = _ref.read(userViewModelProvider).asData?.value?.token;
     if (token == null || token.isEmpty) {
       token = Token;
+
+      if (token == null || token.isEmpty) {
+        var shared = _ref.read(sharedPreferencesProvider);
+        try {
+          await http
+              .post(Uri.parse('http://$ipAddress:5050/User/RefreshToken'),
+                  headers: <String, String>{
+                    'Content-Type': 'application/json; charset=UTF-8',
+                  },
+                  body: jsonEncode(<String, Object>{
+                    'refreshToken': shared.getString("refresh_token")!,
+                    'userIndex': shared.getInt('id')!,
+                  }))
+              .then((value) {
+            token = value.body;
+          });
+        } catch (e) {
+          logger.e("battari service started error", error: e, stackTrace: StackTrace.current);
+        }
+      }
     }
-    if (token.isEmpty) {
+    if (token == null || token!.isEmpty) {
       throw Exception("token is null");
     }
 
