@@ -90,8 +90,6 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
       return () {
         //_engine.destroy();
         _timer?.cancel();
-        _engine.leaveChannel();
-        _engine.disableAudio();
       };
     }, []);
 
@@ -127,6 +125,8 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
         ]);
         Future.wait([task]);
       } else if (status.value == 3) {
+        _engine.leaveChannel();
+        _engine.disableAudio();
         _callTimer?.cancel();
         logger.i("通話終了");
         //#TODO ホーム画面に遷移
