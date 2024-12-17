@@ -292,17 +292,21 @@ class SouguuServiceInfo extends _$SouguuServiceInfo {
   }
 
   Future<bool> init() async {
+    var transaction = Sentry.startTransaction("Splash.init", "SouguuServiceInfo.init");
     try {
       var result = await http.get(Uri.parse('http://$ipAddress:5050/SouguuInfo/GetSouguuInfo'), headers: <String, String>{
         'Authorization': 'Bearer $Token',
       });
+      transaction.startChild("parse result");
       logger.d("souguu_service.dart, _init statuscode: ${result.statusCode}, token: $Token");
       if (result.statusCode != 200) {
+        transaction.finish();
         return false;
       } else {
         var souguuInfo = RestSouguuNotification.fromJson(jsonDecode(result.body));
         state = state.copyWith(souguu: souguuInfo.aiteUserId, restSouguuNotification: souguuInfo);
         logger.i("${souguuInfo.aiteUserId}と遭遇しました");
+        transaction.finish();
         return true;
       }
     } catch (e) {
@@ -310,6 +314,7 @@ class SouguuServiceInfo extends _$SouguuServiceInfo {
       await Sentry.captureException(e, stackTrace: StackTrace.current);
     }
     logger.d("init done");
+    transaction.finish();
     return false;
   }
 

@@ -52,7 +52,9 @@ class Splash extends HookConsumerWidget {
 
       var transaction = Sentry.startTransaction("Splash.init", "Splash.init/userstate!=null");
 
+      transaction.startChild("get token");
       token = await ref.read(userViewModelProvider.notifier).refreshToken(userState.id, userState.refreshToken);
+      transaction.startChild("get souguuInfo");
       isCall = await ref.read(souguuServiceInfoProvider.notifier).init();
 
       logger.d("splash done");
