@@ -59,60 +59,63 @@ class SouguuService extends _$SouguuService {
     // ここで受信したデータを処理する
     if (p0.length > 20) {
       try {
-        var notif = WebsocketSouguuNotification.fromJson(jsonDecode(p0));
-        ref
-            .read(souguuServiceInfoProvider.notifier)
-            .setSouguu(notif.aiteUserId, restSouguuNotification: RestSouguuNotification.fromWebsocketNotification(notif));
-        if (await FlutterForegroundTask.isAppOnForeground) {
-          try {
-            logger.i("foreground, fromForegroundApp: $fromForegroundApp");
-            if (fromForegroundApp) {
-              router.go("/");
-            } else {
-              FlutterForegroundTask.sendDataToMain(p0);
-            }
-            // navigatorKey.currentContext!.pushReplacementNamed("/call");
-          } catch (e) {
-            logger.e("画面遷移に失敗しました： $e", error: e, stackTrace: StackTrace.current);
-            await Sentry.captureException(e, stackTrace: StackTrace.current);
-            if (!fromForegroundApp) {
-              FlutterForegroundTask.sendDataToMain(p0);
-            }
-          }
-        } else {
-          logger.i("background");
-          var now = await FlutterNTP.now();
-          var differenceFromOfficialTime = DateTime.now().difference(now).inSeconds;
-
-          _untilCallStartTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-            int remain = ref
-                    .read(souguuServiceInfoProvider)
-                    .restSouguuNotification
-                    ?.callStartTime
-                    .difference(DateTime.now().subtract(Duration(seconds: differenceFromOfficialTime)))
-                    .inSeconds ??
-                0;
-            if (ref
-                    .read(souguuServiceInfoProvider)
-                    .restSouguuNotification
-                    ?.callStartTime
-                    .compareTo(DateTime.now().subtract(Duration(seconds: differenceFromOfficialTime))) ==
-                -1) {
-              timer.cancel();
-              FlutterForegroundTask.launchApp("/");
-              Future.delayed(const Duration(seconds: 1), () {
+        var dto = WebsocketDto.fromJson(jsonDecode(p0));
+        if (dto.type == "notification") {
+          var notif = WebsocketSouguuNotification.fromJson(dto.data);
+          ref
+              .read(souguuServiceInfoProvider.notifier)
+              .setSouguu(notif.aiteUserId, restSouguuNotification: RestSouguuNotification.fromWebsocketNotification(notif));
+          if (await FlutterForegroundTask.isAppOnForeground) {
+            try {
+              logger.i("foreground, fromForegroundApp: $fromForegroundApp");
+              if (fromForegroundApp) {
+                router.go("/");
+              } else {
                 FlutterForegroundTask.sendDataToMain(p0);
-              });
+              }
+              // navigatorKey.currentContext!.pushReplacementNamed("/call");
+            } catch (e) {
+              logger.e("画面遷移に失敗しました： $e", error: e, stackTrace: StackTrace.current);
+              await Sentry.captureException(e, stackTrace: StackTrace.current);
+              if (!fromForegroundApp) {
+                FlutterForegroundTask.sendDataToMain(p0);
+              }
             }
-            if (notificationServiceSubscription != null && !notificationServiceSubscription!.closed) {
-              notificationServiceSubscription?.read().showCounter(remain, notif.aiteUserId);
-              Sentry.captureMessage("show counter", level: SentryLevel.debug);
-            } else {
-              logger.w("notificationServiceSubscription is null or closed");
-              Sentry.captureMessage("notificationServiceSubscription is null or closed");
-              notificationServiceSubscription = ref.listen(notificationServiceProviderProvider, (previous, next) {});
-            }
-          });
+          } else {
+            logger.i("background");
+            var now = await FlutterNTP.now();
+            var differenceFromOfficialTime = DateTime.now().difference(now).inSeconds;
+
+            _untilCallStartTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+              int remain = ref
+                      .read(souguuServiceInfoProvider)
+                      .restSouguuNotification
+                      ?.callStartTime
+                      .difference(DateTime.now().subtract(Duration(seconds: differenceFromOfficialTime)))
+                      .inSeconds ??
+                  0;
+              if (ref
+                      .read(souguuServiceInfoProvider)
+                      .restSouguuNotification
+                      ?.callStartTime
+                      .compareTo(DateTime.now().subtract(Duration(seconds: differenceFromOfficialTime))) ==
+                  -1) {
+                timer.cancel();
+                FlutterForegroundTask.launchApp("/");
+                Future.delayed(const Duration(seconds: 1), () {
+                  FlutterForegroundTask.sendDataToMain(p0);
+                });
+              }
+              if (notificationServiceSubscription != null && !notificationServiceSubscription!.closed) {
+                notificationServiceSubscription?.read().showCounter(remain, notif.aiteUserId);
+                Sentry.captureMessage("show counter", level: SentryLevel.debug);
+              } else {
+                logger.w("notificationServiceSubscription is null or closed");
+                Sentry.captureMessage("notificationServiceSubscription is null or closed");
+                notificationServiceSubscription = ref.listen(notificationServiceProviderProvider, (previous, next) {});
+              }
+            });
+          }
         }
       } catch (e) {
         logger.e("遭遇通知のパースに失敗しました: $e", error: e, stackTrace: StackTrace.current);
