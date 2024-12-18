@@ -15,7 +15,7 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 
 part 'user_view_model.g.dart';
 
-const ipAddress = "takutk.com";
+const ipAddress = "192.168.10.10";
 
 @Riverpod(keepAlive: true)
 class UserViewModel extends _$UserViewModel {
@@ -27,7 +27,8 @@ class UserViewModel extends _$UserViewModel {
       log("UserViewModel dispose");
       userSharedPreferencesRepositoryProviderSubsc?.close();
     });
-    userSharedPreferencesRepositoryProviderSubsc = ref.listen(userSharedPreferencesRepositoryProvider, (previous, next) {});
+    userSharedPreferencesRepositoryProviderSubsc = ref.listen(
+        userSharedPreferencesRepositoryProvider, (previous, next) {});
     var user = await userSharedPreferencesRepositoryProviderSubsc?.read().get();
     return user;
   }
@@ -73,20 +74,29 @@ class UserViewModel extends _$UserViewModel {
       String name = "";
       int id = 0;
       String userId = "";
-      await http.put(Uri.parse('http://$ipAddress:5050/User/GetUser?userIndex=$userIndex'), headers: <String, String>{
-        'Authorization': 'Bearer $token',
-      }).then((value) {
+      await http.put(
+          Uri.parse('http://$ipAddress:5050/User/GetUser?userIndex=$userIndex'),
+          headers: <String, String>{
+            'Authorization': 'Bearer $token',
+          }).then((value) {
         var user = jsonDecode(value.body);
         name = user["name"];
         id = user["id"];
         userId = user["userId"];
       });
-      var user = UserState(token: token, refreshToken: TokenUtil.getRefreshToken(), name: name, id: id, userId: userId);
+      var user = UserState(
+          token: token,
+          refreshToken: TokenUtil.getRefreshToken(),
+          name: name,
+          id: id,
+          userId: userId);
       setUser(user);
       ref.read(userSharedPreferencesRepositoryProvider).save(user);
       return true;
     } catch (e) {
-      await Sentry.captureException(e, stackTrace: StackTrace.current, hint: Hint.withMap({"message": "refresh user failed"}));
+      await Sentry.captureException(e,
+          stackTrace: StackTrace.current,
+          hint: Hint.withMap({"message": "refresh user failed"}));
       debugPrint(e.toString());
       return false;
     }
@@ -121,15 +131,20 @@ class UserViewModel extends _$UserViewModel {
         refreshToken = decoded["refreshToken"];
       });
     } catch (e) {
-      await Sentry.captureException(e, stackTrace: StackTrace.current, hint: Hint.withMap({"message": "login failed"}));
+      await Sentry.captureException(e,
+          stackTrace: StackTrace.current,
+          hint: Hint.withMap({"message": "login failed"}));
       return e.toString();
     }
     debugPrint("token: $token");
 
     try {
-      await http.put(Uri.parse('http://$ipAddress:5050/User/GetUserByUserId?userId=${userFormState.BattariId}'), headers: <String, String>{
-        'Authorization': 'Bearer $token',
-      }).then((value) {
+      await http.put(
+          Uri.parse(
+              'http://$ipAddress:5050/User/GetUserByUserId?userId=${userFormState.BattariId}'),
+          headers: <String, String>{
+            'Authorization': 'Bearer $token',
+          }).then((value) {
         var user = jsonDecode(value.body);
         name = user["name"];
         // jsonから直接int持ってこれた
@@ -138,12 +153,15 @@ class UserViewModel extends _$UserViewModel {
         debugPrint("name: $name, id: ${id.toString()}");
         Sentry.configureScope((p0) {
           if (p0.user != null) {
-            p0.user!.copyWith(id: id.toString(), username: userFormState.BattariId);
+            p0.user!
+                .copyWith(id: id.toString(), username: userFormState.BattariId);
           }
         });
       });
     } catch (e) {
-      await Sentry.captureException(e, stackTrace: StackTrace.current, hint: Hint.withMap({"message": "get user by user id failed"}));
+      await Sentry.captureException(e,
+          stackTrace: StackTrace.current,
+          hint: Hint.withMap({"message": "get user by user id failed"}));
       return e.toString();
     }
 
@@ -168,7 +186,8 @@ class UserViewModel extends _$UserViewModel {
     return "ログインに失敗しました．";
   }
 
-  Future<String> refreshToken([int? userIndexArg, String? refreshTokenArg]) async {
+  Future<String> refreshToken(
+      [int? userIndexArg, String? refreshTokenArg]) async {
     String token = "";
     int userIndex = userIndexArg ??
         state.maybeWhen(
@@ -203,7 +222,9 @@ class UserViewModel extends _$UserViewModel {
         Token = value.body;
       });
     } catch (e) {
-      Sentry.captureException(e, stackTrace: StackTrace.current, hint: Hint.withMap({"message": "refresh token failed"}));
+      Sentry.captureException(e,
+          stackTrace: StackTrace.current,
+          hint: Hint.withMap({"message": "refresh token failed"}));
       return e.toString();
     }
     if (token.isNotEmpty) {

@@ -18,7 +18,7 @@ void notificationTapBackground(NotificationResponse notificationResponse) {
       debugPrint("notificationTapBackground: app is on foreground");
       return;
     } else {
-      FlutterForegroundTask.launchApp("/");
+      FlutterForegroundTask.launchApp("/foreground_init");
     }
   }();
 }
