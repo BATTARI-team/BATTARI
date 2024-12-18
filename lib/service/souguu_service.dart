@@ -4,6 +4,7 @@ import 'dart:developer';
 
 import 'package:battari/logger.dart';
 import 'package:battari/main.dart';
+import 'package:battari/model/dto/app_service_communication/souguu_notification_dto.dart';
 import 'package:battari/model/dto/rest_souguu_notification.dart';
 import 'package:battari/model/dto/websocket/souguu_websocket_dto.dart';
 import 'package:battari/model/dto/websocket/websocket_dto.dart';
@@ -51,7 +52,7 @@ class SouguuService extends _$SouguuService {
   StreamSubscription<ScreenStateEvent>? _screenStateEventSubscription;
 
   SouguuAppIncredientModel? appData;
-  dealNotification(String p0, [bool fromForegroundApp = false]) async {
+  dealNotification(String p0) async {
     if (p0 != "battari") {
       logger.d("websocketで受信したデータ: $p0");
       await Sentry.captureMessage("websocketで受信したデータ: $p0", level: SentryLevel.debug);
@@ -67,19 +68,17 @@ class SouguuService extends _$SouguuService {
               .setSouguu(notif.aiteUserId, restSouguuNotification: RestSouguuNotification.fromWebsocketNotification(notif));
           if (await FlutterForegroundTask.isAppOnForeground) {
             try {
-              logger.i("foreground, fromForegroundApp: $fromForegroundApp");
-              if (fromForegroundApp) {
-                router.go("/");
-              } else {
-                FlutterForegroundTask.sendDataToMain(p0);
-              }
+              logger.d(dto);
+              var serviceNotificationDto = SouguuNotificationDto(websocketDto: dto.toJson(), token: Token);
+              logger.d("toJson成功");
+              // ここまではきてる
+              FlutterForegroundTask.sendDataToMain(jsonEncode(serviceNotificationDto));
               // navigatorKey.currentContext!.pushReplacementNamed("/call");
             } catch (e) {
               logger.e("画面遷移に失敗しました： $e", error: e, stackTrace: StackTrace.current);
               await Sentry.captureException(e, stackTrace: StackTrace.current);
-              if (!fromForegroundApp) {
-                FlutterForegroundTask.sendDataToMain(p0);
-              }
+              var serviceNotificationDto = SouguuNotificationDto(websocketDto: dto.toJson(), token: Token);
+              FlutterForegroundTask.sendDataToMain(jsonEncode(serviceNotificationDto));
             }
           } else {
             logger.i("background");
@@ -101,9 +100,11 @@ class SouguuService extends _$SouguuService {
                       .compareTo(DateTime.now().subtract(Duration(seconds: differenceFromOfficialTime))) ==
                   -1) {
                 timer.cancel();
-                FlutterForegroundTask.launchApp("/");
+                FlutterForegroundTask.launchApp("/foreground_init");
                 Future.delayed(const Duration(seconds: 1), () {
-                  FlutterForegroundTask.sendDataToMain(p0);
+                  var serviceNotificationDto = SouguuNotificationDto(websocketDto: dto.toJson(), token: Token);
+                  FlutterForegroundTask.sendDataToMain(jsonEncode(serviceNotificationDto));
+                  logger.i(serviceNotificationDto.toJson());
                 });
               }
               if (notificationServiceSubscription != null && !notificationServiceSubscription!.closed) {
@@ -294,6 +295,7 @@ class SouguuServiceInfo extends _$SouguuServiceInfo {
 
   Future<bool> init() async {
     var transaction = Sentry.startTransaction("Splash.init", "SouguuServiceInfo.init");
+    logger.d("get souguu info");
     try {
       var result = await http.get(Uri.parse('http://$ipAddress:5050/SouguuInfo/GetSouguuInfo'), headers: <String, String>{
         'Authorization': 'Bearer $Token',

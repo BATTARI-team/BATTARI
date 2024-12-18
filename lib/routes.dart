@@ -15,7 +15,7 @@ final router = GoRouter(navigatorKey: navigatorKey, routes: [
   GoRoute(
       path: '/',
       builder: (context, state) {
-        return const Splash();
+        return const Splash(isSouguu: false);
       }),
   GoRoute(
     path: '/first_page',
@@ -30,6 +30,6 @@ final router = GoRouter(navigatorKey: navigatorKey, routes: [
   GoRoute(
       path: '/foreground_init',
       builder: (context, state) {
-        return const Splash();
+        return const Splash(isSouguu: true);
       })
 ]);

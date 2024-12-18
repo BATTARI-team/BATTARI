@@ -20,7 +20,6 @@ WebsocketDto _$WebsocketDtoFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$WebsocketDto {
-// 遭遇通知:notification
   String get type => throw _privateConstructorUsedError;
   Map<String, dynamic> get data => throw _privateConstructorUsedError;
 
@@ -116,7 +115,6 @@ class _$WebsocketDtoImpl implements _WebsocketDto {
   factory _$WebsocketDtoImpl.fromJson(Map<String, dynamic> json) =>
       _$$WebsocketDtoImplFromJson(json);
 
-// 遭遇通知:notification
   @override
   final String type;
   final Map<String, dynamic> _data;
@@ -168,7 +166,7 @@ abstract class _WebsocketDto implements WebsocketDto {
   factory _WebsocketDto.fromJson(Map<String, dynamic> json) =
       _$WebsocketDtoImpl.fromJson;
 
-  @override // 遭遇通知:notification
+  @override
   String get type;
   @override
   Map<String, dynamic> get data;

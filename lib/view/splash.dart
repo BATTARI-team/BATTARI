@@ -16,7 +16,8 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Splash extends HookConsumerWidget {
-  const Splash({super.key});
+  final bool isSouguu;
+  const Splash({super.key, required this.isSouguu});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     log("Splash build");
@@ -47,15 +48,39 @@ class Splash extends HookConsumerWidget {
       await android.requestNotificationsPermission();
     }
     if (userState != null) {
-      var token = '';
+      var token = Token;
       bool isCall = false;
 
       var transaction = Sentry.startTransaction("Splash.init", "Splash.init/userstate!=null");
 
+      if (isSouguu) {
+        // 遭遇通知がくるまでまつ
+        int counter = 0;
+        while (counter < 10) {
+          await Future.delayed(const Duration(milliseconds: 100));
+          if (ref.read(souguuServiceInfoProvider).restSouguuNotification != null) {
+            transaction.finish();
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              context.go('/call');
+            });
+          } else {
+            counter++;
+          }
+        }
+      }
+
       transaction.startChild("get token");
-      token = await ref.read(userViewModelProvider.notifier).refreshToken(userState.id, userState.refreshToken);
+      if (Token.isEmpty) {
+        token = await ref.read(userViewModelProvider.notifier).refreshToken(userState.id, userState.refreshToken);
+      } else {
+        token = Token;
+        ref.read(userViewModelProvider.notifier).setToken(token);
+      }
+      logger.i("isSouguu: $isSouguu");
       transaction.startChild("get souguuInfo");
-      isCall = await ref.read(souguuServiceInfoProvider.notifier).init();
+      if (!isSouguu) {
+        isCall = await ref.read(souguuServiceInfoProvider.notifier).init();
+      }
 
       logger.d("splash done");
       transaction.finish();
@@ -70,7 +95,6 @@ class Splash extends HookConsumerWidget {
             context.go('/call');
           });
         } else {
-          // アプリサイドにデータを送信
           WidgetsBinding.instance.addPostFrameCallback((_) {
             context.go('/home');
           });
