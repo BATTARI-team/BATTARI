@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'souguu_notification_dto.dart';
+part of 'souguu_notification_between_app_and_service_dto.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -14,36 +14,41 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
-SouguuNotificationDto _$SouguuNotificationDtoFromJson(
-    Map<String, dynamic> json) {
-  return _SouguuNotificationDto.fromJson(json);
+SouguuNotificationBetweenAppAndServiceDto
+    _$SouguuNotificationBetweenAppAndServiceDtoFromJson(
+        Map<String, dynamic> json) {
+  return _SouguuNotificationBetweenAppAndServiceDto.fromJson(json);
 }
 
 /// @nodoc
-mixin _$SouguuNotificationDto {
+mixin _$SouguuNotificationBetweenAppAndServiceDto {
   Map<String, dynamic> get websocketDto => throw _privateConstructorUsedError;
   String get token => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
-  $SouguuNotificationDtoCopyWith<SouguuNotificationDto> get copyWith =>
-      throw _privateConstructorUsedError;
+  $SouguuNotificationBetweenAppAndServiceDtoCopyWith<
+          SouguuNotificationBetweenAppAndServiceDto>
+      get copyWith => throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $SouguuNotificationDtoCopyWith<$Res> {
-  factory $SouguuNotificationDtoCopyWith(SouguuNotificationDto value,
-          $Res Function(SouguuNotificationDto) then) =
-      _$SouguuNotificationDtoCopyWithImpl<$Res, SouguuNotificationDto>;
+abstract class $SouguuNotificationBetweenAppAndServiceDtoCopyWith<$Res> {
+  factory $SouguuNotificationBetweenAppAndServiceDtoCopyWith(
+          SouguuNotificationBetweenAppAndServiceDto value,
+          $Res Function(SouguuNotificationBetweenAppAndServiceDto) then) =
+      _$SouguuNotificationBetweenAppAndServiceDtoCopyWithImpl<$Res,
+          SouguuNotificationBetweenAppAndServiceDto>;
   @useResult
   $Res call({Map<String, dynamic> websocketDto, String token});
 }
 
 /// @nodoc
-class _$SouguuNotificationDtoCopyWithImpl<$Res,
-        $Val extends SouguuNotificationDto>
-    implements $SouguuNotificationDtoCopyWith<$Res> {
-  _$SouguuNotificationDtoCopyWithImpl(this._value, this._then);
+class _$SouguuNotificationBetweenAppAndServiceDtoCopyWithImpl<$Res,
+        $Val extends SouguuNotificationBetweenAppAndServiceDto>
+    implements $SouguuNotificationBetweenAppAndServiceDtoCopyWith<$Res> {
+  _$SouguuNotificationBetweenAppAndServiceDtoCopyWithImpl(
+      this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
@@ -70,24 +75,25 @@ class _$SouguuNotificationDtoCopyWithImpl<$Res,
 }
 
 /// @nodoc
-abstract class _$$SouguuNotificationDtoImplCopyWith<$Res>
-    implements $SouguuNotificationDtoCopyWith<$Res> {
-  factory _$$SouguuNotificationDtoImplCopyWith(
-          _$SouguuNotificationDtoImpl value,
-          $Res Function(_$SouguuNotificationDtoImpl) then) =
-      __$$SouguuNotificationDtoImplCopyWithImpl<$Res>;
+abstract class _$$SouguuNotificationBetweenAppAndServiceDtoImplCopyWith<$Res>
+    implements $SouguuNotificationBetweenAppAndServiceDtoCopyWith<$Res> {
+  factory _$$SouguuNotificationBetweenAppAndServiceDtoImplCopyWith(
+          _$SouguuNotificationBetweenAppAndServiceDtoImpl value,
+          $Res Function(_$SouguuNotificationBetweenAppAndServiceDtoImpl) then) =
+      __$$SouguuNotificationBetweenAppAndServiceDtoImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({Map<String, dynamic> websocketDto, String token});
 }
 
 /// @nodoc
-class __$$SouguuNotificationDtoImplCopyWithImpl<$Res>
-    extends _$SouguuNotificationDtoCopyWithImpl<$Res,
-        _$SouguuNotificationDtoImpl>
-    implements _$$SouguuNotificationDtoImplCopyWith<$Res> {
-  __$$SouguuNotificationDtoImplCopyWithImpl(_$SouguuNotificationDtoImpl _value,
-      $Res Function(_$SouguuNotificationDtoImpl) _then)
+class __$$SouguuNotificationBetweenAppAndServiceDtoImplCopyWithImpl<$Res>
+    extends _$SouguuNotificationBetweenAppAndServiceDtoCopyWithImpl<$Res,
+        _$SouguuNotificationBetweenAppAndServiceDtoImpl>
+    implements _$$SouguuNotificationBetweenAppAndServiceDtoImplCopyWith<$Res> {
+  __$$SouguuNotificationBetweenAppAndServiceDtoImplCopyWithImpl(
+      _$SouguuNotificationBetweenAppAndServiceDtoImpl _value,
+      $Res Function(_$SouguuNotificationBetweenAppAndServiceDtoImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -96,7 +102,7 @@ class __$$SouguuNotificationDtoImplCopyWithImpl<$Res>
     Object? websocketDto = null,
     Object? token = null,
   }) {
-    return _then(_$SouguuNotificationDtoImpl(
+    return _then(_$SouguuNotificationBetweenAppAndServiceDtoImpl(
       websocketDto: null == websocketDto
           ? _value._websocketDto
           : websocketDto // ignore: cast_nullable_to_non_nullable
@@ -111,13 +117,15 @@ class __$$SouguuNotificationDtoImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$SouguuNotificationDtoImpl implements _SouguuNotificationDto {
-  const _$SouguuNotificationDtoImpl(
+class _$SouguuNotificationBetweenAppAndServiceDtoImpl
+    implements _SouguuNotificationBetweenAppAndServiceDto {
+  const _$SouguuNotificationBetweenAppAndServiceDtoImpl(
       {required final Map<String, dynamic> websocketDto, required this.token})
       : _websocketDto = websocketDto;
 
-  factory _$SouguuNotificationDtoImpl.fromJson(Map<String, dynamic> json) =>
-      _$$SouguuNotificationDtoImplFromJson(json);
+  factory _$SouguuNotificationBetweenAppAndServiceDtoImpl.fromJson(
+          Map<String, dynamic> json) =>
+      _$$SouguuNotificationBetweenAppAndServiceDtoImplFromJson(json);
 
   final Map<String, dynamic> _websocketDto;
   @override
@@ -132,14 +140,14 @@ class _$SouguuNotificationDtoImpl implements _SouguuNotificationDto {
 
   @override
   String toString() {
-    return 'SouguuNotificationDto(websocketDto: $websocketDto, token: $token)';
+    return 'SouguuNotificationBetweenAppAndServiceDto(websocketDto: $websocketDto, token: $token)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$SouguuNotificationDtoImpl &&
+            other is _$SouguuNotificationBetweenAppAndServiceDtoImpl &&
             const DeepCollectionEquality()
                 .equals(other._websocketDto, _websocketDto) &&
             (identical(other.token, token) || other.token == token));
@@ -153,25 +161,31 @@ class _$SouguuNotificationDtoImpl implements _SouguuNotificationDto {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$SouguuNotificationDtoImplCopyWith<_$SouguuNotificationDtoImpl>
-      get copyWith => __$$SouguuNotificationDtoImplCopyWithImpl<
-          _$SouguuNotificationDtoImpl>(this, _$identity);
+  _$$SouguuNotificationBetweenAppAndServiceDtoImplCopyWith<
+          _$SouguuNotificationBetweenAppAndServiceDtoImpl>
+      get copyWith =>
+          __$$SouguuNotificationBetweenAppAndServiceDtoImplCopyWithImpl<
+                  _$SouguuNotificationBetweenAppAndServiceDtoImpl>(
+              this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$SouguuNotificationDtoImplToJson(
+    return _$$SouguuNotificationBetweenAppAndServiceDtoImplToJson(
       this,
     );
   }
 }
 
-abstract class _SouguuNotificationDto implements SouguuNotificationDto {
-  const factory _SouguuNotificationDto(
-      {required final Map<String, dynamic> websocketDto,
-      required final String token}) = _$SouguuNotificationDtoImpl;
+abstract class _SouguuNotificationBetweenAppAndServiceDto
+    implements SouguuNotificationBetweenAppAndServiceDto {
+  const factory _SouguuNotificationBetweenAppAndServiceDto(
+          {required final Map<String, dynamic> websocketDto,
+          required final String token}) =
+      _$SouguuNotificationBetweenAppAndServiceDtoImpl;
 
-  factory _SouguuNotificationDto.fromJson(Map<String, dynamic> json) =
-      _$SouguuNotificationDtoImpl.fromJson;
+  factory _SouguuNotificationBetweenAppAndServiceDto.fromJson(
+          Map<String, dynamic> json) =
+      _$SouguuNotificationBetweenAppAndServiceDtoImpl.fromJson;
 
   @override
   Map<String, dynamic> get websocketDto;
@@ -179,6 +193,7 @@ abstract class _SouguuNotificationDto implements SouguuNotificationDto {
   String get token;
   @override
   @JsonKey(ignore: true)
-  _$$SouguuNotificationDtoImplCopyWith<_$SouguuNotificationDtoImpl>
+  _$$SouguuNotificationBetweenAppAndServiceDtoImplCopyWith<
+          _$SouguuNotificationBetweenAppAndServiceDtoImpl>
       get copyWith => throw _privateConstructorUsedError;
 }

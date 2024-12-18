@@ -4,15 +4,14 @@ import 'dart:developer';
 
 import 'package:battari/logger.dart';
 import 'package:battari/main.dart';
-import 'package:battari/model/dto/app_service_communication/souguu_notification_dto.dart';
+import 'package:battari/model/dto/app_service_communication/souguu_notification_between_app_and_service_dto.dart';
 import 'package:battari/model/dto/rest_souguu_notification.dart';
-import 'package:battari/model/dto/websocket/souguu_websocket_dto.dart';
+import 'package:battari/model/dto/websocket/souguu_material_websocket_dto.dart';
 import 'package:battari/model/dto/websocket/websocket_dto.dart';
 import 'package:battari/model/dto/websocket/websocket_souguu_notification.dart';
 import 'package:battari/model/souguu_incredient/souguu_app_incredient_model.dart';
 import 'package:battari/model/souguu_incredient/souguu_incredient_data_appusage_model.dart';
 import 'package:battari/model/state/souguu_service_state.dart';
-import 'package:battari/routes.dart';
 import 'package:battari/service/notification_service.dart';
 import 'package:battari/service/websocket_service.dart';
 import 'package:battari/view_model/user_view_model.dart';
@@ -28,7 +27,6 @@ import 'package:screen_state/screen_state.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:usage_stats/usage_stats.dart';
-import 'package:http/http.dart' as http;
 
 part 'souguu_service.g.dart';
 
@@ -69,7 +67,7 @@ class SouguuService extends _$SouguuService {
           if (await FlutterForegroundTask.isAppOnForeground) {
             try {
               logger.d(dto);
-              var serviceNotificationDto = SouguuNotificationDto(websocketDto: dto.toJson(), token: Token);
+              var serviceNotificationDto = SouguuNotificationBetweenAppAndServiceDto(websocketDto: dto.toJson(), token: Token);
               logger.d("toJson成功");
               // ここまではきてる
               FlutterForegroundTask.sendDataToMain(jsonEncode(serviceNotificationDto));
@@ -77,7 +75,7 @@ class SouguuService extends _$SouguuService {
             } catch (e) {
               logger.e("画面遷移に失敗しました： $e", error: e, stackTrace: StackTrace.current);
               await Sentry.captureException(e, stackTrace: StackTrace.current);
-              var serviceNotificationDto = SouguuNotificationDto(websocketDto: dto.toJson(), token: Token);
+              var serviceNotificationDto = SouguuNotificationBetweenAppAndServiceDto(websocketDto: dto.toJson(), token: Token);
               FlutterForegroundTask.sendDataToMain(jsonEncode(serviceNotificationDto));
             }
           } else {
@@ -102,7 +100,7 @@ class SouguuService extends _$SouguuService {
                 timer.cancel();
                 FlutterForegroundTask.launchApp("/foreground_init");
                 Future.delayed(const Duration(seconds: 1), () {
-                  var serviceNotificationDto = SouguuNotificationDto(websocketDto: dto.toJson(), token: Token);
+                  var serviceNotificationDto = SouguuNotificationBetweenAppAndServiceDto(websocketDto: dto.toJson(), token: Token);
                   FlutterForegroundTask.sendDataToMain(jsonEncode(serviceNotificationDto));
                   logger.i(serviceNotificationDto.toJson());
                 });
@@ -195,7 +193,7 @@ class SouguuService extends _$SouguuService {
       //     jsonEncode(SouguuWebsocketDto(id: userId!, isWelcome: false, incredients: incredients, created: DateTime.now()).toJson());
       var output = jsonEncode(WebsocketDto(
               type: "souguu_materials",
-              data: SouguuWebsocketDto(id: userId!, isWelcome: false, incredients: incredients, created: DateTime.now()).toJson())
+              data: SouguuMaterialWebsocketDto(id: userId!, isWelcome: false, incredients: incredients, created: DateTime.now()).toJson())
           .toJson());
 
       debugPrint(output);

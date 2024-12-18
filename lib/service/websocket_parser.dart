@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:battari/logger.dart';
 import 'package:battari/main.dart';
-import 'package:battari/model/dto/app_service_communication/souguu_notification_dto.dart';
+import 'package:battari/model/dto/app_service_communication/souguu_notification_between_app_and_service_dto.dart';
 import 'package:battari/model/dto/rest_souguu_notification.dart';
 import 'package:battari/model/dto/websocket/websocket_dto.dart';
 import 'package:battari/model/dto/websocket/websocket_souguu_notification.dart';
@@ -27,7 +27,7 @@ dealNotificationForForegroundApp(Ref ref, String p0) async {
     debugPrint(p0);
     try {
       // var notif = WebsocketSouguuNotification.fromJson(jsonDecode(p0));
-      var fromService = SouguuNotificationDto.fromJson(jsonDecode(p0));
+      var fromService = SouguuNotificationBetweenAppAndServiceDto.fromJson(jsonDecode(p0));
       Sentry.captureMessage('fromService parsed', level: SentryLevel.debug);
       logger.d(fromService);
       var dto = WebsocketDto.fromJson(fromService.websocketDto);
