@@ -16,7 +16,7 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 
 part 'user_view_model.g.dart';
 
-const ipAddress = "192.168.10.10";
+const ipAddress = "takutk.com";
 
 @Riverpod(keepAlive: true)
 class UserViewModel extends _$UserViewModel {
