@@ -4,15 +4,17 @@ import 'dart:developer';
 
 import 'package:battari/logger.dart';
 import 'package:battari/main.dart';
+import 'package:battari/model/dto/app_service_communication/souguu_notification_between_app_and_service_dto.dart';
 import 'package:battari/model/dto/rest_souguu_notification.dart';
-import 'package:battari/model/dto/souguu_websocket_dto.dart';
-import 'package:battari/model/dto/websocket_souguu_notification.dart';
+import 'package:battari/model/dto/websocket/souguu_material_websocket_dto.dart';
+import 'package:battari/model/dto/websocket/websocket_dto.dart';
+import 'package:battari/model/dto/websocket/websocket_souguu_notification.dart';
 import 'package:battari/model/souguu_incredient/souguu_app_incredient_model.dart';
 import 'package:battari/model/souguu_incredient/souguu_incredient_data_appusage_model.dart';
 import 'package:battari/model/state/souguu_service_state.dart';
-import 'package:battari/routes.dart';
 import 'package:battari/service/notification_service.dart';
 import 'package:battari/service/websocket_service.dart';
+import 'package:battari/view/splash.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
@@ -26,7 +28,6 @@ import 'package:screen_state/screen_state.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:usage_stats/usage_stats.dart';
-import 'package:http/http.dart' as http;
 
 part 'souguu_service.g.dart';
 
@@ -50,83 +51,101 @@ class SouguuService extends _$SouguuService {
   StreamSubscription<ScreenStateEvent>? _screenStateEventSubscription;
 
   SouguuAppIncredientModel? appData;
-  dealNotification(String p0, [bool fromForegroundApp = false]) async {
+  dealNotification(String p0) async {
     if (p0 != "battari") {
       logger.d("websocketで受信したデータ: $p0");
-      await Sentry.captureMessage("websocketで受信したデータ: $p0",
-          level: SentryLevel.debug);
+      await Sentry.captureMessage("websocketで受信したデータ: $p0", level: SentryLevel.debug);
     }
     // ここで受信したデータを処理する
     if (p0.length > 20) {
       try {
-        var notif = WebsocketSouguuNotification.fromJson(jsonDecode(p0));
-        ref.read(souguuServiceInfoProvider.notifier).setSouguu(notif.aiteUserId,
-            restSouguuNotification:
-                RestSouguuNotification.fromWebsocketNotification(notif));
-        if (await FlutterForegroundTask.isAppOnForeground) {
-          try {
-            logger.i("foreground, fromForegroundApp: $fromForegroundApp");
-            if (fromForegroundApp) {
-              router.go("/");
-            } else {
-              FlutterForegroundTask.sendDataToMain(p0);
+        var dto = WebsocketDto.fromJson(jsonDecode(p0));
+        if (dto.type == "notification") {
+          var notif = WebsocketSouguuNotification.fromJson(dto.data);
+          ref
+              .read(souguuServiceInfoProvider.notifier)
+              .setSouguu(notif.aiteUserId, restSouguuNotification: RestSouguuNotification.fromWebsocketNotification(notif));
+          if (await FlutterForegroundTask.isAppOnForeground) {
+            try {
+              logger.d(dto);
+              var serviceNotificationDto = SouguuNotificationBetweenAppAndServiceDto(websocketDto: dto.toJson(), token: Token);
+              logger.d("toJson成功");
+              // ここまではきてる
+              FlutterForegroundTask.sendDataToMain(jsonEncode(serviceNotificationDto));
+              // navigatorKey.currentContext!.pushReplacementNamed("/call");
+            } catch (e) {
+              logger.e("画面遷移に失敗しました： $e", error: e, stackTrace: StackTrace.current);
+              await Sentry.captureException(e, stackTrace: StackTrace.current);
+              var serviceNotificationDto = SouguuNotificationBetweenAppAndServiceDto(websocketDto: dto.toJson(), token: Token);
+              FlutterForegroundTask.sendDataToMain(jsonEncode(serviceNotificationDto));
             }
-            // navigatorKey.currentContext!.pushReplacementNamed("/call");
-          } catch (e) {
-            logger.e("画面遷移に失敗しました： $e",
-                error: e, stackTrace: StackTrace.current);
-            await Sentry.captureException(e, stackTrace: StackTrace.current);
-            if (!fromForegroundApp) {
-              FlutterForegroundTask.sendDataToMain(p0);
-            }
-          }
-        } else {
-          logger.i("background");
-          var now = await FlutterNTP.now();
-          var differenceFromOfficialTime =
-              DateTime.now().difference(now).inSeconds;
+          } else {
+            var now = await FlutterNTP.now();
+            var differenceFromOfficialTime = DateTime.now().difference(now).inSeconds;
 
-          _untilCallStartTimer =
-              Timer.periodic(const Duration(seconds: 1), (timer) {
-            int remain = ref
-                    .read(souguuServiceInfoProvider)
-                    .restSouguuNotification
-                    ?.callStartTime
-                    .difference(DateTime.now().subtract(
-                        Duration(seconds: differenceFromOfficialTime)))
-                    .inSeconds ??
-                0;
-            if (ref
-                    .read(souguuServiceInfoProvider)
-                    .restSouguuNotification
-                    ?.callStartTime
-                    .compareTo(DateTime.now().subtract(
-                        Duration(seconds: differenceFromOfficialTime))) ==
-                -1) {
+            void onAppOpened(Timer timer) async {
+              if (_untilCallStartTimer == null) {
+                logger.w("untilCallStartTimer is null");
+              }
               timer.cancel();
-              FlutterForegroundTask.launchApp("/");
-              Future.delayed(const Duration(seconds: 1), () {
-                FlutterForegroundTask.sendDataToMain(p0);
+              bool _isForeground = await FlutterForegroundTask.isAppOnForeground;
+              await Future.delayed(const Duration(milliseconds: 200), () {
+                var serviceNotificationDto = SouguuNotificationBetweenAppAndServiceDto(websocketDto: dto.toJson(), token: Token);
+                FlutterForegroundTask.sendDataToMain(jsonEncode(serviceNotificationDto));
+                logger.i(serviceNotificationDto.toJson());
+              });
+              await Future.delayed(const Duration(milliseconds: 500), () {
+                var serviceNotificationDto = SouguuNotificationBetweenAppAndServiceDto(websocketDto: dto.toJson(), token: Token);
+                FlutterForegroundTask.sendDataToMain(jsonEncode(serviceNotificationDto));
+                logger.i(serviceNotificationDto.toJson());
+              });
+              Future.delayed(const Duration(milliseconds: 1500), () {
+                var serviceNotificationDto = SouguuNotificationBetweenAppAndServiceDto(websocketDto: dto.toJson(), token: Token);
+                FlutterForegroundTask.sendDataToMain(jsonEncode(serviceNotificationDto));
+                logger.i(serviceNotificationDto.toJson());
               });
             }
-            if (notificationServiceSubscription != null &&
-                !notificationServiceSubscription!.closed) {
-              notificationServiceSubscription
-                  ?.read()
-                  .showCounter(remain, notif.aiteUserId);
-              Sentry.captureMessage("show counter", level: SentryLevel.debug);
-            } else {
-              logger.w("notificationServiceSubscription is null or closed");
-              Sentry.captureMessage(
-                  "notificationServiceSubscription is null or closed");
-              notificationServiceSubscription = ref.listen(
-                  notificationServiceProviderProvider, (previous, next) {});
+
+            void onTimerDone(Timer timer) {
+              FlutterForegroundTask.launchApp("/foreground_init");
+              onAppOpened(timer);
             }
-          });
+
+            bool _isForegroundOnTimerStart = await FlutterForegroundTask.isAppOnForeground;
+            _untilCallStartTimer = Timer.periodic(const Duration(seconds: 1), (Timer timer) async {
+              bool _isForeground = await FlutterForegroundTask.isAppOnForeground;
+              if ((_isForegroundOnTimerStart != true) && (_isForeground == true)) {
+                onAppOpened(timer);
+              } else {
+                int remain = ref
+                        .read(souguuServiceInfoProvider)
+                        .restSouguuNotification
+                        ?.callStartTime
+                        .difference(DateTime.now().subtract(Duration(seconds: differenceFromOfficialTime)))
+                        .inSeconds ??
+                    0;
+                if (ref
+                        .read(souguuServiceInfoProvider)
+                        .restSouguuNotification
+                        ?.callStartTime
+                        .compareTo(DateTime.now().subtract(Duration(seconds: differenceFromOfficialTime))) ==
+                    -1) {
+                  onTimerDone(timer);
+                }
+                if (notificationServiceSubscription != null && !notificationServiceSubscription!.closed) {
+                  notificationServiceSubscription?.read().showCounter(remain, notif.aiteUserId);
+                  Sentry.captureMessage("show counter", level: SentryLevel.debug);
+                } else {
+                  logger.w("notificationServiceSubscription is null or closed");
+                  Sentry.captureMessage("notificationServiceSubscription is null or closed");
+                  notificationServiceSubscription = ref.listen(notificationServiceProviderProvider, (previous, next) {});
+                }
+              }
+            });
+          }
         }
       } catch (e) {
-        logger.e("遭遇通知のパースに失敗しました: $e",
-            error: e, stackTrace: StackTrace.current);
+        logger.e("遭遇通知のパースに失敗しました: $e", error: e, stackTrace: StackTrace.current);
         await Sentry.captureException(e, stackTrace: StackTrace.current);
       }
     }
@@ -148,16 +167,14 @@ class SouguuService extends _$SouguuService {
         Token = value.body;
       });
     } catch (e) {
-      logger.e("battari service started error",
-          error: e, stackTrace: StackTrace.current);
+      logger.e("battari service started error", error: e, stackTrace: StackTrace.current);
     }
   }
 
   ProviderSubscription? souguuServiceInfoProviderSubscription;
 
   void _setWebsocketProviderSubs() {
-    websocketProviderSubscription =
-        ref.listen(websocketServiceProvider, (previous, next) {});
+    websocketProviderSubscription = ref.listen(websocketServiceProvider, (previous, next) {});
     _refreshToken();
     ref.read(websocketServiceProvider).addWebsocketReceiver(dealNotification);
   }
@@ -168,14 +185,11 @@ class SouguuService extends _$SouguuService {
     _init();
     _setWebsocketProviderSubs();
 
-    souguuServiceInfoProviderSubscription = ref.listen<SouguuServiceState>(
-        souguuServiceInfoProvider, (previus, next) {});
-    _refreshTokenTimer =
-        Timer.periodic(const Duration(hours: 3), (timer) async {
+    souguuServiceInfoProviderSubscription = ref.listen<SouguuServiceState>(souguuServiceInfoProvider, (previus, next) {});
+    _refreshTokenTimer = Timer.periodic(const Duration(hours: 3), (timer) async {
       await _refreshToken();
     });
-    _screenStateEventSubscription =
-        Screen().screenStateStream.listen((ScreenStateEvent data) {
+    _screenStateEventSubscription = Screen().screenStateStream.listen((ScreenStateEvent data) {
       if (data == ScreenStateEvent.SCREEN_ON) {
         // 画面がONになった時の処理
         logger.i("screen on");
@@ -191,35 +205,30 @@ class SouguuService extends _$SouguuService {
       }
     });
     _souguuIncredientSender = Timer.periodic(souguuMaterialDuration, (timer) {
-      userId ??= ref.read(userViewModelProvider).maybeWhen(
-          orElse: () => null,
-          data: (data) {
-            if (data == null) return null;
-            return data.id;
-          });
+      userId ??= ref.read(userViewModelProvider)?.id;
       if (userId == null || websocketProviderSubscription == null) return;
       List<Map<String, dynamic>> incredients = [];
       // 遭遇材料の追加
       if (appData != null) {
         incredients.add(appData!.toJson());
       }
-      var output = jsonEncode(SouguuWebsocketDto(
-              id: userId!,
-              isWelcome: false,
-              incredients: incredients,
-              created: DateTime.now())
+      // var output =
+      //     jsonEncode(SouguuWebsocketDto(id: userId!, isWelcome: false, incredients: incredients, created: DateTime.now()).toJson());
+      var output = jsonEncode(WebsocketDto(
+              type: "souguu_materials",
+              data: SouguuMaterialWebsocketDto(id: userId!, isWelcome: false, incredients: incredients, created: DateTime.now()).toJson())
           .toJson());
 
+      debugPrint(output);
+
       if (websocketProviderSubscription != null) {
-        if (!websocketProviderSubscription!.closed)
-          websocketProviderSubscription!.read().sendMessage(output);
+        if (!websocketProviderSubscription!.closed) websocketProviderSubscription!.read().sendMessage(output);
       }
     });
     _appUsageGetter = Timer.periodic(appUsageDuration, (timer) async {
       await _checkAppUsage();
     });
-    notificationServiceSubscription =
-        ref.listen(notificationServiceProviderProvider, (previous, next) {});
+    notificationServiceSubscription = ref.listen(notificationServiceProviderProvider, (previous, next) {});
 
     return 0;
   }
@@ -232,29 +241,21 @@ class SouguuService extends _$SouguuService {
     if (_lastOpenTimeStamp != null) {
       await _initUsage();
       DateTime currentTime = DateTime.now();
-      DateTime lastOpenTime =
-          DateTime.fromMillisecondsSinceEpoch(_lastOpenTimeStamp!);
+      DateTime lastOpenTime = DateTime.fromMillisecondsSinceEpoch(_lastOpenTimeStamp!);
 
       // 経過時間を秒で計算
       // ignore: unused_local_variable
       // #TODO
       int elapsedMinutes = currentTime.difference(lastOpenTime).inSeconds ~/ 60;
-      int elapsedSeconds =
-          currentTime.difference(lastOpenTime).inSeconds.toInt();
+      int elapsedSeconds = currentTime.difference(lastOpenTime).inSeconds.toInt();
 
-      String appName = _events
-              .firstWhere(
-                  (event) => event.timeStamp == _lastOpenTimeStamp.toString())
-              .packageName ??
-          "不明なアプリ";
+      String appName = _events.firstWhere((event) => event.timeStamp == _lastOpenTimeStamp.toString()).packageName ?? "不明なアプリ";
 
       DateTime now = DateTime.now(); // 現在の時間を取得
 
       print("$appName:$elapsedSeconds経過"); // _targetSeconds以下なら経過秒数を表示
-      appData = SouguuAppIncredientModel(
-          type: "app",
-          appData: SouguuIncredientDataAppUsageModel(
-              appName: appName, useTime: elapsedSeconds));
+      appData =
+          SouguuAppIncredientModel(type: "app", appData: SouguuIncredientDataAppUsageModel(appName: appName, useTime: elapsedSeconds));
     } else {
       appData = null;
     }
@@ -267,8 +268,7 @@ class SouguuService extends _$SouguuService {
       DateTime endDate = DateTime.now();
       DateTime startDate = endDate.subtract(Duration(days: 1));
 
-      List<EventUsageInfo> queryEvents =
-          await UsageStats.queryEvents(startDate, endDate);
+      List<EventUsageInfo> queryEvents = await UsageStats.queryEvents(startDate, endDate);
 
       // 最新の eventType == 1 イベントのタイムスタンプを取得
       for (var event in queryEvents.reversed) {
@@ -293,14 +293,11 @@ class SouguuService extends _$SouguuService {
   void disconnectWebsocket() async {
     await websocketProviderSubscription?.read().cancelConnect();
     websocketProviderSubscription?.close();
-    await Sentry.captureMessage("websocket disconnected",
-        level: SentryLevel.debug);
+    await Sentry.captureMessage("websocket disconnected", level: SentryLevel.debug);
 
-    await http.get(
-        Uri.parse('http://$ipAddress:5050/SouguuInfo/ClearSouguuIncredient'),
-        headers: <String, String>{
-          'Authorization': 'Bearer $Token',
-        });
+    await http.get(Uri.parse('http://$ipAddress:5050/SouguuInfo/ClearSouguuIncredient'), headers: <String, String>{
+      'Authorization': 'Bearer $Token',
+    });
     websocketProviderSubscription = null;
   }
 }
@@ -318,32 +315,26 @@ class SouguuServiceInfo extends _$SouguuServiceInfo {
   }
 
   Future<bool> init() async {
-    var transaction =
-        Sentry.startTransaction("Splash.init", "SouguuServiceInfo.init");
+    var transaction = Sentry.startTransaction("Splash.init", "SouguuServiceInfo.init");
+    logger.d("get souguu info");
     try {
-      var result = await http.get(
-          Uri.parse('http://$ipAddress:5050/SouguuInfo/GetSouguuInfo'),
-          headers: <String, String>{
-            'Authorization': 'Bearer $Token',
-          });
+      var result = await http.get(Uri.parse('http://$ipAddress:5050/SouguuInfo/GetSouguuInfo'), headers: <String, String>{
+        'Authorization': 'Bearer $Token',
+      });
       transaction.startChild("parse result");
-      logger.d(
-          "souguu_service.dart, _init statuscode: ${result.statusCode}, token: $Token");
+      logger.d("souguu_service.dart, _init statuscode: ${result.statusCode}, token: $Token");
       if (result.statusCode != 200) {
         transaction.finish();
         return false;
       } else {
-        var souguuInfo =
-            RestSouguuNotification.fromJson(jsonDecode(result.body));
-        state = state.copyWith(
-            souguu: souguuInfo.aiteUserId, restSouguuNotification: souguuInfo);
+        var souguuInfo = RestSouguuNotification.fromJson(jsonDecode(result.body));
+        state = state.copyWith(souguu: souguuInfo.aiteUserId, restSouguuNotification: souguuInfo);
         logger.i("${souguuInfo.aiteUserId}と遭遇しました");
         transaction.finish();
         return true;
       }
     } catch (e) {
-      logger.e("souguu_service.dart, _init: 遭遇情報の取得に失敗しました",
-          error: e, stackTrace: StackTrace.current);
+      logger.e("souguu_service.dart, _init: 遭遇情報の取得に失敗しました", error: e, stackTrace: StackTrace.current);
       await Sentry.captureException(e, stackTrace: StackTrace.current);
     }
     logger.d("init done");
@@ -352,9 +343,7 @@ class SouguuServiceInfo extends _$SouguuServiceInfo {
   }
 
   /// 現在遭遇しているかの情報を更新する
-  void setSouguu(int? souguu,
-      {RestSouguuNotification? restSouguuNotification}) {
-    state = state.copyWith(
-        souguu: souguu ?? 0, restSouguuNotification: restSouguuNotification);
+  void setSouguu(int? souguu, {RestSouguuNotification? restSouguuNotification}) {
+    state = state.copyWith(souguu: souguu ?? 0, restSouguuNotification: restSouguuNotification);
   }
 }

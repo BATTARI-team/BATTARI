@@ -9,62 +9,54 @@ import 'package:battari/util/token_util.dart';
 import 'package:battari/view_model/user_form_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logger/web.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:http/http.dart' as http;
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 part 'user_view_model.g.dart';
 
-const ipAddress = "takutk.com";
+const ipAddress = "192.168.10.10";
 
 @Riverpod(keepAlive: true)
 class UserViewModel extends _$UserViewModel {
-  ProviderSubscription? userSharedPreferencesRepositoryProviderSubsc;
   @override
-  Future<UserState?> build() async {
+  UserState? build() {
     log("UserViewModel build");
     ref.onDispose(() {
       log("UserViewModel dispose");
-      userSharedPreferencesRepositoryProviderSubsc?.close();
     });
-    userSharedPreferencesRepositoryProviderSubsc = ref.listen(userSharedPreferencesRepositoryProvider, (previous, next) {});
-    var user = await userSharedPreferencesRepositoryProviderSubsc?.read().get();
-    return user;
+    return null;
+  }
+
+  Future<void> init() async {
+    var user = await ref.read(userSharedPreferencesRepositoryProvider).get();
+    state = user;
   }
 
   void setToken(String token) {
     logger.i("tokenが更新されました: $token");
     Token = token;
-    state.maybeWhen(orElse: () {
-      state = AsyncData(UserState(token: token));
-    }, data: (data) {
-      if (data == null) {
-        state = AsyncData(UserState(token: token));
-      } else {
-        state = AsyncData(data.copyWith(token: token));
-      }
-    });
+    if (state == null) {
+      state = UserState(token: token);
+      Sentry.captureMessage("state is null", hint: Hint.withMap({"message": "set token"}), level: SentryLevel.debug);
+    } else {
+      state = state!.copyWith(token: token);
+    }
   }
 
   void setUser(UserState user) {
-    state.maybeWhen(
-      orElse: () {
-        debugPrint("state is null");
-      },
-      data: (data) {
-        if (data == null) {
-          state = AsyncData(user);
-        } else {
-          state = AsyncData(data.copyWith(
-            id: user.id,
-            userId: user.userId,
-            name: user.name,
-            token: user.token,
-          ));
-          logger.i("userが更新されました: ${user.name}");
-        }
-      },
-    );
+    if (state == null) {
+      state = user;
+    } else {
+      state = state!.copyWith(
+        id: user.id,
+        userId: user.userId,
+        name: user.name,
+        token: user.token,
+      );
+      logger.i("userが更新されました: ${user.name}");
+    }
   }
 
   Future<bool> refreshUser(int userIndex) async {
@@ -171,21 +163,15 @@ class UserViewModel extends _$UserViewModel {
   Future<String> refreshToken([int? userIndexArg, String? refreshTokenArg]) async {
     String token = "";
     int userIndex = userIndexArg ??
-        state.maybeWhen(
-          orElse: () => 0,
-          data: (data) {
-            if (data == null) return 0;
-            return data.id;
-          },
-        );
+        () {
+          if (state == null) return 0;
+          return state!.id;
+        }();
     String refreshToken = refreshTokenArg ??
-        state.maybeWhen(
-          orElse: () => "",
-          data: (data) {
-            if (data == null) return "";
-            return data.refreshToken;
-          },
-        );
+        () {
+          if (state == null) return "";
+          return state!.refreshToken;
+        }();
 
     try {
       debugPrint('http://$ipAddress:5050/User/RefreshToken');

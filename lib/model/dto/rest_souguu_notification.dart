@@ -1,4 +1,4 @@
-import 'package:battari/model/dto/websocket_souguu_notification.dart';
+import 'package:battari/model/dto/websocket/websocket_souguu_notification.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 part 'rest_souguu_notification.freezed.dart';
 part 'rest_souguu_notification.g.dart';

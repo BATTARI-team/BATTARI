@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'souguu_websocket_dto.dart';
+part of 'souguu_material_websocket_dto.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
