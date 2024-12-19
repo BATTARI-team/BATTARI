@@ -8,6 +8,7 @@ import 'package:battari/model/dto/websocket/websocket_dto.dart';
 import 'package:battari/model/dto/websocket/websocket_souguu_notification.dart';
 import 'package:battari/routes.dart';
 import 'package:battari/service/souguu_service.dart';
+import 'package:battari/view_model/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -28,7 +29,12 @@ dealNotificationForForegroundApp(Ref ref, String p0) async {
     try {
       var fromService = SouguuNotificationBetweenAppAndServiceDto.fromJson(jsonDecode(p0));
       var dto = WebsocketDto.fromJson(fromService.websocketDto);
-      Token = fromService.token;
+      if (fromService.token.isNotEmpty) {
+        Token = fromService.token;
+      } else {
+        ref.read(userViewModelProvider.notifier).refreshToken();
+        Sentry.captureMessage("websocketで受信したデータにトークンがありません", level: SentryLevel.warning);
+      }
       logger.d(dto);
       if (dto.type == 'notification') {
         var souguuInfo = ref.read(souguuServiceInfoProvider);
