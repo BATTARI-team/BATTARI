@@ -177,12 +177,7 @@ class SouguuService extends _$SouguuService {
       }
     });
     _souguuIncredientSender = Timer.periodic(souguuMaterialDuration, (timer) {
-      userId ??= ref.read(userViewModelProvider).maybeWhen(
-          orElse: () => null,
-          data: (data) {
-            if (data == null) return null;
-            return data.id;
-          });
+      userId ??= ref.read(userViewModelProvider)?.id;
       if (userId == null || websocketProviderSubscription == null) return;
       List<Map<String, dynamic>> incredients = [];
       // 遭遇材料の追加

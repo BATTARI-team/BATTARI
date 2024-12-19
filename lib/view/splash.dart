@@ -39,6 +39,8 @@ class Splash extends HookConsumerWidget {
       sharedPreferencesProvider.overrideWithValue(sharedPreferences),
     ]);
     UserState? userState = await ref.read(userSharedPreferencesRepositoryProvider).get();
+    await ref.read(userViewModelProvider.notifier).init();
+
     debugPrint("done");
 
     // 通知権限

@@ -34,7 +34,7 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
     int differenceFromOfficialTime = 0;
     var callCountdown = useState(0);
     SouguuServiceState souguuInfo = ref.watch(souguuServiceInfoProvider);
-    UserState? userState = ref.watch(userViewModelProvider).asData!.value;
+    UserState? userState = ref.watch(userViewModelProvider);
     if (souguuInfo.restSouguuNotification == null || userState == null) {
       // デフォルト値挿入
       souguuInfo = SouguuServiceState(
@@ -46,8 +46,7 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
               callStartTime: DateTime.now().add(const Duration(seconds: 10)),
               souguuReason: "instagramでBATTARI",
               token: "006f1e"));
-      userState =
-          const UserState(id: 6, userId: "test", name: "test", token: "006f1e");
+      userState = const UserState(id: 6, userId: "test", name: "test", token: "006f1e");
     }
 
     useEffect(() {

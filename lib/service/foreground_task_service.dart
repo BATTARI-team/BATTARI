@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:battari/logger.dart';
 import 'package:battari/main.dart';
+import 'package:battari/model/state/user_state.dart';
 import 'package:battari/repository/user_repository.dart';
 import 'package:battari/service/souguu_service.dart';
 import 'package:battari/view_model/user_view_model.dart';
@@ -82,6 +83,7 @@ class MyTaskHandler extends TaskHandler {
     logger.i("foreground_task_service.dart : token is $token");
     Token = token;
     userViewmodelProviderSubscription = providerContainer.listen(userViewModelProvider, (value, next) {});
+    providerContainer.read(userViewModelProvider.notifier).init();
     providerContainer.read(userViewModelProvider.notifier).setToken(token);
     souguuServiceProviderSubscription = providerContainer.listen(souguuServiceProvider, (value, next) {});
   }

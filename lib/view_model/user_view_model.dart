@@ -9,6 +9,7 @@ import 'package:battari/util/token_util.dart';
 import 'package:battari/view_model/user_form_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logger/web.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:http/http.dart' as http;
 import 'package:sentry_flutter/sentry_flutter.dart';
@@ -19,53 +20,43 @@ const ipAddress = "192.168.10.10";
 
 @Riverpod(keepAlive: true)
 class UserViewModel extends _$UserViewModel {
-  ProviderSubscription? userSharedPreferencesRepositoryProviderSubsc;
   @override
-  Future<UserState?> build() async {
+  UserState? build() {
     log("UserViewModel build");
     ref.onDispose(() {
       log("UserViewModel dispose");
-      userSharedPreferencesRepositoryProviderSubsc?.close();
     });
-    userSharedPreferencesRepositoryProviderSubsc = ref.listen(
-        userSharedPreferencesRepositoryProvider, (previous, next) {});
-    var user = await userSharedPreferencesRepositoryProviderSubsc?.read().get();
-    return user;
+    return null;
+  }
+
+  Future<void> init() async {
+    var user = await ref.read(userSharedPreferencesRepositoryProvider).get();
+    state = user;
   }
 
   void setToken(String token) {
     logger.i("tokenが更新されました: $token");
     Token = token;
-    state.maybeWhen(orElse: () {
-      state = AsyncData(UserState(token: token));
-    }, data: (data) {
-      if (data == null) {
-        state = AsyncData(UserState(token: token));
-      } else {
-        state = AsyncData(data.copyWith(token: token));
-      }
-    });
+    if (state == null) {
+      state = UserState(token: token);
+      Sentry.captureMessage("state is null", hint: Hint.withMap({"message": "set token"}), level: SentryLevel.debug);
+    } else {
+      state = state!.copyWith(token: token);
+    }
   }
 
   void setUser(UserState user) {
-    state.maybeWhen(
-      orElse: () {
-        debugPrint("state is null");
-      },
-      data: (data) {
-        if (data == null) {
-          state = AsyncData(user);
-        } else {
-          state = AsyncData(data.copyWith(
-            id: user.id,
-            userId: user.userId,
-            name: user.name,
-            token: user.token,
-          ));
-          logger.i("userが更新されました: ${user.name}");
-        }
-      },
-    );
+    if (state == null) {
+      state = user;
+    } else {
+      state = state!.copyWith(
+        id: user.id,
+        userId: user.userId,
+        name: user.name,
+        token: user.token,
+      );
+      logger.i("userが更新されました: ${user.name}");
+    }
   }
 
   Future<bool> refreshUser(int userIndex) async {
@@ -74,29 +65,20 @@ class UserViewModel extends _$UserViewModel {
       String name = "";
       int id = 0;
       String userId = "";
-      await http.put(
-          Uri.parse('http://$ipAddress:5050/User/GetUser?userIndex=$userIndex'),
-          headers: <String, String>{
-            'Authorization': 'Bearer $token',
-          }).then((value) {
+      await http.put(Uri.parse('http://$ipAddress:5050/User/GetUser?userIndex=$userIndex'), headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      }).then((value) {
         var user = jsonDecode(value.body);
         name = user["name"];
         id = user["id"];
         userId = user["userId"];
       });
-      var user = UserState(
-          token: token,
-          refreshToken: TokenUtil.getRefreshToken(),
-          name: name,
-          id: id,
-          userId: userId);
+      var user = UserState(token: token, refreshToken: TokenUtil.getRefreshToken(), name: name, id: id, userId: userId);
       setUser(user);
       ref.read(userSharedPreferencesRepositoryProvider).save(user);
       return true;
     } catch (e) {
-      await Sentry.captureException(e,
-          stackTrace: StackTrace.current,
-          hint: Hint.withMap({"message": "refresh user failed"}));
+      await Sentry.captureException(e, stackTrace: StackTrace.current, hint: Hint.withMap({"message": "refresh user failed"}));
       debugPrint(e.toString());
       return false;
     }
@@ -131,20 +113,15 @@ class UserViewModel extends _$UserViewModel {
         refreshToken = decoded["refreshToken"];
       });
     } catch (e) {
-      await Sentry.captureException(e,
-          stackTrace: StackTrace.current,
-          hint: Hint.withMap({"message": "login failed"}));
+      await Sentry.captureException(e, stackTrace: StackTrace.current, hint: Hint.withMap({"message": "login failed"}));
       return e.toString();
     }
     debugPrint("token: $token");
 
     try {
-      await http.put(
-          Uri.parse(
-              'http://$ipAddress:5050/User/GetUserByUserId?userId=${userFormState.BattariId}'),
-          headers: <String, String>{
-            'Authorization': 'Bearer $token',
-          }).then((value) {
+      await http.put(Uri.parse('http://$ipAddress:5050/User/GetUserByUserId?userId=${userFormState.BattariId}'), headers: <String, String>{
+        'Authorization': 'Bearer $token',
+      }).then((value) {
         var user = jsonDecode(value.body);
         name = user["name"];
         // jsonから直接int持ってこれた
@@ -153,15 +130,12 @@ class UserViewModel extends _$UserViewModel {
         debugPrint("name: $name, id: ${id.toString()}");
         Sentry.configureScope((p0) {
           if (p0.user != null) {
-            p0.user!
-                .copyWith(id: id.toString(), username: userFormState.BattariId);
+            p0.user!.copyWith(id: id.toString(), username: userFormState.BattariId);
           }
         });
       });
     } catch (e) {
-      await Sentry.captureException(e,
-          stackTrace: StackTrace.current,
-          hint: Hint.withMap({"message": "get user by user id failed"}));
+      await Sentry.captureException(e, stackTrace: StackTrace.current, hint: Hint.withMap({"message": "get user by user id failed"}));
       return e.toString();
     }
 
@@ -186,25 +160,18 @@ class UserViewModel extends _$UserViewModel {
     return "ログインに失敗しました．";
   }
 
-  Future<String> refreshToken(
-      [int? userIndexArg, String? refreshTokenArg]) async {
+  Future<String> refreshToken([int? userIndexArg, String? refreshTokenArg]) async {
     String token = "";
     int userIndex = userIndexArg ??
-        state.maybeWhen(
-          orElse: () => 0,
-          data: (data) {
-            if (data == null) return 0;
-            return data.id;
-          },
-        );
+        () {
+          if (state == null) return 0;
+          return state!.id;
+        }();
     String refreshToken = refreshTokenArg ??
-        state.maybeWhen(
-          orElse: () => "",
-          data: (data) {
-            if (data == null) return "";
-            return data.refreshToken;
-          },
-        );
+        () {
+          if (state == null) return "";
+          return state!.refreshToken;
+        }();
 
     try {
       debugPrint('http://$ipAddress:5050/User/RefreshToken');
@@ -222,9 +189,7 @@ class UserViewModel extends _$UserViewModel {
         Token = value.body;
       });
     } catch (e) {
-      Sentry.captureException(e,
-          stackTrace: StackTrace.current,
-          hint: Hint.withMap({"message": "refresh token failed"}));
+      Sentry.captureException(e, stackTrace: StackTrace.current, hint: Hint.withMap({"message": "refresh token failed"}));
       return e.toString();
     }
     if (token.isNotEmpty) {

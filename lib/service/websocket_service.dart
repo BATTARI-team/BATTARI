@@ -129,7 +129,7 @@ class WebsocketService {
 
   _connectWebsocket() async {
     String? token = "";
-    token = _ref.read(userViewModelProvider).asData?.value?.token;
+    token = _ref.read(userViewModelProvider)?.token;
     if (token == null || token.isEmpty) {
       token = Token;
 

@@ -3,12 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class TokenUtil {
   static String getToken() {
-    var token = ProviderContainer().read(userViewModelProvider).asData?.value?.token;
+    var token = ProviderContainer().read(userViewModelProvider)?.token;
     return token ?? "";
   }
 
   static String getRefreshToken() {
-    var token = ProviderContainer().read(userViewModelProvider).asData?.value?.refreshToken;
+    var token = ProviderContainer().read(userViewModelProvider)?.refreshToken;
     return token ?? "";
   }
 }
