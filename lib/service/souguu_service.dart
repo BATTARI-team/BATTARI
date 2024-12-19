@@ -83,17 +83,23 @@ class SouguuService extends _$SouguuService {
             var now = await FlutterNTP.now();
             var differenceFromOfficialTime = DateTime.now().difference(now).inSeconds;
 
-            void onAppOpened(Timer timer) {
+            void onAppOpened(Timer timer) async {
               if (_untilCallStartTimer == null) {
                 logger.w("untilCallStartTimer is null");
               }
               timer.cancel();
-              Future.delayed(const Duration(milliseconds: 200), () {
+              bool _isForeground = await FlutterForegroundTask.isAppOnForeground;
+              await Future.delayed(const Duration(milliseconds: 200), () {
                 var serviceNotificationDto = SouguuNotificationBetweenAppAndServiceDto(websocketDto: dto.toJson(), token: Token);
                 FlutterForegroundTask.sendDataToMain(jsonEncode(serviceNotificationDto));
                 logger.i(serviceNotificationDto.toJson());
               });
-              Future.delayed(const Duration(milliseconds: 1000), () {
+              await Future.delayed(const Duration(milliseconds: 500), () {
+                var serviceNotificationDto = SouguuNotificationBetweenAppAndServiceDto(websocketDto: dto.toJson(), token: Token);
+                FlutterForegroundTask.sendDataToMain(jsonEncode(serviceNotificationDto));
+                logger.i(serviceNotificationDto.toJson());
+              });
+              Future.delayed(const Duration(milliseconds: 1500), () {
                 var serviceNotificationDto = SouguuNotificationBetweenAppAndServiceDto(websocketDto: dto.toJson(), token: Token);
                 FlutterForegroundTask.sendDataToMain(jsonEncode(serviceNotificationDto));
                 logger.i(serviceNotificationDto.toJson());

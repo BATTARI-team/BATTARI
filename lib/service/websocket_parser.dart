@@ -31,7 +31,14 @@ dealNotificationForForegroundApp(Ref ref, String p0) async {
       Token = fromService.token;
       logger.d(dto);
       if (dto.type == 'notification') {
+        var souguuInfo = ref.read(souguuServiceInfoProvider);
         var notif = WebsocketSouguuNotification.fromJson(dto.data);
+        if (souguuInfo.restSouguuNotification != null) {
+          if (souguuInfo.restSouguuNotification!.callId == notif.callId) {
+            logger.d("同じ通話IDの通知が来ました。無視します。");
+            return;
+          }
+        }
         ref
             .read(souguuServiceInfoProvider.notifier)
             .setSouguu(notif.aiteUserId, restSouguuNotification: RestSouguuNotification.fromWebsocketNotification(notif));
