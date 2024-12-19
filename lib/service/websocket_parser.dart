@@ -26,24 +26,18 @@ dealNotificationForForegroundApp(Ref ref, String p0) async {
   if (p0.length > 20) {
     debugPrint(p0);
     try {
-      // var notif = WebsocketSouguuNotification.fromJson(jsonDecode(p0));
       var fromService = SouguuNotificationBetweenAppAndServiceDto.fromJson(jsonDecode(p0));
-      Sentry.captureMessage('fromService parsed', level: SentryLevel.debug);
-      logger.d(fromService);
       var dto = WebsocketDto.fromJson(fromService.websocketDto);
-      Sentry.captureMessage('websocketDto parsed', level: SentryLevel.debug);
       Token = fromService.token;
       logger.d(dto);
       if (dto.type == 'notification') {
         var notif = WebsocketSouguuNotification.fromJson(dto.data);
-        Sentry.captureMessage('WebsocketSouguuNotification parsed', level: SentryLevel.debug);
         ref
             .read(souguuServiceInfoProvider.notifier)
             .setSouguu(notif.aiteUserId, restSouguuNotification: RestSouguuNotification.fromWebsocketNotification(notif));
         if (await FlutterForegroundTask.isAppOnForeground) {
           try {
             router.go("/foreground_init");
-            // navigatorKey.currentContext!.pushReplacementNamed("/call");
           } catch (e) {
             logger.e("画面遷移に失敗しました： $e", error: e, stackTrace: StackTrace.current);
             await Sentry.captureException(e, stackTrace: StackTrace.current);
