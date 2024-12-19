@@ -95,6 +95,11 @@ class SouguuService extends _$SouguuService {
               });
             }
 
+            void onTimerDone(Timer timer) {
+              FlutterForegroundTask.launchApp("/foreground_init");
+              onAppOpened(timer);
+            }
+
             bool _isForegroundOnTimerStart = await FlutterForegroundTask.isAppOnForeground;
             _untilCallStartTimer = Timer.periodic(const Duration(seconds: 1), (Timer timer) async {
               bool _isForeground = await FlutterForegroundTask.isAppOnForeground;
@@ -114,7 +119,7 @@ class SouguuService extends _$SouguuService {
                         ?.callStartTime
                         .compareTo(DateTime.now().subtract(Duration(seconds: differenceFromOfficialTime))) ==
                     -1) {
-                  onAppOpened(timer);
+                  onTimerDone(timer);
                 }
                 if (notificationServiceSubscription != null && !notificationServiceSubscription!.closed) {
                   notificationServiceSubscription?.read().showCounter(remain, notif.aiteUserId);
