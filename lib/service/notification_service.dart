@@ -10,12 +10,22 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 part 'notification_service.g.dart';
 
 @pragma('vm:entry-point')
 void notificationTapBackground(NotificationResponse notificationResponse) async {
   logger.i("notification tapped from background");
+  if (notificationResponse.actionId == "cancel_call") {
+    var sharedPref = await SharedPreferences.getInstance();
+    var token = sharedPref.getString("token");
+    var response = await http.put(Uri.parse('http://$ipAddress:5050/SouguuInfo/CancelCall'), headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    });
+    return;
+  }
   if (await FlutterForegroundTask.isAppOnForeground) {
     return;
   } else {
