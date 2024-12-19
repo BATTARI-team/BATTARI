@@ -26,7 +26,8 @@ class HomeView extends ConsumerWidget {
         child: const Text("developer page"),
       ),
       body: Center(
-        child: DeveloperWidgets.loginedUserWidget(),
+        child: DeveloperWidgets.loginedUserWidget(context),
+        //child: Image.asset('assets/images/defaultIcon.png'),
       ),
     );
   }

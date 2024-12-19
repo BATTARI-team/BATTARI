@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:battari/constant/app_color.dart';
+import 'package:battari/constant/app_size.dart';
 import 'package:battari/view/call.dart';
 import 'package:battari/view/developer/app_usage_time.dart';
 import 'package:battari/view/developer/background.dart';
@@ -14,7 +16,9 @@ import 'package:package_info_plus/package_info_plus.dart';
 class DeveloperWidgets extends StatelessWidget {
   const DeveloperWidgets({super.key});
 
-  static loginedUserWidget() {
+  static loginedUserWidget(BuildContext context) {
+    final appSize = AppSize(context); // AppSize インスタンスを作成
+
     return Consumer(
       builder: (context, ref, _) {
         return ref.watch(userViewModelProvider).when(
@@ -34,6 +38,47 @@ class DeveloperWidgets extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  Center(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: AppColor.ui.border,
+                        ),
+                        borderRadius: BorderRadius.circular(30),
+                        color: AppColor.brand.secondary,
+                      ),
+                      width: appSize.widgetWidth, // インスタンス経由で widgetWidth にアクセス
+                      height: appSize.deviceHeight * 0.3,
+                      child: Center(
+                          child: Column(
+                        children: [
+                          Container(
+                            width: appSize.deviceWidth * 0.2,
+                            height: appSize.deviceHeight * 0.1,
+                            decoration: BoxDecoration(
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey,
+                                  spreadRadius: 0.5,
+                                  blurRadius: 8,
+                                  offset: Offset(4, 4),
+                                ),
+                              ],
+                              border: Border.all(color: AppColor.ui.white),
+                              color: AppColor.ui.a,
+                              shape: BoxShape.circle,
+                              image: const DecorationImage(
+                                fit: BoxFit.fill,
+                                image:
+                                    AssetImage('assets/images/defaultIcon.png'),
+                              ),
+                            ),
+                          ),
+                          Text('a'),
+                        ],
+                      )),
+                    ),
+                  ),
                   Text("ユーザー: ${data.name}"),
                   Text("ユーザーID: ${data.id}"),
                   Text(
@@ -71,7 +116,9 @@ class DeveloperWidgets extends StatelessWidget {
             Consumer(builder: (context, ref, _) {
               return TextButton(
                   child: const Text("clear shared preferences"),
-                  onPressed: () => ref.read(userSharedPreferencesRepositoryProvider).clear());
+                  onPressed: () => ref
+                      .read(userSharedPreferencesRepositoryProvider)
+                      .clear());
             }),
             // Consumer(
             //   builder: (context, ref, child) {
@@ -100,14 +147,18 @@ class DeveloperWidgets extends StatelessWidget {
   }
 
   Widget _developerElement(String title, Widget widget, BuildContext context) {
-    return TextButton(onPressed: (() => Navigator.of(context).push(MaterialPageRoute(builder: (context) => widget))), child: Text(title));
+    return TextButton(
+        onPressed: (() => Navigator.of(context)
+            .push(MaterialPageRoute(builder: (context) => widget))),
+        child: Text(title));
   }
 
   Future<void> _requestPermissions() async {
     // Android 13+, you need to allow notification permission to display foreground service notification.
     //
     // iOS: If you need notification, ask for permission.
-    final NotificationPermission notificationPermission = await FlutterForegroundTask.checkNotificationPermission();
+    final NotificationPermission notificationPermission =
+        await FlutterForegroundTask.checkNotificationPermission();
     if (notificationPermission != NotificationPermission.granted) {
       await FlutterForegroundTask.requestNotificationPermission();
     }
@@ -139,7 +190,8 @@ class DeveloperWidgets extends StatelessWidget {
       androidNotificationOptions: AndroidNotificationOptions(
         channelId: 'foreground_service',
         channelName: 'Foreground Service Notification',
-        channelDescription: 'This notification appears when the foreground service is running.',
+        channelDescription:
+            'This notification appears when the foreground service is running.',
         onlyAlertOnce: true,
       ),
       iosNotificationOptions: const IOSNotificationOptions(
