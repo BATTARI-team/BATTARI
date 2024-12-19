@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:battari/logger.dart';
 import 'package:battari/main.dart';
+import 'package:battari/model/dto/websocket/cancel_call_websocket_dto.dart';
 import 'package:battari/view/splash.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:flutter/foundation.dart';
@@ -76,6 +77,14 @@ class NotificationService {
     if (remain == 0) {
       await flutterLocalNotificationsPlugin.cancel(0);
     }
+  }
+
+  void cancelCounter() async {
+    await flutterLocalNotificationsPlugin.cancel(0);
+  }
+
+  void showCallCancel(CancelCallWebsocketDto dto) async {
+    await flutterLocalNotificationsPlugin.show(1, "通話がキャンセルされました", "", const NotificationDetails());
   }
 }
 

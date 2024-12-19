@@ -6,7 +6,7 @@ part of 'souguu_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$souguuServiceHash() => r'ab6690ff2a5b66b414fd70be7576d987b936cb40';
+String _$souguuServiceHash() => r'ae1451f5ae9b117dff33c10954d8dd35f490cbdd';
 
 /// See also [SouguuService].
 @ProviderFor(SouguuService)
