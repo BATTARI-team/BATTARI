@@ -88,7 +88,12 @@ class SouguuService extends _$SouguuService {
                 logger.w("untilCallStartTimer is null");
               }
               timer.cancel();
-              Future.delayed(const Duration(milliseconds: 500), () {
+              Future.delayed(const Duration(milliseconds: 200), () {
+                var serviceNotificationDto = SouguuNotificationBetweenAppAndServiceDto(websocketDto: dto.toJson(), token: Token);
+                FlutterForegroundTask.sendDataToMain(jsonEncode(serviceNotificationDto));
+                logger.i(serviceNotificationDto.toJson());
+              });
+              Future.delayed(const Duration(milliseconds: 1000), () {
                 var serviceNotificationDto = SouguuNotificationBetweenAppAndServiceDto(websocketDto: dto.toJson(), token: Token);
                 FlutterForegroundTask.sendDataToMain(jsonEncode(serviceNotificationDto));
                 logger.i(serviceNotificationDto.toJson());

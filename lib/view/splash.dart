@@ -73,12 +73,14 @@ class Splash extends HookConsumerWidget {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             context.go('/call');
           });
+          logger.d('souguu notification received from service');
           break;
         } else {
           counter++;
         }
       }
       if (counter == 30) {
+        logger.w("souguu notification not received");
         isSouguuMutable = false;
       }
     }
