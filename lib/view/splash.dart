@@ -49,65 +49,77 @@ class Splash extends HookConsumerWidget {
     if (android != null) {
       await android.requestNotificationsPermission();
     }
-    if (userState != null) {
-      var token = Token;
-      bool isCall = false;
 
-      var transaction = Sentry.startTransaction("Splash.init", "Splash.init/userstate!=null");
-
-      if (isSouguu) {
-        // 遭遇通知がくるまでまつ
-        int counter = 0;
-        while (counter < 10) {
-          await Future.delayed(const Duration(milliseconds: 100));
-          if (ref.read(souguuServiceInfoProvider).restSouguuNotification != null) {
-            transaction.finish();
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              context.go('/call');
-            });
-          } else {
-            counter++;
-          }
-        }
-      }
-
-      transaction.startChild("get token");
-      if (Token.isEmpty) {
-        token = await ref.read(userViewModelProvider.notifier).refreshToken(userState.id, userState.refreshToken);
-      } else {
-        token = Token;
-        ref.read(userViewModelProvider.notifier).setToken(token);
-      }
-      logger.i("isSouguu: $isSouguu");
-      transaction.startChild("get souguuInfo");
-      if (!isSouguu) {
-        isCall = await ref.read(souguuServiceInfoProvider.notifier).init();
-      }
-
-      logger.d("splash done");
-      transaction.finish();
-      if (token.isEmpty) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          context.go('/login');
-        });
-        return;
-      } else {
-        if (isCall) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            context.go('/call');
-          });
-        } else {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            context.go('/home');
-          });
-        }
-        return;
-      }
-    } else {
+    if (userState == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         context.go('/login');
       });
       return;
     }
+
+    var token = Token;
+    bool isCall = false;
+    bool _isSouguu = isSouguu;
+
+    var transaction = Sentry.startTransaction("Splash.init", "Splash.init/userstate!=null");
+
+    if (_isSouguu) {
+      // 遭遇通知がくるまでまつ
+      int counter = 0;
+      while (counter < 30) {
+        await Future.delayed(const Duration(milliseconds: 100));
+        if (ref.read(souguuServiceInfoProvider).restSouguuNotification != null) {
+          transaction.finish();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            context.go('/call');
+          });
+          logger.i("kita");
+          break;
+        } else {
+          counter++;
+        }
+      }
+      if (counter == 30) {
+        _isSouguu = false;
+      }
+    }
+
+    transaction.startChild("get token");
+    if (Token.isEmpty) {
+      token = await ref.read(userViewModelProvider.notifier).refreshToken(userState.id, userState.refreshToken);
+    } else {
+      token = Token;
+      ref.read(userViewModelProvider.notifier).setToken(token);
+    }
+    logger.i("_isSouguu: $_isSouguu");
+    transaction.startChild("get souguuInfo");
+    if (!_isSouguu) {
+      isCall = await ref.read(souguuServiceInfoProvider.notifier).init();
+    }
+
+    logger.d("splash done");
+    transaction.finish();
+
+    if (_isSouguu) {
+      return;
+    }
+
+    if (token.isEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.go('/login');
+      });
+      return;
+    }
+
+    if (isCall) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.go('/call');
+      });
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.go('/home');
+      });
+    }
+    return;
   }
 }

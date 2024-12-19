@@ -17,20 +17,18 @@ class DeveloperWidgets extends StatelessWidget {
   static loginedUserWidget() {
     return Consumer(builder: (context, ref, _) {
       var data = ref.watch(userViewModelProvider);
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
           Text("ユーザー: ${data?.name}"),
           Text("ユーザーID: ${data?.id}"),
-                  Text(
+          Text(
             "トークン:${data?.token}",
-                  )
-                ],
-              );
-            });
-      },
-    );
+          )
+        ],
+      );
+    });
   }
 
   @override

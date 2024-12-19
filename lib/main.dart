@@ -66,10 +66,7 @@ class Battari extends ConsumerWidget with WidgetsBindingObserver {
   Widget build(BuildContext context, WidgetRef ref) {
     FlutterForegroundTask.addTaskDataCallback((data) {
       logger.d("foreground task data: $data");
-      logger.i("foreground task data: $data");
-      // ref.read(souguuServiceProvider.notifier).dealNotification(data.toString(), true);
       ref.read(dealNotificationForForegroundAppProvider(data.toString()));
-      // ref.read(souguuServiceProvider.notifier).disconnectWebsocket();
     });
     debugPrint("Battari build");
     return MaterialApp.router(
