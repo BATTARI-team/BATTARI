@@ -14,6 +14,7 @@ import 'package:battari/model/souguu_incredient/souguu_incredient_data_appusage_
 import 'package:battari/model/state/souguu_service_state.dart';
 import 'package:battari/service/notification_service.dart';
 import 'package:battari/service/websocket_service.dart';
+import 'package:battari/view/splash.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
@@ -79,39 +80,50 @@ class SouguuService extends _$SouguuService {
               FlutterForegroundTask.sendDataToMain(jsonEncode(serviceNotificationDto));
             }
           } else {
-            logger.i("background");
             var now = await FlutterNTP.now();
             var differenceFromOfficialTime = DateTime.now().difference(now).inSeconds;
 
-            _untilCallStartTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-              int remain = ref
-                      .read(souguuServiceInfoProvider)
-                      .restSouguuNotification
-                      ?.callStartTime
-                      .difference(DateTime.now().subtract(Duration(seconds: differenceFromOfficialTime)))
-                      .inSeconds ??
-                  0;
-              if (ref
-                      .read(souguuServiceInfoProvider)
-                      .restSouguuNotification
-                      ?.callStartTime
-                      .compareTo(DateTime.now().subtract(Duration(seconds: differenceFromOfficialTime))) ==
-                  -1) {
-                timer.cancel();
-                FlutterForegroundTask.launchApp("/foreground_init");
-                Future.delayed(const Duration(seconds: 1), () {
-                  var serviceNotificationDto = SouguuNotificationBetweenAppAndServiceDto(websocketDto: dto.toJson(), token: Token);
-                  FlutterForegroundTask.sendDataToMain(jsonEncode(serviceNotificationDto));
-                  logger.i(serviceNotificationDto.toJson());
-                });
+            void onAppOpened(Timer timer) {
+              if (_untilCallStartTimer == null) {
+                logger.w("untilCallStartTimer is null");
               }
-              if (notificationServiceSubscription != null && !notificationServiceSubscription!.closed) {
-                notificationServiceSubscription?.read().showCounter(remain, notif.aiteUserId);
-                Sentry.captureMessage("show counter", level: SentryLevel.debug);
+              timer.cancel();
+              Future.delayed(const Duration(milliseconds: 500), () {
+                var serviceNotificationDto = SouguuNotificationBetweenAppAndServiceDto(websocketDto: dto.toJson(), token: Token);
+                FlutterForegroundTask.sendDataToMain(jsonEncode(serviceNotificationDto));
+                logger.i(serviceNotificationDto.toJson());
+              });
+            }
+
+            bool _isForegroundOnTimerStart = await FlutterForegroundTask.isAppOnForeground;
+            _untilCallStartTimer = Timer.periodic(const Duration(seconds: 1), (Timer timer) async {
+              bool _isForeground = await FlutterForegroundTask.isAppOnForeground;
+              if ((_isForegroundOnTimerStart != true) && (_isForeground == true)) {
+                onAppOpened(timer);
               } else {
-                logger.w("notificationServiceSubscription is null or closed");
-                Sentry.captureMessage("notificationServiceSubscription is null or closed");
-                notificationServiceSubscription = ref.listen(notificationServiceProviderProvider, (previous, next) {});
+                int remain = ref
+                        .read(souguuServiceInfoProvider)
+                        .restSouguuNotification
+                        ?.callStartTime
+                        .difference(DateTime.now().subtract(Duration(seconds: differenceFromOfficialTime)))
+                        .inSeconds ??
+                    0;
+                if (ref
+                        .read(souguuServiceInfoProvider)
+                        .restSouguuNotification
+                        ?.callStartTime
+                        .compareTo(DateTime.now().subtract(Duration(seconds: differenceFromOfficialTime))) ==
+                    -1) {
+                  onAppOpened(timer);
+                }
+                if (notificationServiceSubscription != null && !notificationServiceSubscription!.closed) {
+                  notificationServiceSubscription?.read().showCounter(remain, notif.aiteUserId);
+                  Sentry.captureMessage("show counter", level: SentryLevel.debug);
+                } else {
+                  logger.w("notificationServiceSubscription is null or closed");
+                  Sentry.captureMessage("notificationServiceSubscription is null or closed");
+                  notificationServiceSubscription = ref.listen(notificationServiceProviderProvider, (previous, next) {});
+                }
               }
             });
           }

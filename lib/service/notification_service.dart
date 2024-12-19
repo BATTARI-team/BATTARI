@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import 'package:battari/logger.dart';
 import 'package:battari/main.dart';
+import 'package:battari/view/splash.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
@@ -12,15 +14,13 @@ import 'package:http/http.dart' as http;
 part 'notification_service.g.dart';
 
 @pragma('vm:entry-point')
-void notificationTapBackground(NotificationResponse notificationResponse) {
-  () async {
-    if (await FlutterForegroundTask.isAppOnForeground) {
-      debugPrint("notificationTapBackground: app is on foreground");
-      return;
-    } else {
-      FlutterForegroundTask.launchApp("/foreground_init");
-    }
-  }();
+void notificationTapBackground(NotificationResponse notificationResponse) async {
+  logger.i("notification tapped from background");
+  if (await FlutterForegroundTask.isAppOnForeground) {
+    return;
+  } else {
+    FlutterForegroundTask.launchApp("/foreground_init");
+  }
 }
 
 @Riverpod(keepAlive: true)
@@ -30,9 +30,12 @@ class NotificationService {
   late Ref _ref;
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   NotificationService(Ref ref) {
+    logger.i("NotificationService init");
     _ref = ref;
     () async {
       await flutterLocalNotificationsPlugin.initialize(
+        onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
+        onDidReceiveNotificationResponse: notificationTapBackground,
         const InitializationSettings(
           android: AndroidInitializationSettings("@mipmap/ic_launcher"),
         ),
@@ -49,6 +52,9 @@ class NotificationService {
       '遭遇まであと$remain秒',
       const NotificationDetails(
         android: AndroidNotificationDetails(
+          actions: [
+            AndroidNotificationAction('cancel_call', '拒否'),
+          ],
           onlyAlertOnce: true,
           'channel id',
           'channel name',

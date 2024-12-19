@@ -9,6 +9,7 @@ import 'package:battari/model/state/user_state.dart';
 import 'package:battari/service/souguu_service.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -33,6 +34,7 @@ class Splash extends HookConsumerWidget {
   }
 
   Future<void> init(BuildContext context, WidgetRef ref) async {
+    var transaction = Sentry.startTransaction("Splash.init", "Splash.init");
     var sharedPreferences = await SharedPreferences.getInstance();
     // この関数が終わらないと遷移しないため
     ProviderScope.containerOf(context).updateOverrides([
@@ -59,11 +61,9 @@ class Splash extends HookConsumerWidget {
 
     var token = Token;
     bool isCall = false;
-    bool _isSouguu = isSouguu;
+    bool isSouguuMutable = isSouguu;
 
-    var transaction = Sentry.startTransaction("Splash.init", "Splash.init/userstate!=null");
-
-    if (_isSouguu) {
+    if (isSouguuMutable) {
       // 遭遇通知がくるまでまつ
       int counter = 0;
       while (counter < 30) {
@@ -73,14 +73,13 @@ class Splash extends HookConsumerWidget {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             context.go('/call');
           });
-          logger.i("kita");
           break;
         } else {
           counter++;
         }
       }
       if (counter == 30) {
-        _isSouguu = false;
+        isSouguuMutable = false;
       }
     }
 
@@ -91,16 +90,15 @@ class Splash extends HookConsumerWidget {
       token = Token;
       ref.read(userViewModelProvider.notifier).setToken(token);
     }
-    logger.i("_isSouguu: $_isSouguu");
     transaction.startChild("get souguuInfo");
-    if (!_isSouguu) {
+    if (!isSouguuMutable) {
       isCall = await ref.read(souguuServiceInfoProvider.notifier).init();
     }
 
     logger.d("splash done");
     transaction.finish();
 
-    if (_isSouguu) {
+    if (isSouguuMutable) {
       return;
     }
 

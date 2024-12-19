@@ -3,14 +3,14 @@ import 'dart:convert';
 
 import 'package:battari/logger.dart';
 import 'package:battari/main.dart';
-import 'package:battari/model/state/user_state.dart';
 import 'package:battari/repository/user_repository.dart';
+import 'package:battari/service/notification_service.dart';
 import 'package:battari/service/souguu_service.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart' show FlutterForegroundTask, TaskHandler, TaskStarter;
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:web_socket_channel/io.dart';
 import 'package:http/http.dart' as http;
 
 // The callback function should always be a top-level or static function.
@@ -62,6 +62,7 @@ class MyTaskHandler extends TaskHandler {
     providerContainer = ProviderContainer(overrides: [
       sharedPreferencesProvider.overrideWithValue(shared),
     ]);
+
     logger.i("battari service started");
     String token = "";
     try {
@@ -113,5 +114,12 @@ class MyTaskHandler extends TaskHandler {
 
   // Called when the notification button is pressed.
   @override
-  void onNotificationButtonPressed(String id) async {}
+  void onNotificationButtonPressed(String id) async {
+    logger.i("notification button pressed: $id");
+  }
+
+  @override
+  void onNotificationPressed() {
+    logger.i("notification pressed");
+  }
 }
