@@ -203,7 +203,7 @@ class SouguuService extends _$SouguuService {
     }
   }
 
-  final int distanceHome = 10;
+  final int distanceHome = 20;
   Future<bool> _isHome(Position position, UserState user) async {
     var user = await ref.read(userSharedPreferencesRepositoryProvider).get();
     var _isHome = Geolocator.distanceBetween(
