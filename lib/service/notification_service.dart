@@ -21,10 +21,12 @@ void notificationTapBackground(NotificationResponse notificationResponse) async 
   if (notificationResponse.actionId == "cancel_call") {
     var sharedPref = await SharedPreferences.getInstance();
     var token = sharedPref.getString("token");
-    var response = await http.put(Uri.parse('http://$ipAddress:5050/SouguuInfo/CancelCall'), headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $token',
-    });
+    var response = await http.put(Uri.parse('http://$ipAddress:5050/SouguuInfo/CancelCall'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode(const CancelCallWebsocketDto(reason: "").toJson()));
     return;
   }
   if (await FlutterForegroundTask.isAppOnForeground) {
@@ -84,7 +86,13 @@ class NotificationService {
   }
 
   void showCallCancel(CancelCallWebsocketDto dto) async {
-    await flutterLocalNotificationsPlugin.show(1, "通話がキャンセルされました", "", const NotificationDetails());
+    await flutterLocalNotificationsPlugin.show(
+        1,
+        "通話が中止されました",
+        "通話がキャンセルされました",
+        const NotificationDetails(
+          android: AndroidNotificationDetails('cancel_call', 'cancel_call', importance: Importance.max, priority: Priority.high),
+        ));
   }
 }
 

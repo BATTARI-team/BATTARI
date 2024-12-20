@@ -1,5 +1,9 @@
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:battari/logger.dart';
+import 'package:battari/main.dart';
+import 'package:battari/model/dto/websocket/cancel_call_websocket_dto.dart';
 import 'package:battari/view/call.dart';
 import 'package:battari/view/developer/app_usage_time.dart';
 import 'package:battari/view/developer/background.dart';
@@ -10,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:http/http.dart' as http;
 
 class DeveloperWidgets extends StatelessWidget {
   const DeveloperWidgets({super.key});
@@ -79,7 +84,21 @@ class DeveloperWidgets extends StatelessWidget {
               onPressed: () {},
             ),
             _developerElement("appusage", AppUsageTime(), context),
-            _developerElement("call", Call(), context)
+            _developerElement("call", Call(), context),
+            TextButton(
+              child: const Text("""
+send cancel notif"""),
+              onPressed: () async {
+                var response = await http.put(Uri.parse('http://$ipAddress:5050/SouguuInfo/CancelCall'),
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'Authorization': 'Bearer $Token',
+                    },
+                    body: jsonEncode(const CancelCallWebsocketDto(reason: "").toJson()));
+                logger.d(response.body + response.statusCode.toString());
+                return;
+              },
+            ),
           ],
         ));
   }
