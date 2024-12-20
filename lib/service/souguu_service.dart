@@ -6,6 +6,7 @@ import 'package:battari/logger.dart';
 import 'package:battari/main.dart';
 import 'package:battari/model/dto/app_service_communication/souguu_notification_between_app_and_service_dto.dart';
 import 'package:battari/model/dto/rest_souguu_notification.dart';
+import 'package:battari/model/dto/websocket/cancel_call_websocket_dto.dart';
 import 'package:battari/model/dto/websocket/souguu_material_websocket_dto.dart';
 import 'package:battari/model/dto/websocket/websocket_dto.dart';
 import 'package:battari/model/dto/websocket/websocket_souguu_notification.dart';
@@ -55,6 +56,7 @@ class SouguuService extends _$SouguuService {
 
   bool isHome = false;
   bool isLock = false;
+  Function(CancelCallWebsocketDto dto)? cancelCallListener;
 
   SouguuAppIncredientModel? appData;
   dealNotification(String p0) async {
@@ -117,6 +119,14 @@ class SouguuService extends _$SouguuService {
               onAppOpened(timer);
             }
 
+            cancelCallListener = ((dto) {
+              _untilCallStartTimer?.cancel();
+              _untilCallStartTimer = null;
+              ref.read(notificationServiceProviderProvider).cancelCounter();
+              ref.read(notificationServiceProviderProvider).showCallCancel(dto);
+              //#TODO もしフォアグラウンドだったら，通話がキャンセルされたよ画面に遷移する
+            });
+
             bool _isForegroundOnTimerStart = await FlutterForegroundTask.isAppOnForeground;
             _untilCallStartTimer = Timer.periodic(const Duration(seconds: 1), (Timer timer) async {
               bool _isForeground = await FlutterForegroundTask.isAppOnForeground;
@@ -149,6 +159,11 @@ class SouguuService extends _$SouguuService {
               }
             });
           }
+        }
+        if (dto.type == "cancel_call") {
+          var cancelCallDto = CancelCallWebsocketDto.fromJson(dto.data);
+          cancelCallListener?.call(cancelCallDto);
+          cancelCallListener = null;
         }
       } catch (e) {
         logger.e("遭遇通知のパースに失敗しました: $e", error: e, stackTrace: StackTrace.current);
