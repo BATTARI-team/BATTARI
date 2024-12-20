@@ -28,7 +28,7 @@ class _WebSocketTestState extends State<WebSocketTest> {
 
     sendMessage(WidgetRef ref, {String? message}) {
       message ??= jsonEncode({
-        'id': ref.read(userViewModelProvider).asData?.value?.id,
+        'id': ref.read(userViewModelProvider)?.id,
         'isWelcome': false,
         'created': DateTime.now(),
         'incredients': [
@@ -59,7 +59,7 @@ class _WebSocketTestState extends State<WebSocketTest> {
               onPressed: () {
                 sendMessage(ref,
                     message: jsonEncode({
-                      'id': ref.read(userViewModelProvider).asData?.value?.id,
+                      'id': ref.read(userViewModelProvider)?.id,
                       'isWelcome': false,
                       'created': DateTime.now().toIso8601String(),
                       'incredients': [
@@ -80,13 +80,7 @@ class _WebSocketTestState extends State<WebSocketTest> {
             decoration: const InputDecoration(labelText: 'Send a message'),
           ),
           Consumer(builder: (context, ref, _) {
-            return Text("token: ${ref.read(userViewModelProvider).when(data: (data) {
-              return data!.token;
-            }, loading: () {
-              return "";
-            }, error: ((error, stackTrace) {
-              return "";
-            }))}");
+            return Text("token: ${ref.read(userViewModelProvider) ?? "null"}");
           }),
           Consumer(
             builder: (BuildContext context, WidgetRef ref, Widget? child) {

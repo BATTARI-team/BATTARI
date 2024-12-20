@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:battari/model/state/user_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 part 'user_repository.g.dart';
@@ -31,6 +32,7 @@ class UserSharedPreferencesRepository extends IUserRepository {
   UserSharedPreferencesRepository(this.ref);
   @override
   Future<UserState?> get() async {
+    var transaction = Sentry.startTransaction("UserSharedPreferencesRepository.get", "UserSharedPreferencesRepository.get");
     var reference = ref.read(sharedPreferencesProvider);
     String? refreshToken = reference.getString("refresh_token");
     String? userId = reference.getString("user_id");
@@ -39,6 +41,7 @@ class UserSharedPreferencesRepository extends IUserRepository {
     double? houseLatitude = reference.getDouble("house_latitude");
     double? houseLongitude = reference.getDouble("house_longitude");
 
+    transaction.finish();
     if (refreshToken == null || userId == null || id == null || name == null) {
       return null;
     }

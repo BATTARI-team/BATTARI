@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:battari/logger.dart';
 import 'package:battari/model/battari_setting/battari_setting.dart';
 import 'package:battari/repository/user_repository.dart';
-import 'package:battari/service/souguu_service.dart';
+import 'package:battari/service/websocket_parser.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
@@ -65,11 +65,7 @@ class Battari extends ConsumerWidget with WidgetsBindingObserver {
   Widget build(BuildContext context, WidgetRef ref) {
     FlutterForegroundTask.addTaskDataCallback((data) {
       logger.d("foreground task data: $data");
-      logger.i("foreground task data: $data");
-      if (context.mounted) {
-        ref.read(souguuServiceProvider.notifier).dealNotification(data.toString(), true);
-      }
-      // ref.read(souguuServiceProvider.notifier).disconnectWebsocket();
+      ref.read(dealNotificationForForegroundAppProvider(data.toString()));
     });
     debugPrint("Battari build");
     return MaterialApp.router(

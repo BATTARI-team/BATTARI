@@ -34,7 +34,7 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
     int differenceFromOfficialTime = 0;
     var callCountdown = useState(0);
     SouguuServiceState souguuInfo = ref.watch(souguuServiceInfoProvider);
-    UserState? userState = ref.watch(userViewModelProvider).asData!.value;
+    UserState? userState = ref.watch(userViewModelProvider);
     if (souguuInfo.restSouguuNotification == null || userState == null) {
       // デフォルト値挿入
       souguuInfo = SouguuServiceState(
@@ -60,26 +60,15 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
           if (souguuInfo.restSouguuNotification!.callStartTime.compareTo(now) == -1) {
             status.value = 2;
           } else {
-            bool lock = true;
-            WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-              countdown.value = souguuInfo.restSouguuNotification!.callStartTime.difference((now)).inSeconds;
-              status.value = 1;
-              lock = false;
-            });
-            while (lock) {
-              await Future.delayed(const Duration(milliseconds: 100));
-            }
+            countdown.value = souguuInfo.restSouguuNotification!.callStartTime.difference((now)).inSeconds;
+            status.value = 1;
 
             _timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
-              debugPrint("timer");
-
-              // if (souguuInfo.restSouguuNotification!.callStartTime < DateTime.now()) {
               var now = await TimeUtil.getOfficialTime();
               debugPrint(souguuInfo.restSouguuNotification?.callStartTime.toString());
               countdown.value = souguuInfo.restSouguuNotification!.callStartTime.difference(now).inSeconds;
               if (souguuInfo.restSouguuNotification?.callStartTime.compareTo(now) == -1) {
                 status.value = 2;
-                lock = false;
                 timer.cancel();
               }
             });
@@ -90,8 +79,6 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
       return () {
         //_engine.destroy();
         _timer?.cancel();
-        _engine.leaveChannel();
-        _engine.disableAudio();
       };
     }, []);
 
@@ -105,11 +92,12 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
           var now = await TimeUtil.getOfficialTime();
           callCountdown.value = souguuInfo.restSouguuNotification!.callEndTime.difference(now).inSeconds;
           _callTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
-            debugPrint("callTimer");
             if (callCountdown.value <= 0 || status.value == 3 || souguuInfo.restSouguuNotification!.callEndTime.compareTo(now) == -1) {
-              debugPrint("aaaaaaaaaaa tuuwasyuuryou");
-              bool lock = true;
               status.value = 3;
+
+              _engine.leaveChannel();
+              _engine.disableAudio();
+              _callTimer?.cancel();
               timer.cancel();
             } else {
               callCountdown.value = callCountdown.value - 1;
@@ -127,7 +115,6 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
         ]);
         Future.wait([task]);
       } else if (status.value == 3) {
-        _callTimer?.cancel();
         logger.i("通話終了");
         //#TODO ホーム画面に遷移
       }

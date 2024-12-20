@@ -6,35 +6,29 @@ part of 'souguu_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$souguuServiceHash() => r'a8e72be25eae404e1a56ac54006a97d37f8a8028';
+String _$souguuServiceHash() => r'ab6690ff2a5b66b414fd70be7576d987b936cb40';
 
 /// See also [SouguuService].
 @ProviderFor(SouguuService)
-final souguuServiceProvider =
-    AutoDisposeNotifierProvider<SouguuService, int>.internal(
+final souguuServiceProvider = AutoDisposeNotifierProvider<SouguuService, int>.internal(
   SouguuService.new,
   name: r'souguuServiceProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$souguuServiceHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product') ? null : _$souguuServiceHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
 typedef _$SouguuService = AutoDisposeNotifier<int>;
-String _$souguuServiceInfoHash() => r'7cc70ff0d9fc41927ad1c474fe698b3c24306fd9';
+String _$souguuServiceInfoHash() => r'7227f40e51a6ab9337645f09381e5e1a709939d6';
 
 /// 遭遇しているかなどの情報を保持するプロバイダー
 ///
 /// Copied from [SouguuServiceInfo].
 @ProviderFor(SouguuServiceInfo)
-final souguuServiceInfoProvider =
-    NotifierProvider<SouguuServiceInfo, SouguuServiceState>.internal(
+final souguuServiceInfoProvider = NotifierProvider<SouguuServiceInfo, SouguuServiceState>.internal(
   SouguuServiceInfo.new,
   name: r'souguuServiceInfoProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$souguuServiceInfoHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product') ? null : _$souguuServiceInfoHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );

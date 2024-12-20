@@ -16,36 +16,20 @@ class DeveloperWidgets extends StatelessWidget {
   const DeveloperWidgets({super.key});
 
   static loginedUserWidget() {
-    return Consumer(
-      builder: (context, ref, _) {
-        return ref.watch(userViewModelProvider).when(
-            error: (error, _) => Center(
-                  child: Text(error.toString()),
-                ),
-            loading: () => const CircularProgressIndicator(
-                  color: Colors.red,
-                ),
-            data: (data) {
-              if (data == null) {
-                return const CircularProgressIndicator(
-                  color: Colors.red,
-                );
-              }
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text("ユーザー: ${data.name}"),
-                  Text("ユーザーID: ${data.id}"),
-                  Text(
-                    "トークン:${data.token}",
-                  ),
-                  Text("緯度:${data.houseLatitude}, 経度:${data.houseLongitude}")
-                ],
-              );
-            });
-      },
-    );
+    return Consumer(builder: (context, ref, _) {
+      var data = ref.watch(userViewModelProvider);
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text("ユーザー: ${data?.name}"),
+          Text("ユーザーID: ${data?.id}"),
+          Text(
+            "トークン:${data?.token}",
+          )
+        ],
+      );
+    });
   }
 
   @override
@@ -97,8 +81,7 @@ class DeveloperWidgets extends StatelessWidget {
             ),
             _developerElement("appusage", AppUsageTime(), context),
             _developerElement("call", Call(), context),
-          _developerElement("settings_home", SettingHomeView(), context),
-
+            _developerElement("settings_home", SettingHomeView(), context),
           ],
         ));
   }
