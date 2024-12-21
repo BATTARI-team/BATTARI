@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:core';
 
 import 'package:battari/logger.dart';
 import 'package:battari/main.dart';
+import 'package:battari/model/state/user_state.dart';
 import 'package:battari/repository/user_repository.dart';
 import 'package:battari/service/notification_service.dart';
 import 'package:battari/service/souguu_service.dart';
