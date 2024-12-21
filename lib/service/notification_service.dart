@@ -56,19 +56,23 @@ class NotificationService {
     }();
   }
 
-  void showCounter(int remain, int userId) async {
+  void showCounter(int remain, int userId, bool alert) async {
     debugPrint("show counter $remain");
     var name = await _ref.watch(userNameProviderByIdProvider(userId));
+    var notifications = await flutterLocalNotificationsPlugin.getActiveNotifications();
     await flutterLocalNotificationsPlugin.show(
       0,
       '$nameさんと遭遇しました！',
       '遭遇まであと$remain秒',
-      const NotificationDetails(
+      NotificationDetails(
         android: AndroidNotificationDetails(
           actions: [
             AndroidNotificationAction('cancel_call', '拒否'),
           ],
-          onlyAlertOnce: true,
+          onlyAlertOnce: !alert,
+          silent: alert,
+          enableVibration: !alert,
+          playSound: !alert,
           'channel id',
           'channel name',
           importance: Importance.max,

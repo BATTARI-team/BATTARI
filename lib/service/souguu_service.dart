@@ -144,7 +144,14 @@ class SouguuService extends _$SouguuService {
                   onTimerDone(timer);
                 }
                 if (notificationServiceSubscription != null && !notificationServiceSubscription!.closed) {
-                  notificationServiceSubscription?.read().showCounter(remain, notif.aiteUserId);
+                  notificationServiceSubscription?.read().showCounter(remain, notif.aiteUserId, () {
+                    if ((remain % 3 == 0)) {
+                      return true;
+                    } else {
+                      return false;
+                    }
+                  }());
+
                   Sentry.captureMessage("show counter", level: SentryLevel.debug);
                 } else {
                   logger.w("notificationServiceSubscription is null or closed");
