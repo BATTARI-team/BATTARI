@@ -70,7 +70,6 @@ class NotificationService {
             AndroidNotificationAction('cancel_call', '拒否'),
           ],
           onlyAlertOnce: !alert,
-          silent: alert,
           enableVibration: !alert,
           playSound: !alert,
           'channel id',
