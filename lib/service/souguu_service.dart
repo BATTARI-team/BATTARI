@@ -229,7 +229,8 @@ class SouguuService extends _$SouguuService {
       _setWebsocketProviderSubs();
     }
 
-    _isHomeGetterTimer = Timer.periodic(const Duration(seconds: 120), (timer) async => _isHomeGetter());
+    //#TODO 2分に戻す
+    _isHomeGetterTimer = Timer.periodic(const Duration(seconds: 20), (timer) async => _isHomeGetter());
     _isHomeGetter();
     //#TODO 大体タイマーは役割が一緒だからそれらの関数をインターフェースかしたい
 
@@ -300,7 +301,7 @@ class SouguuService extends _$SouguuService {
     var position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     //if (position.latitude == user.houseLatitude && position.longitude == user.houseLongitude) {
     if ((await _isHome(position, user))) {
-      logger.d('isHome: $isHome');
+      logger.d('isHome: $isHome, $position, $user');
       if (isHome == false) {
         isHome = true;
 
@@ -375,6 +376,7 @@ class SouguuService extends _$SouguuService {
 
   //遭遇できなくなったら実行する
   void disconnectWebsocket() async {
+    logger.d("disconnect websocket");
     await websocketProviderSubscription?.read().cancelConnect();
     websocketProviderSubscription?.close();
     await Sentry.captureMessage("websocket disconnected", level: SentryLevel.debug);
