@@ -185,7 +185,13 @@ class SouguuService extends _$SouguuService {
                 'userIndex': shared.getInt('id')!,
               }))
           .then((value) {
-        Token = value.body;
+        if (value.statusCode == 200) {
+          Token = value.body;
+          ref.read(userViewModelProvider.notifier).setToken(Token);
+        } else {
+          logger.e("refresh token failed");
+          Sentry.captureMessage("refresh token failed", level: SentryLevel.error);
+        }
       });
     } catch (e) {
       logger.e("battari service started error", error: e, stackTrace: StackTrace.current);

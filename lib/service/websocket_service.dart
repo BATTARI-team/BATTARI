@@ -145,8 +145,27 @@ class WebsocketService {
                     'refreshToken': shared.getString("refresh_token")!,
                     'userIndex': shared.getInt('id')!,
                   }))
-              .then((value) {
-            token = value.body;
+              .then((value) async {
+            if (value.statusCode == 200) {
+              token = value.body;
+              _ref.read(userViewModelProvider.notifier).setToken(token!);
+            } else {
+              await http
+                  .post(Uri.parse('http://$ipAddress:5050/User/RefreshToken'),
+                      headers: <String, String>{
+                        'Content-Type': 'application/json; charset=UTF-8',
+                      },
+                      body: jsonEncode(<String, Object>{
+                        'refreshToken': shared.getString("refresh_token")!,
+                        'userIndex': shared.getInt('id')!,
+                      }))
+                  .then((value) {
+                if (value.statusCode == 200) {
+                  token = value.body;
+                  _ref.read(userViewModelProvider.notifier).setToken(token!);
+                }
+              });
+            }
           });
         } catch (e) {
           logger.e("battari service started error", error: e, stackTrace: StackTrace.current);
