@@ -207,6 +207,7 @@ class WebsocketService {
       _sendStreamController.isClosed ? _sendStreamController.add(message) : null;
       if (message != 'hello') {
         logger.i("websocketにメッセージを送信しました: $message");
+        Sentry.captureMessage("websocketにメッセージを送信しました: $message", level: SentryLevel.debug);
       }
     } catch (e) {
       logger.w("websocketの接続に失敗しました: ", error: e, stackTrace: StackTrace.current);
