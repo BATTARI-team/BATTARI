@@ -43,6 +43,7 @@ class UserViewModel extends _$UserViewModel {
     } else {
       state = state!.copyWith(token: token);
     }
+    ref.read(userSharedPreferencesRepositoryProvider).saveToken(token);
   }
 
   void setUser(UserState user) {
@@ -194,8 +195,11 @@ class UserViewModel extends _$UserViewModel {
                 'userIndex': userIndex,
               }))
           .then((value) {
-        token = value.body;
-        Token = value.body;
+        if (value.statusCode == 200) {
+          token = value.body;
+          Token = value.body;
+          ref.read(userViewModelProvider.notifier).setToken(token);
+        }
       });
     } catch (e) {
       Sentry.captureException(e, stackTrace: StackTrace.current, hint: Hint.withMap({"message": "refresh token failed"}));

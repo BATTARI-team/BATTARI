@@ -78,7 +78,10 @@ class MyTaskHandler extends TaskHandler {
                 'userIndex': shared.getInt('id')!,
               }))
           .then((value) {
-        token = value.body;
+        if (value.statusCode == 200) {
+          token = value.body;
+          providerContainer.read(userViewModelProvider.notifier).setToken(token);
+        }
       });
     } catch (e) {
       logger.e("battari service started error", error: e, stackTrace: StackTrace.current);
