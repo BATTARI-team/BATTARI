@@ -92,7 +92,8 @@ class _ExamplePageState extends State<ExamplePage> {
         notificationText: 'Tap to return to the app',
         notificationIcon: null,
         notificationButtons: [
-          const NotificationButton(id: 'btn_hello', text: 'hello'),
+          const NotificationButton(id: '再起動', text: 'restart'),
+          const NotificationButton(id: '停止', text: 'stop'),
         ],
         callback: startCallback,
       );
