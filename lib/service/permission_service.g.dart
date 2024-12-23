@@ -1,26 +1,26 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'user_view_model.dart';
+part of 'permission_service.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$userViewModelHash() => r'e3391b7a0409113479409168909e14d7c81de9e5';
+String _$permissionServiceHash() => r'0268ab9a36895a0cf105025a030276ca47a7d136';
 
-/// See also [UserViewModel].
-@ProviderFor(UserViewModel)
-final userViewModelProvider =
-    NotifierProvider<UserViewModel, UserState?>.internal(
-  UserViewModel.new,
-  name: r'userViewModelProvider',
+/// See also [PermissionService].
+@ProviderFor(PermissionService)
+final permissionServiceProvider = AutoDisposeNotifierProvider<PermissionService,
+    PermissionServiceState>.internal(
+  PermissionService.new,
+  name: r'permissionServiceProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$userViewModelHash,
+      : _$permissionServiceHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$UserViewModel = Notifier<UserState?>;
+typedef _$PermissionService = AutoDisposeNotifier<PermissionServiceState>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

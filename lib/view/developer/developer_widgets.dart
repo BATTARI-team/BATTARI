@@ -8,6 +8,7 @@ import 'package:battari/view/call.dart';
 import 'package:battari/view/developer/app_usage_time.dart';
 import 'package:battari/view/developer/background.dart';
 import 'package:battari/repository/user_repository.dart';
+import 'package:battari/view/developer/permission_developper_page.dart';
 import 'package:battari/view/instruction/setting_home_view.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:battari/view/developer/websocket_test.dart';
@@ -101,6 +102,7 @@ send cancel notif"""),
                 return;
               },
             ),
+            _developerElement("permission", const PermissionDevelopperPage(), context)
           ],
         ));
   }
