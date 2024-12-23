@@ -120,7 +120,16 @@ class MyTaskHandler extends TaskHandler {
   // Called when the notification button is pressed.
   @override
   void onNotificationButtonPressed(String id) async {
-    logger.i("notification button pressed: $id");
+    switch (id) {
+      case '停止':
+        await FlutterForegroundTask.stopService();
+        break;
+      case '再起動':
+        await FlutterForegroundTask.restartService();
+        break;
+      default:
+        logger.i("notification button pressed: $id");
+    }
   }
 
   @override

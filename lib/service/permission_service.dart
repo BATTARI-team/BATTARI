@@ -151,11 +151,12 @@ class PermissionService extends _$PermissionService {
     } else {
       return FlutterForegroundTask.startService(
         serviceId: 256,
-        notificationTitle: 'Foreground Service is running',
-        notificationText: 'Tap to return to the app',
+        notificationTitle: 'BATTARI service is running',
+        notificationText: '',
         notificationIcon: null,
         notificationButtons: [
-          const NotificationButton(id: 'btn_hello', text: 'hello'),
+          const NotificationButton(id: 'restart', text: '再起動'),
+          const NotificationButton(id: 'btn_hello', text: '停止'),
         ],
         callback: startCallback,
       );
