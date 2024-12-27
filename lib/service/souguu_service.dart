@@ -179,6 +179,9 @@ class SouguuService extends _$SouguuService {
           var cancelCallDto = CancelCallWebsocketDto.fromJson(dto.data);
           cancelCallListener?.call(cancelCallDto);
           cancelCallListener = null;
+          if (await FlutterForegroundTask.isAppOnForeground) {
+            FlutterForegroundTask.sendDataToMain(jsonEncode(dto));
+          }
         }
       } catch (e) {
         logger.e("遭遇通知のパースに失敗しました: $e", error: e, stackTrace: StackTrace.current);
