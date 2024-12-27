@@ -211,12 +211,17 @@ class SouguuService extends _$SouguuService {
 
   final int distanceHome = 20;
   Future<bool> _isHome(Position position, UserState user) async {
+    if (isLock) return false;
     var user = await ref.read(userSharedPreferencesRepositoryProvider).get();
     var _isHome = Geolocator.distanceBetween(
             position.latitude, position.longitude, user != null ? user.houseLatitude : 0, user != null ? user.houseLongitude : 0) <
         distanceHome;
-    //logger.d(
-    //    "distance: ${Geolocator.distanceBetween(position.latitude, position.longitude, user.houseLatitude, user.houseLongitude)}, position.latitude: ${position.latitude}, position.long: ${position.longitude}, user.houseLatitude: ${user.houseLatitude}, user.houseLong: ${user.houseLongitude}, result is : $_isHome");
+    if (user == null) {
+      logger.d("user is null");
+    } else {
+      logger.d(
+          "distance: ${Geolocator.distanceBetween(position.latitude, position.longitude, user.houseLatitude, user.houseLongitude)}, position.latitude: ${position.latitude}, position.long: ${position.longitude}, user.houseLatitude: ${user.houseLatitude}, user.houseLong: ${user.houseLongitude}, result is : $_isHome");
+    }
     return _isHome;
   }
 
