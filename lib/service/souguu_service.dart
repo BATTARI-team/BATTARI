@@ -17,10 +17,10 @@ import 'package:battari/model/state/user_state.dart';
 import 'package:battari/repository/user_repository.dart';
 import 'package:battari/service/notification_service.dart';
 import 'package:battari/service/websocket_service.dart';
+import 'package:battari/util/time_util.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
-import 'package:flutter_ntp/flutter_ntp.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -66,10 +66,14 @@ class SouguuService extends _$SouguuService {
     }
     // ここで受信したデータを処理する
     if (p0.length > 20) {
+      debugPrint("0");
       try {
         var dto = WebsocketDto.fromJson(jsonDecode(p0));
+        debugPrint("1");
         if (dto.type == "notification") {
+          debugPrint("2");
           var notif = WebsocketSouguuNotification.fromJson(dto.data);
+          debugPrint("3");
           ref
               .read(souguuServiceInfoProvider.notifier)
               .setSouguu(notif.aiteUserId, restSouguuNotification: RestSouguuNotification.fromWebsocketNotification(notif));
@@ -88,8 +92,14 @@ class SouguuService extends _$SouguuService {
               FlutterForegroundTask.sendDataToMain(jsonEncode(serviceNotificationDto));
             }
           } else {
-            var now = await FlutterNTP.now();
-            var differenceFromOfficialTime = DateTime.now().difference(now).inSeconds;
+            int diffrenceFromOfficialTime = DateTime.now().difference(DateTime.now()).inSeconds;
+            debugPrint("4");
+            try {
+              var now = await TimeUtil.getOfficialTime();
+              diffrenceFromOfficialTime = DateTime.now().difference(now).inSeconds;
+            } catch (e) {
+              logger.e("ntp error", error: e, stackTrace: StackTrace.current);
+            }
 
             void onAppOpened(Timer timer) async {
               if (_untilCallStartTimer == null) {
@@ -126,6 +136,7 @@ class SouguuService extends _$SouguuService {
               ref.read(notificationServiceProviderProvider).showCallCancel(dto);
               //#TODO もしフォアグラウンドだったら，通話がキャンセルされたよ画面に遷移する
             });
+            debugPrint("5");
 
             bool _isForegroundOnTimerStart = await FlutterForegroundTask.isAppOnForeground;
             _untilCallStartTimer = Timer.periodic(const Duration(seconds: 1), (Timer timer) async {
@@ -137,14 +148,14 @@ class SouguuService extends _$SouguuService {
                         .read(souguuServiceInfoProvider)
                         .restSouguuNotification
                         ?.callStartTime
-                        .difference(DateTime.now().subtract(Duration(seconds: differenceFromOfficialTime)))
+                        .difference(DateTime.now().subtract(Duration(seconds: diffrenceFromOfficialTime)))
                         .inSeconds ??
                     0;
                 if (ref
                         .read(souguuServiceInfoProvider)
                         .restSouguuNotification
                         ?.callStartTime
-                        .compareTo(DateTime.now().subtract(Duration(seconds: differenceFromOfficialTime))) ==
+                        .compareTo(DateTime.now().subtract(Duration(seconds: diffrenceFromOfficialTime))) ==
                     -1) {
                   onTimerDone(timer);
                 }
