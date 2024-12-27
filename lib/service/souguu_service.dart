@@ -17,6 +17,7 @@ import 'package:battari/model/state/user_state.dart';
 import 'package:battari/repository/user_repository.dart';
 import 'package:battari/service/notification_service.dart';
 import 'package:battari/service/websocket_service.dart';
+import 'package:battari/util/call_util.dart';
 import 'package:battari/util/time_util.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:flutter/material.dart';
@@ -71,6 +72,9 @@ class SouguuService extends _$SouguuService {
         var dto = WebsocketDto.fromJson(jsonDecode(p0));
         debugPrint("1");
         if (dto.type == "notification") {
+          if (isLock) {
+            await CallUtil.cancelCall("相手がオフラインになりました");
+          }
           debugPrint("2");
           var notif = WebsocketSouguuNotification.fromJson(dto.data);
           debugPrint("3");
@@ -262,7 +266,7 @@ class SouguuService extends _$SouguuService {
       await _refreshToken();
     });
 
-    _screenStateEventSubscription = Screen().screenStateStream.listen((ScreenStateEvent data) {
+    _screenStateEventSubscription = Screen().screenStateStream.listen((ScreenStateEvent data) async {
       if (data == ScreenStateEvent.SCREEN_ON) {
         // 画面がONになった時の処理
         logger.i("screen on");
@@ -277,6 +281,7 @@ class SouguuService extends _$SouguuService {
       } else if (data == ScreenStateEvent.SCREEN_OFF) {
         // 画面がOFFになった時の処理
         isLock = true;
+        await CallUtil.cancelCall("相手がオフラインになりました");
         logger.i("screen off");
         disconnectWebsocket();
       }
