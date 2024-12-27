@@ -215,8 +215,12 @@ class SouguuService extends _$SouguuService {
     var _isHome = Geolocator.distanceBetween(
             position.latitude, position.longitude, user != null ? user.houseLatitude : 0, user != null ? user.houseLongitude : 0) <
         distanceHome;
-    //logger.d(
-    //    "distance: ${Geolocator.distanceBetween(position.latitude, position.longitude, user.houseLatitude, user.houseLongitude)}, position.latitude: ${position.latitude}, position.long: ${position.longitude}, user.houseLatitude: ${user.houseLatitude}, user.houseLong: ${user.houseLongitude}, result is : $_isHome");
+    if (user == null) {
+      logger.d("user is null");
+    } else {
+      logger.d(
+          "distance: ${Geolocator.distanceBetween(position.latitude, position.longitude, user.houseLatitude, user.houseLongitude)}, position.latitude: ${position.latitude}, position.long: ${position.longitude}, user.houseLatitude: ${user.houseLatitude}, user.houseLong: ${user.houseLongitude}, result is : $_isHome");
+    }
     return _isHome;
   }
 
