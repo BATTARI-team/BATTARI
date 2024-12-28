@@ -30,12 +30,12 @@ class HomeView extends ConsumerWidget {
         child: const Text("developer page"),
       ),
       body: Center(
-        child: loginedUserWidget(context),
+        child: loginedUserWidget(context, false),
       ),
     );
   }
 
-  static loginedUserWidget(BuildContext context) {
+  static loginedUserWidget(BuildContext context, bool isHome) {
     final appSize = AppSize(context); // AppSize インスタンスを作成
 
     return Consumer(builder: (context, ref, _) {
@@ -141,7 +141,7 @@ class HomeView extends ConsumerWidget {
                       SizedBox(width: 10),
                       Icon(
                         Icons.check,
-                        color: Colors.green,
+                        color: isHome ? Colors.green : Colors.grey,
                         size: 20,
                       ),
                       Text(
