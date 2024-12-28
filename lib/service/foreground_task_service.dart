@@ -1,15 +1,18 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:core';
 
 import 'package:battari/logger.dart';
 import 'package:battari/main.dart';
+import 'package:battari/model/state/user_state.dart';
 import 'package:battari/repository/user_repository.dart';
+import 'package:battari/service/notification_service.dart';
 import 'package:battari/service/souguu_service.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart' show FlutterForegroundTask, TaskHandler, TaskStarter;
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:web_socket_channel/io.dart';
 import 'package:http/http.dart' as http;
 
 // The callback function should always be a top-level or static function.
@@ -61,6 +64,7 @@ class MyTaskHandler extends TaskHandler {
     providerContainer = ProviderContainer(overrides: [
       sharedPreferencesProvider.overrideWithValue(shared),
     ]);
+
     logger.i("battari service started");
     String token = "";
     try {
@@ -74,7 +78,10 @@ class MyTaskHandler extends TaskHandler {
                 'userIndex': shared.getInt('id')!,
               }))
           .then((value) {
-        token = value.body;
+        if (value.statusCode == 200) {
+          token = value.body;
+          providerContainer.read(userViewModelProvider.notifier).setToken(token);
+        }
       });
     } catch (e) {
       logger.e("battari service started error", error: e, stackTrace: StackTrace.current);
@@ -82,6 +89,7 @@ class MyTaskHandler extends TaskHandler {
     logger.i("foreground_task_service.dart : token is $token");
     Token = token;
     userViewmodelProviderSubscription = providerContainer.listen(userViewModelProvider, (value, next) {});
+    providerContainer.read(userViewModelProvider.notifier).init();
     providerContainer.read(userViewModelProvider.notifier).setToken(token);
     souguuServiceProviderSubscription = providerContainer.listen(souguuServiceProvider, (value, next) {});
   }
@@ -111,5 +119,21 @@ class MyTaskHandler extends TaskHandler {
 
   // Called when the notification button is pressed.
   @override
-  void onNotificationButtonPressed(String id) {}
+  void onNotificationButtonPressed(String id) async {
+    switch (id) {
+      case '停止':
+        await FlutterForegroundTask.stopService();
+        break;
+      case '再起動':
+        await FlutterForegroundTask.restartService();
+        break;
+      default:
+        logger.i("notification button pressed: $id");
+    }
+  }
+
+  @override
+  void onNotificationPressed() {
+    logger.i("notification pressed");
+  }
 }

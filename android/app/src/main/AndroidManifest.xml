@@ -30,7 +30,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
+
+        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ActionBroadcastReceiver" />
         <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
         <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">
             <intent-filter>
@@ -58,6 +59,10 @@
             <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
             <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
             <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+     <!-- Required for location -->
+      <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+      <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+      <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
 			<!-- foregroundServiceType: dataSync -->
 			<uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />

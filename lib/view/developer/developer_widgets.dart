@@ -1,12 +1,18 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:battari/constant/app_color.dart';
 import 'package:battari/constant/app_size.dart';
+import 'package:battari/logger.dart';
+import 'package:battari/main.dart';
+import 'package:battari/model/dto/websocket/cancel_call_websocket_dto.dart';
 import 'package:battari/view/call.dart';
 import 'package:battari/view/developer/app_usage_time.dart';
 import 'package:battari/view/developer/background.dart';
 import 'package:battari/repository/user_repository.dart';
 import 'package:battari/view/online_widget.dart';
+import 'package:battari/view/developer/permission_developper_page.dart';
+import 'package:battari/view/instruction/setting_home_view.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:battari/view/developer/websocket_test.dart';
 import 'package:flutter/material.dart';
@@ -14,142 +20,26 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:http/http.dart' as http;
 
 class DeveloperWidgets extends StatelessWidget {
   const DeveloperWidgets({super.key});
 
-  static loginedUserWidget(BuildContext context) {
-    final appSize = AppSize(context); // AppSize インスタンスを作成
-
-    return Consumer(
-      builder: (context, ref, _) {
-        return ref.watch(userViewModelProvider).when(
-            error: (error, _) => Center(
-                  child: Text(error.toString()),
-                ),
-            loading: () => const CircularProgressIndicator(
-                  color: Colors.red,
-                ),
-            data: (data) {
-              if (data == null) {
-                return const CircularProgressIndicator(
-                  color: Colors.red,
-                );
-              }
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Center(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          width: 2,
-                          color: AppColor.ui.darkborder,
-                        ),
-                        borderRadius: BorderRadius.circular(20),
-                        color: AppColor.brand.secondary,
-                      ),
-                      width: appSize.widgetWidth, // インスタンス経由で widgetWidth にアクセス
-                      height: 243,
-                      child: Center(
-                          child: Column(
-                        children: [
-                          SizedBox(height: 20),
-                          Stack(
-                            children: [
-                              Container(
-                                width: appSize.deviceWidth * 0.2,
-                                height: appSize.deviceHeight * 0.1,
-                                decoration: BoxDecoration(
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey,
-                                      spreadRadius: 0.5,
-                                      blurRadius: 8,
-                                      offset: Offset(4, 4),
-                                    ),
-                                  ],
-                                  border: Border.all(color: AppColor.ui.white),
-                                  color: AppColor.ui.a,
-                                  shape: BoxShape.circle,
-                                  image: const DecorationImage(
-                                    fit: BoxFit.fill,
-                                    image: AssetImage(
-                                        'assets/images/defaultIcon.png'),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                top: 67,
-                                left: 60,
-                                child: onlineWidget(width: 22, height: 22),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: appSize.deviceHeight * 0.01),
-                          Text(
-                            data.name,
-                            style: TextStyle(
-                                fontWeight: FontWeight.w800,
-                                fontSize: 20,
-                                color: AppColor.text.darkgray),
-                          ),
-                          Text("@${data.userId}"),
-                          SizedBox(height: 5),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              onlineWidget(
-                                height: 20,
-                                width: 20,
-                              ),
-                              SizedBox(width: 5),
-                              Text(
-                                '誰かと遭遇するかも...!',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 15,
-                                    color: AppColor.text.darkgray),
-                              ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: 8,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.check,
-                                color: Colors.green,
-                                size: 20,
-                              ),
-                              Text(
-                                'スマートフォンを使用している',
-                                style: TextStyle(fontSize: 11),
-                              ),
-                              SizedBox(width: 10),
-                              Icon(
-                                Icons.check,
-                                color: Colors.green,
-                                size: 20,
-                              ),
-                              Text(
-                                '位置情報が自宅',
-                                style: TextStyle(fontSize: 11),
-                              ),
-                            ],
-                          )
-                        ],
-                      )),
-                    ),
-                  ),
-                ],
-              );
-            });
-      },
-    );
+  static loginedUserWidget() {
+    return Consumer(builder: (context, ref, _) {
+      var data = ref.watch(userViewModelProvider);
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text("ユーザー: ${data?.name}"),
+          Text("ユーザーID: ${data?.id}"),
+          Text(
+            "トークン:${data?.token}",
+          )
+        ],
+      );
+    });
   }
 
   @override
@@ -202,7 +92,26 @@ class DeveloperWidgets extends StatelessWidget {
               onPressed: () {},
             ),
             _developerElement("appusage", AppUsageTime(), context),
-            _developerElement("call", Call(), context)
+            _developerElement("call", Call(), context),
+            _developerElement("settings_home", SettingHomeView(), context),
+            TextButton(
+              child: const Text("""
+send cancel notif"""),
+              onPressed: () async {
+                var response = await http.put(
+                    Uri.parse('http://$ipAddress:5050/SouguuInfo/CancelCall'),
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'Authorization': 'Bearer $Token',
+                    },
+                    body: jsonEncode(
+                        const CancelCallWebsocketDto(reason: "").toJson()));
+                logger.d(response.body + response.statusCode.toString());
+                return;
+              },
+            ),
+            _developerElement(
+                "permission", const PermissionDevelopperPage(), context)
           ],
         ));
   }

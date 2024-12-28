@@ -1,6 +1,9 @@
 import 'dart:convert';
 
+import 'package:battari/logger.dart';
 import 'package:battari/main.dart';
+import 'package:battari/model/dto/websocket/cancel_call_websocket_dto.dart';
+import 'package:battari/view/splash.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
@@ -8,19 +11,29 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 part 'notification_service.g.dart';
 
 @pragma('vm:entry-point')
-void notificationTapBackground(NotificationResponse notificationResponse) {
-  () async {
-    if (await FlutterForegroundTask.isAppOnForeground) {
-      debugPrint("notificationTapBackground: app is on foreground");
-      return;
-    } else {
-      FlutterForegroundTask.launchApp("/");
-    }
-  }();
+void notificationTapBackground(NotificationResponse notificationResponse) async {
+  logger.i("notification tapped from background");
+  if (notificationResponse.actionId == "cancel_call") {
+    var sharedPref = await SharedPreferences.getInstance();
+    var token = sharedPref.getString("token");
+    var response = await http.put(Uri.parse('http://$ipAddress:5050/SouguuInfo/CancelCall'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode(const CancelCallWebsocketDto(reason: "").toJson()));
+    return;
+  }
+  if (await FlutterForegroundTask.isAppOnForeground) {
+    return;
+  } else {
+    FlutterForegroundTask.launchApp("/foreground_init");
+  }
 }
 
 @Riverpod(keepAlive: true)
@@ -30,9 +43,12 @@ class NotificationService {
   late Ref _ref;
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   NotificationService(Ref ref) {
+    logger.i("NotificationService init");
     _ref = ref;
     () async {
       await flutterLocalNotificationsPlugin.initialize(
+        onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
+        onDidReceiveNotificationResponse: notificationTapBackground,
         const InitializationSettings(
           android: AndroidInitializationSettings("@mipmap/ic_launcher"),
         ),
@@ -49,6 +65,9 @@ class NotificationService {
       '遭遇まであと$remain秒',
       const NotificationDetails(
         android: AndroidNotificationDetails(
+          actions: [
+            AndroidNotificationAction('cancel_call', '拒否'),
+          ],
           onlyAlertOnce: true,
           'channel id',
           'channel name',
@@ -60,6 +79,20 @@ class NotificationService {
     if (remain == 0) {
       await flutterLocalNotificationsPlugin.cancel(0);
     }
+  }
+
+  void cancelCounter() async {
+    await flutterLocalNotificationsPlugin.cancel(0);
+  }
+
+  void showCallCancel(CancelCallWebsocketDto dto) async {
+    await flutterLocalNotificationsPlugin.show(
+        1,
+        "通話が中止されました",
+        "通話がキャンセルされました",
+        const NotificationDetails(
+          android: AndroidNotificationDetails('cancel_call', 'cancel_call', importance: Importance.max, priority: Priority.high),
+        ));
   }
 }
 

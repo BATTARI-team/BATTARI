@@ -1,14 +1,18 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
 import 'package:battari/logger.dart';
 import 'package:battari/main.dart';
+import 'package:battari/repository/user_repository.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:web_socket_channel/io.dart';
+import 'package:http/http.dart' as http;
 
 part 'websocket_service.g.dart';
 
@@ -48,7 +52,7 @@ class WebsocketService {
 
   void _initializeTimer() {
     //#TODO asyncにしちゃったから，ロック的なのが必要かも
-    const timeout = 3;
+    const timeout = 4;
     _reconnectTimer = Timer.periodic(const Duration(seconds: 10), (timer) async {
       if (!isRunning) return;
       if (_count > timeout) {
@@ -58,6 +62,7 @@ class WebsocketService {
       }
       if (_count > 1) {
         debugPrint("websocketの再接続まで... ${timeout - _count}");
+        await Sentry.captureMessage("websocketの再接続まで... ${timeout - _count}");
       }
       _count++;
     });
@@ -79,6 +84,7 @@ class WebsocketService {
     _reconnectTimer = null;
     await channel?.sink.close(null, "canceled");
     await channel?.sink.close();
+    await Sentry.captureMessage("websocket canceled");
     channel = null;
     isRunning = false;
   }
@@ -115,6 +121,7 @@ class WebsocketService {
       await _connectWebsocket();
     } catch (e) {
       logger.w("websocketの接続に失敗しました", error: e, stackTrace: StackTrace.current);
+      await Sentry.captureException(e, stackTrace: StackTrace.current, hint: Hint.withMap({"message": "websocketの接続に失敗しました"}));
       await Future.delayed(const Duration(seconds: 3));
     }
     _isReconnect = false;
@@ -122,11 +129,50 @@ class WebsocketService {
 
   _connectWebsocket() async {
     String? token = "";
-    token = _ref.read(userViewModelProvider).asData?.value?.token;
+    token = _ref.read(userViewModelProvider)?.token;
     if (token == null || token.isEmpty) {
       token = Token;
+
+      if (token == null || token.isEmpty) {
+        var shared = _ref.read(sharedPreferencesProvider);
+        try {
+          await http
+              .post(Uri.parse('http://$ipAddress:5050/User/RefreshToken'),
+                  headers: <String, String>{
+                    'Content-Type': 'application/json; charset=UTF-8',
+                  },
+                  body: jsonEncode(<String, Object>{
+                    'refreshToken': shared.getString("refresh_token")!,
+                    'userIndex': shared.getInt('id')!,
+                  }))
+              .then((value) async {
+            if (value.statusCode == 200) {
+              token = value.body;
+              _ref.read(userViewModelProvider.notifier).setToken(token!);
+            } else {
+              await http
+                  .post(Uri.parse('http://$ipAddress:5050/User/RefreshToken'),
+                      headers: <String, String>{
+                        'Content-Type': 'application/json; charset=UTF-8',
+                      },
+                      body: jsonEncode(<String, Object>{
+                        'refreshToken': shared.getString("refresh_token")!,
+                        'userIndex': shared.getInt('id')!,
+                      }))
+                  .then((value) {
+                if (value.statusCode == 200) {
+                  token = value.body;
+                  _ref.read(userViewModelProvider.notifier).setToken(token!);
+                }
+              });
+            }
+          });
+        } catch (e) {
+          logger.e("battari service started error", error: e, stackTrace: StackTrace.current);
+        }
+      }
     }
-    if (token.isEmpty) {
+    if (token == null || token!.isEmpty) {
       throw Exception("token is null");
     }
 
@@ -141,6 +187,7 @@ class WebsocketService {
       });
     } catch (e) {
       logger.w("websocketの接続に失敗しました: token: $token", error: e, stackTrace: StackTrace.current);
+      await Sentry.captureException(e, stackTrace: StackTrace.current, hint: Hint.withMap({"message": "websocketの接続に失敗しました"}));
       if (e is SocketException) {
         await Future.delayed(const Duration(seconds: 3));
         _reconnectWebSocket();
@@ -154,6 +201,7 @@ class WebsocketService {
       logger.i("websocketの接続に成功しました");
     } catch (e) {
       logger.w("websocketの接続に失敗しました: token: $token", error: e, stackTrace: StackTrace.current);
+      await Sentry.captureException(e, stackTrace: StackTrace.current, hint: Hint.withMap({"message": "websocketの接続に失敗しました"}));
       await _reconnectWebSocket();
     }
     channel?.stream.listen((event) {
@@ -162,6 +210,7 @@ class WebsocketService {
       _count = 0;
     }, onError: (error) async {
       logger.w("websocketの通信が切断されました: token: $token", error: error, stackTrace: StackTrace.current);
+      await Sentry.captureException(error, stackTrace: StackTrace.current, hint: Hint.withMap({"message": "websocketの通信が切断されました"}));
       isRunning = false;
       await Future.delayed(const Duration(seconds: 3));
       _reconnectWebSocket();
@@ -177,9 +226,11 @@ class WebsocketService {
       _sendStreamController.isClosed ? _sendStreamController.add(message) : null;
       if (message != 'hello') {
         logger.i("websocketにメッセージを送信しました: $message");
+        Sentry.captureMessage("websocketにメッセージを送信しました: $message", level: SentryLevel.debug);
       }
     } catch (e) {
       logger.w("websocketの接続に失敗しました: ", error: e, stackTrace: StackTrace.current);
+      await Sentry.captureException(e, stackTrace: StackTrace.current, hint: Hint.withMap({"message": "websocketの通信が切断されました"}));
     }
   }
 }

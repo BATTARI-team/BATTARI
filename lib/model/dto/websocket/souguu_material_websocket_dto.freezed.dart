@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'souguu_websocket_dto.dart';
+part of 'souguu_material_websocket_dto.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -14,12 +14,13 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
-SouguuWebsocketDto _$SouguuWebsocketDtoFromJson(Map<String, dynamic> json) {
+SouguuMaterialWebsocketDto _$SouguuMaterialWebsocketDtoFromJson(
+    Map<String, dynamic> json) {
   return _SouguuWebsocketDto.fromJson(json);
 }
 
 /// @nodoc
-mixin _$SouguuWebsocketDto {
+mixin _$SouguuMaterialWebsocketDto {
   int get id => throw _privateConstructorUsedError;
   bool get isWelcome => throw _privateConstructorUsedError;
   DateTime get created => throw _privateConstructorUsedError;
@@ -28,15 +29,16 @@ mixin _$SouguuWebsocketDto {
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
-  $SouguuWebsocketDtoCopyWith<SouguuWebsocketDto> get copyWith =>
-      throw _privateConstructorUsedError;
+  $SouguuMaterialWebsocketDtoCopyWith<SouguuMaterialWebsocketDto>
+      get copyWith => throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $SouguuWebsocketDtoCopyWith<$Res> {
-  factory $SouguuWebsocketDtoCopyWith(
-          SouguuWebsocketDto value, $Res Function(SouguuWebsocketDto) then) =
-      _$SouguuWebsocketDtoCopyWithImpl<$Res, SouguuWebsocketDto>;
+abstract class $SouguuMaterialWebsocketDtoCopyWith<$Res> {
+  factory $SouguuMaterialWebsocketDtoCopyWith(SouguuMaterialWebsocketDto value,
+          $Res Function(SouguuMaterialWebsocketDto) then) =
+      _$SouguuMaterialWebsocketDtoCopyWithImpl<$Res,
+          SouguuMaterialWebsocketDto>;
   @useResult
   $Res call(
       {int id,
@@ -46,9 +48,10 @@ abstract class $SouguuWebsocketDtoCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$SouguuWebsocketDtoCopyWithImpl<$Res, $Val extends SouguuWebsocketDto>
-    implements $SouguuWebsocketDtoCopyWith<$Res> {
-  _$SouguuWebsocketDtoCopyWithImpl(this._value, this._then);
+class _$SouguuMaterialWebsocketDtoCopyWithImpl<$Res,
+        $Val extends SouguuMaterialWebsocketDto>
+    implements $SouguuMaterialWebsocketDtoCopyWith<$Res> {
+  _$SouguuMaterialWebsocketDtoCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
@@ -86,7 +89,7 @@ class _$SouguuWebsocketDtoCopyWithImpl<$Res, $Val extends SouguuWebsocketDto>
 
 /// @nodoc
 abstract class _$$SouguuWebsocketDtoImplCopyWith<$Res>
-    implements $SouguuWebsocketDtoCopyWith<$Res> {
+    implements $SouguuMaterialWebsocketDtoCopyWith<$Res> {
   factory _$$SouguuWebsocketDtoImplCopyWith(_$SouguuWebsocketDtoImpl value,
           $Res Function(_$SouguuWebsocketDtoImpl) then) =
       __$$SouguuWebsocketDtoImplCopyWithImpl<$Res>;
@@ -101,7 +104,8 @@ abstract class _$$SouguuWebsocketDtoImplCopyWith<$Res>
 
 /// @nodoc
 class __$$SouguuWebsocketDtoImplCopyWithImpl<$Res>
-    extends _$SouguuWebsocketDtoCopyWithImpl<$Res, _$SouguuWebsocketDtoImpl>
+    extends _$SouguuMaterialWebsocketDtoCopyWithImpl<$Res,
+        _$SouguuWebsocketDtoImpl>
     implements _$$SouguuWebsocketDtoImplCopyWith<$Res> {
   __$$SouguuWebsocketDtoImplCopyWithImpl(_$SouguuWebsocketDtoImpl _value,
       $Res Function(_$SouguuWebsocketDtoImpl) _then)
@@ -165,7 +169,7 @@ class _$SouguuWebsocketDtoImpl implements _SouguuWebsocketDto {
 
   @override
   String toString() {
-    return 'SouguuWebsocketDto(id: $id, isWelcome: $isWelcome, created: $created, incredients: $incredients)';
+    return 'SouguuMaterialWebsocketDto(id: $id, isWelcome: $isWelcome, created: $created, incredients: $incredients)';
   }
 
   @override
@@ -201,7 +205,7 @@ class _$SouguuWebsocketDtoImpl implements _SouguuWebsocketDto {
   }
 }
 
-abstract class _SouguuWebsocketDto implements SouguuWebsocketDto {
+abstract class _SouguuWebsocketDto implements SouguuMaterialWebsocketDto {
   factory _SouguuWebsocketDto(
           {required final int id,
           required final bool isWelcome,
