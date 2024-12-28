@@ -13,12 +13,7 @@ class _Brand {
 }
 
 class _Text {
-  //final Color primary = const Color(0xFF373737);
-  //final Color appBarTitle = const Color(0xFF373737);
-  //final Color gray = const Color(0xFF808080);
-  final Color blackMid = const Color(0x61000000);
   final Color white = const Color(0xFFFFFFFF);
-  //final Color link = const Color(0xFF6699ff);
   final Color darkgray = Colors.black.withOpacity(0.7);
 
   final Color darkred = const Color(0xFFA12115);
@@ -26,6 +21,8 @@ class _Text {
 
 class _Ui {
   final Color border = Colors.black.withOpacity(0.5);
+  final Color darkborder = Colors.black.withOpacity(0.55);
+
   final Color white = const Color(0xFFFFFFFF);
   final Color black = const Color(0xFF000000);
   final Color background = const Color(0xFF202124);
