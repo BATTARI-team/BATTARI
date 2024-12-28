@@ -6,7 +6,7 @@ part of 'permission_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$permissionServiceHash() => r'0268ab9a36895a0cf105025a030276ca47a7d136';
+String _$permissionServiceHash() => r'b8e3536160e8b6ad7ef07bd966aed0169015eca8';
 
 /// See also [PermissionService].
 @ProviderFor(PermissionService)

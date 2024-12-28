@@ -56,6 +56,9 @@ dealNotificationForForegroundApp(Ref ref, String p0) async {
             await Sentry.captureException(e, stackTrace: StackTrace.current);
           }
         }
+      } else if (dto.type == "cancel_call") {
+        logger.d("きたあ");
+        ref.read(souguuServiceInfoProvider.notifier).setCancel("test");
       }
     } catch (e) {
       logger.e("遭遇通知のパースに失敗しました: $e", error: e, stackTrace: StackTrace.current);

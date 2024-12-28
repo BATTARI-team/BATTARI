@@ -179,6 +179,9 @@ class SouguuService extends _$SouguuService {
           var cancelCallDto = CancelCallWebsocketDto.fromJson(dto.data);
           cancelCallListener?.call(cancelCallDto);
           cancelCallListener = null;
+          if (await FlutterForegroundTask.isAppOnForeground) {
+            FlutterForegroundTask.sendDataToMain(jsonEncode(dto));
+          }
         }
       } catch (e) {
         logger.e("遭遇通知のパースに失敗しました: $e", error: e, stackTrace: StackTrace.current);
@@ -458,5 +461,9 @@ class SouguuServiceInfo extends _$SouguuServiceInfo {
   /// 現在遭遇しているかの情報を更新する
   void setSouguu(int? souguu, {RestSouguuNotification? restSouguuNotification}) {
     state = state.copyWith(souguu: souguu ?? 0, restSouguuNotification: restSouguuNotification);
+  }
+
+  void setCancel(String reason) {
+    state = state.copyWith(cancelReason: 'test');
   }
 }

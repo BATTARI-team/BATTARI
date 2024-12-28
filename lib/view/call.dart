@@ -194,7 +194,11 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
     return WithForegroundTask(
       child: Scaffold(
         appBar: AppBar(),
-        body: widget,
+        body: (ref.watch(souguuServiceInfoProvider).cancelReason.isEmpty)
+            ? widget
+            : const Center(
+                child: Text("通話がキャンセルされました"),
+              ),
       ),
     );
   }

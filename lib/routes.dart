@@ -1,4 +1,5 @@
 import 'package:battari/view/call.dart';
+import 'package:battari/view/cancel_call.dart';
 import 'package:battari/view/developer/developer_widgets.dart';
 import 'package:battari/view/home.dart';
 import 'package:battari/view/instruction/first_time_view.dart';
@@ -27,6 +28,7 @@ final router = GoRouter(navigatorKey: navigatorKey, routes: [
   GoRoute(path: '/login', builder: (context, state) => const LoginView()),
   GoRoute(path: '/home', builder: (context, state) => const HomeView()),
   GoRoute(path: '/call', builder: (context, state) => Call()),
+  GoRoute(path: '/cancel_call', builder: (context, state) => const CancelCallPage()),
   GoRoute(
       path: '/foreground_init',
       builder: (context, state) {
