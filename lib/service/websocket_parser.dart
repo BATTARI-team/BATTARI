@@ -57,7 +57,8 @@ dealNotificationForForegroundApp(Ref ref, String p0) async {
           }
         }
       } else if (dto.type == "cancel_call") {
-        router.go('/cancel_call');
+        logger.d("きたあ");
+        ref.read(souguuServiceInfoProvider.notifier).setCancel("test");
       }
     } catch (e) {
       logger.e("遭遇通知のパースに失敗しました: $e", error: e, stackTrace: StackTrace.current);

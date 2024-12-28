@@ -20,6 +20,7 @@ mixin _$SouguuServiceState {
   int get souguu => throw _privateConstructorUsedError;
   RestSouguuNotification? get restSouguuNotification =>
       throw _privateConstructorUsedError;
+  String get cancelReason => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $SouguuServiceStateCopyWith<SouguuServiceState> get copyWith =>
@@ -32,7 +33,10 @@ abstract class $SouguuServiceStateCopyWith<$Res> {
           SouguuServiceState value, $Res Function(SouguuServiceState) then) =
       _$SouguuServiceStateCopyWithImpl<$Res, SouguuServiceState>;
   @useResult
-  $Res call({int souguu, RestSouguuNotification? restSouguuNotification});
+  $Res call(
+      {int souguu,
+      RestSouguuNotification? restSouguuNotification,
+      String cancelReason});
 
   $RestSouguuNotificationCopyWith<$Res>? get restSouguuNotification;
 }
@@ -52,6 +56,7 @@ class _$SouguuServiceStateCopyWithImpl<$Res, $Val extends SouguuServiceState>
   $Res call({
     Object? souguu = null,
     Object? restSouguuNotification = freezed,
+    Object? cancelReason = null,
   }) {
     return _then(_value.copyWith(
       souguu: null == souguu
@@ -62,6 +67,10 @@ class _$SouguuServiceStateCopyWithImpl<$Res, $Val extends SouguuServiceState>
           ? _value.restSouguuNotification
           : restSouguuNotification // ignore: cast_nullable_to_non_nullable
               as RestSouguuNotification?,
+      cancelReason: null == cancelReason
+          ? _value.cancelReason
+          : cancelReason // ignore: cast_nullable_to_non_nullable
+              as String,
     ) as $Val);
   }
 
@@ -87,7 +96,10 @@ abstract class _$$SouguuServiceStateImplCopyWith<$Res>
       __$$SouguuServiceStateImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({int souguu, RestSouguuNotification? restSouguuNotification});
+  $Res call(
+      {int souguu,
+      RestSouguuNotification? restSouguuNotification,
+      String cancelReason});
 
   @override
   $RestSouguuNotificationCopyWith<$Res>? get restSouguuNotification;
@@ -106,6 +118,7 @@ class __$$SouguuServiceStateImplCopyWithImpl<$Res>
   $Res call({
     Object? souguu = null,
     Object? restSouguuNotification = freezed,
+    Object? cancelReason = null,
   }) {
     return _then(_$SouguuServiceStateImpl(
       souguu: null == souguu
@@ -116,6 +129,10 @@ class __$$SouguuServiceStateImplCopyWithImpl<$Res>
           ? _value.restSouguuNotification
           : restSouguuNotification // ignore: cast_nullable_to_non_nullable
               as RestSouguuNotification?,
+      cancelReason: null == cancelReason
+          ? _value.cancelReason
+          : cancelReason // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }
@@ -123,7 +140,8 @@ class __$$SouguuServiceStateImplCopyWithImpl<$Res>
 /// @nodoc
 
 class _$SouguuServiceStateImpl implements _SouguuServiceState {
-  _$SouguuServiceStateImpl({this.souguu = 0, this.restSouguuNotification});
+  _$SouguuServiceStateImpl(
+      {this.souguu = 0, this.restSouguuNotification, this.cancelReason = ""});
 
   /// 遭遇してない場合は0, 遭遇した場合は遭遇した相手
   @override
@@ -131,6 +149,9 @@ class _$SouguuServiceStateImpl implements _SouguuServiceState {
   final int souguu;
   @override
   final RestSouguuNotification? restSouguuNotification;
+  @override
+  @JsonKey()
+  final String cancelReason;
 
   @override
   bool operator ==(Object other) {
@@ -139,11 +160,14 @@ class _$SouguuServiceStateImpl implements _SouguuServiceState {
             other is _$SouguuServiceStateImpl &&
             (identical(other.souguu, souguu) || other.souguu == souguu) &&
             (identical(other.restSouguuNotification, restSouguuNotification) ||
-                other.restSouguuNotification == restSouguuNotification));
+                other.restSouguuNotification == restSouguuNotification) &&
+            (identical(other.cancelReason, cancelReason) ||
+                other.cancelReason == cancelReason));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, souguu, restSouguuNotification);
+  int get hashCode =>
+      Object.hash(runtimeType, souguu, restSouguuNotification, cancelReason);
 
   @JsonKey(ignore: true)
   @override
@@ -155,9 +179,9 @@ class _$SouguuServiceStateImpl implements _SouguuServiceState {
 
 abstract class _SouguuServiceState implements SouguuServiceState {
   factory _SouguuServiceState(
-          {final int souguu,
-          final RestSouguuNotification? restSouguuNotification}) =
-      _$SouguuServiceStateImpl;
+      {final int souguu,
+      final RestSouguuNotification? restSouguuNotification,
+      final String cancelReason}) = _$SouguuServiceStateImpl;
 
   @override
 
@@ -165,6 +189,8 @@ abstract class _SouguuServiceState implements SouguuServiceState {
   int get souguu;
   @override
   RestSouguuNotification? get restSouguuNotification;
+  @override
+  String get cancelReason;
   @override
   @JsonKey(ignore: true)
   _$$SouguuServiceStateImplCopyWith<_$SouguuServiceStateImpl> get copyWith =>

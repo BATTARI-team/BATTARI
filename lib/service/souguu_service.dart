@@ -462,4 +462,8 @@ class SouguuServiceInfo extends _$SouguuServiceInfo {
   void setSouguu(int? souguu, {RestSouguuNotification? restSouguuNotification}) {
     state = state.copyWith(souguu: souguu ?? 0, restSouguuNotification: restSouguuNotification);
   }
+
+  void setCancel(String reason) {
+    state = state.copyWith(cancelReason: 'test');
+  }
 }

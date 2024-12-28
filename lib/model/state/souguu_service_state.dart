@@ -9,6 +9,7 @@ class SouguuServiceState with _$SouguuServiceState {
     /// 遭遇してない場合は0, 遭遇した場合は遭遇した相手
     @Default(0) int souguu,
     RestSouguuNotification? restSouguuNotification,
+    @Default("") String cancelReason,
   }) = _SouguuServiceState;
 
   @override
