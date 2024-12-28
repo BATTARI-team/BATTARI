@@ -4,6 +4,7 @@ import 'dart:core';
 
 import 'package:battari/logger.dart';
 import 'package:battari/main.dart';
+import 'package:battari/model/dto/websocket/websocket_dto.dart';
 import 'package:battari/model/state/user_state.dart';
 import 'package:battari/repository/user_repository.dart';
 import 'package:battari/service/notification_service.dart';
@@ -115,7 +116,23 @@ class MyTaskHandler extends TaskHandler {
 
   // Called when data is sent using [FlutterForegroundTask.sendDataToTask].
   @override
-  void onReceiveData(Object data) {}
+  void onReceiveData(Object data) {
+    String dataString = data.toString();
+    WebsocketDto? dto;
+    try {
+      dto = WebsocketDto.fromJson(jsonDecode(dataString));
+      if (dto.type == 'is_home') {
+        FlutterForegroundTask.sendDataToMain(
+          jsonEncode({
+            "type": "is_home",
+            "data": {"is_home": providerContainer.read(souguuServiceProvider.notifier).isHome}
+          }),
+        );
+      }
+    } catch (e) {
+      logger.e("onReceiveData error", error: e, stackTrace: StackTrace.current);
+    }
+  }
 
   // Called when the notification button is pressed.
   @override
