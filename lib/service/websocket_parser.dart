@@ -17,6 +17,8 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 
 part 'websocket_parser.g.dart';
 
+List<Future<void> Function(WebsocketDto dto)> dealNotificationListeneres = [];
+
 @riverpod
 dealNotificationForForegroundApp(Ref ref, String p0) async {
   if (p0 != "battari") {
@@ -29,6 +31,9 @@ dealNotificationForForegroundApp(Ref ref, String p0) async {
     try {
       var fromService = SouguuNotificationBetweenAppAndServiceDto.fromJson(jsonDecode(p0));
       var dto = WebsocketDto.fromJson(fromService.websocketDto);
+      for (var element in dealNotificationListeneres) {
+        element(dto);
+      }
       if (fromService.token.isNotEmpty) {
         Token = fromService.token;
       } else {

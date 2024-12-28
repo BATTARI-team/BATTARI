@@ -1,26 +1,26 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'permission_service.dart';
+part of 'is_home_view_model.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$permissionServiceHash() => r'b8e3536160e8b6ad7ef07bd966aed0169015eca8';
+String _$isHomeViewModelHash() => r'6e1597e0b90fe7608cf33d660d031b61a2bfc932';
 
-/// See also [PermissionService].
-@ProviderFor(PermissionService)
-final permissionServiceProvider = AutoDisposeNotifierProvider<PermissionService,
-    PermissionServiceState>.internal(
-  PermissionService.new,
-  name: r'permissionServiceProvider',
+/// See also [IsHomeViewModel].
+@ProviderFor(IsHomeViewModel)
+final isHomeViewModelProvider =
+    AutoDisposeAsyncNotifierProvider<IsHomeViewModel, bool>.internal(
+  IsHomeViewModel.new,
+  name: r'isHomeViewModelProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$permissionServiceHash,
+      : _$isHomeViewModelHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$PermissionService = AutoDisposeNotifier<PermissionServiceState>;
+typedef _$IsHomeViewModel = AutoDisposeAsyncNotifier<bool>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
