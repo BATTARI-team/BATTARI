@@ -9,7 +9,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'is_home_view_model.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class IsHomeViewModel extends _$IsHomeViewModel {
   @override
   Future<bool> build() async {
@@ -19,23 +19,22 @@ class IsHomeViewModel extends _$IsHomeViewModel {
       throw Exception("this notifier is only available for foreground app");
     }
 
-    bool? isHome = false;
+    bool? isHome;
 
     func(dto) async {
-      logger.i("きた3");
       if (dto.type == "is_home") {
-        logger.i("きた4");
         isHome = dto.data['is_home'];
       }
     }
 
-    dealNotificationListeneres.add(func);
+    dealNotificationListener = func;
+
     int counter = 0;
     // 3秒まつ
-    while (counter++ < 300 && isHome == null) {
+    while (counter++ < 30 && isHome == null) {
       await Future.delayed(const Duration(milliseconds: 100));
     }
-    dealNotificationListeneres.remove(func);
+    dealNotificationListener = null;
     if (isHome != null) {
       return isHome!;
     }
