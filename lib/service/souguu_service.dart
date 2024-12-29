@@ -19,6 +19,7 @@ import 'package:battari/service/notification_service.dart';
 import 'package:battari/service/websocket_service.dart';
 import 'package:battari/util/call_util.dart';
 import 'package:battari/util/time_util.dart';
+import 'package:battari/view_model/is_home_view_model.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
@@ -237,6 +238,8 @@ class SouguuService extends _$SouguuService {
       logger.d(
           "distance: ${Geolocator.distanceBetween(position.latitude, position.longitude, user.houseLatitude, user.houseLongitude)}, position.latitude: ${position.latitude}, position.long: ${position.longitude}, user.houseLatitude: ${user.houseLatitude}, user.houseLong: ${user.houseLongitude}, result is : $_isHome");
     }
+    FlutterForegroundTask.sendDataToMain(jsonEncode(SouguuNotificationBetweenAppAndServiceDto(
+        websocketDto: WebsocketDto(type: "is_home", data: {"is_home": _isHome}).toJson(), token: Token)));
     return _isHome;
   }
 
