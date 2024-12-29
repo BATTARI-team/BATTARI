@@ -124,10 +124,7 @@ class MyTaskHandler extends TaskHandler {
     SouguuNotificationBetweenAppAndServiceDto? dto;
     try {
       dto = SouguuNotificationBetweenAppAndServiceDto.fromJson(jsonDecode(dataString));
-      logger.d("ここまできた2");
       if (dto.websocketDto['type'] == 'is_home') {
-        logger.d("ここまできた1");
-
         var dto = WebsocketDto(type: 'is_home', data: {"is_home": providerContainer.read(souguuServiceProvider.notifier).isHome});
         var sousinn = SouguuNotificationBetweenAppAndServiceDto(token: Token, websocketDto: dto.toJson());
         FlutterForegroundTask.sendDataToMain(jsonEncode(sousinn.toJson()));

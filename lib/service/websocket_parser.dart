@@ -18,7 +18,6 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 
 part 'websocket_parser.g.dart';
 
-List<Future<void> Function(WebsocketDto dto)> dealNotificationListeneres = [];
 Future<void> Function(WebsocketDto dto)? dealNotificationListener;
 
 @riverpod
