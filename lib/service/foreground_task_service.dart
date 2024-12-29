@@ -4,7 +4,9 @@ import 'dart:core';
 
 import 'package:battari/logger.dart';
 import 'package:battari/main.dart';
+import 'package:battari/model/dto/app_service_communication/souguu_notification_between_app_and_service_dto.dart';
 import 'package:battari/model/dto/websocket/websocket_dto.dart';
+import 'package:battari/model/souguu_incredient/souguu_incredient_data_appusage_model.dart';
 import 'package:battari/model/state/user_state.dart';
 import 'package:battari/repository/user_repository.dart';
 import 'package:battari/service/notification_service.dart';
@@ -118,16 +120,17 @@ class MyTaskHandler extends TaskHandler {
   @override
   void onReceiveData(Object data) {
     String dataString = data.toString();
-    WebsocketDto? dto;
+    logger.d("foreground serviceで受信: $dataString");
+    SouguuNotificationBetweenAppAndServiceDto? dto;
     try {
-      dto = WebsocketDto.fromJson(jsonDecode(dataString));
-      if (dto.type == 'is_home') {
-        FlutterForegroundTask.sendDataToMain(
-          jsonEncode({
-            "type": "is_home",
-            "data": {"is_home": providerContainer.read(souguuServiceProvider.notifier).isHome}
-          }),
-        );
+      dto = SouguuNotificationBetweenAppAndServiceDto.fromJson(jsonDecode(dataString));
+      logger.d("ここまできた2");
+      if (dto.websocketDto['type'] == 'is_home') {
+        logger.d("ここまできた1");
+
+        var dto = WebsocketDto(type: 'is_home', data: {"is_home": providerContainer.read(souguuServiceProvider.notifier).isHome});
+        var sousinn = SouguuNotificationBetweenAppAndServiceDto(token: Token, websocketDto: dto.toJson());
+        FlutterForegroundTask.sendDataToMain(jsonEncode(sousinn.toJson()));
       }
     } catch (e) {
       logger.e("onReceiveData error", error: e, stackTrace: StackTrace.current);

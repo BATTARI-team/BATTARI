@@ -8,6 +8,7 @@ import 'package:battari/model/dto/websocket/websocket_dto.dart';
 import 'package:battari/model/dto/websocket/websocket_souguu_notification.dart';
 import 'package:battari/routes.dart';
 import 'package:battari/service/souguu_service.dart';
+import 'package:battari/view_model/is_home_view_model.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
@@ -18,6 +19,7 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 part 'websocket_parser.g.dart';
 
 List<Future<void> Function(WebsocketDto dto)> dealNotificationListeneres = [];
+Future<void> Function(WebsocketDto dto)? dealNotificationListener;
 
 @riverpod
 dealNotificationForForegroundApp(Ref ref, String p0) async {
@@ -31,8 +33,13 @@ dealNotificationForForegroundApp(Ref ref, String p0) async {
     try {
       var fromService = SouguuNotificationBetweenAppAndServiceDto.fromJson(jsonDecode(p0));
       var dto = WebsocketDto.fromJson(fromService.websocketDto);
-      for (var element in dealNotificationListeneres) {
-        element(dto);
+
+      if (dto.type == "is_home") {
+        if (dealNotificationListener != null) {
+          await dealNotificationListener!(dto);
+        }
+        ref.read(isHomeViewModelProvider.notifier).setIsHome(dto.data['is_home']);
+        return;
       }
       if (fromService.token.isNotEmpty) {
         Token = fromService.token;
