@@ -49,8 +49,8 @@ class SouguuService extends _$SouguuService {
   Timer? _souguuIncredientSender;
   Timer? _isHomeGetterTimer;
 
-  final souguuMaterialDuration = const Duration(seconds: 10);
-  final appUsageDuration = const Duration(seconds: 10);
+  final souguuMaterialDuration = const Duration(minutes: 1);
+  final appUsageDuration = const Duration(seconds: 40);
 
   int? userId;
 
@@ -259,7 +259,7 @@ class SouguuService extends _$SouguuService {
     }
 
     //#TODO 2分に戻す
-    _isHomeGetterTimer = Timer.periodic(const Duration(seconds: 20), (timer) async => _isHomeGetter());
+    _isHomeGetterTimer = Timer.periodic(const Duration(minutes: 2), (timer) async => _isHomeGetter());
     _isHomeGetter();
     //#TODO 大体タイマーは役割が一緒だからそれらの関数をインターフェースかしたい
 

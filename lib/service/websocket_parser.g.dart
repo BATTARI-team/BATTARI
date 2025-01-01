@@ -7,7 +7,7 @@ part of 'websocket_parser.dart';
 // **************************************************************************
 
 String _$dealNotificationForForegroundAppHash() =>
-    r'e5fdb492130f8bc25ff239492cdb8934d60c0853';
+    r'48b5646e715cb3296d2362783ea7e8ee1926a1e0';
 
 /// Copied from Dart SDK
 class _SystemHash {

@@ -149,7 +149,7 @@ send cancel notif"""),
     }
   }
 
-  void _initService() {
+  static void initService() {
     FlutterForegroundTask.init(
       androidNotificationOptions: AndroidNotificationOptions(
         channelId: 'foreground_service',

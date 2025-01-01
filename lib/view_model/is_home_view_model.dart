@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:battari/logger.dart';
+import 'package:battari/main.dart';
 import 'package:battari/model/dto/app_service_communication/souguu_notification_between_app_and_service_dto.dart';
 import 'package:battari/model/dto/websocket/websocket_dto.dart';
 import 'package:battari/service/websocket_parser.dart';
@@ -23,22 +24,25 @@ class IsHomeViewModel extends _$IsHomeViewModel {
 
     func(dto) async {
       if (dto.type == "is_home") {
-        isHome = dto.data['is_home'];
+        isHome = dto.data['is_home'] as bool;
       }
     }
 
     dealNotificationListener = func;
 
     int counter = 0;
+    FlutterForegroundTask.sendDataToTask(// ここでデータを送信
+        jsonEncode(
+            SouguuNotificationBetweenAppAndServiceDto(websocketDto: WebsocketDto(type: 'is_home', data: {}).toJson(), token: Token)));
     // 3秒まつ
-    while (counter++ < 30 && isHome == null) {
+    while (counter++ < 300 && isHome == null) {
       await Future.delayed(const Duration(milliseconds: 100));
     }
     dealNotificationListener = null;
     if (isHome != null) {
       return isHome!;
     }
-    return true;
+    return false;
   }
 
   void setIsHome(bool isHome) {

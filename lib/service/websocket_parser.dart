@@ -37,7 +37,7 @@ dealNotificationForForegroundApp(Ref ref, String p0) async {
         if (dealNotificationListener != null) {
           await dealNotificationListener!(dto);
         }
-        ref.read(isHomeViewModelProvider.notifier).setIsHome(dto.data['is_home']);
+        ref.read(isHomeViewModelProvider.notifier).setIsHome(dto.data['is_home'] as bool);
         return;
       }
       if (fromService.token.isNotEmpty) {

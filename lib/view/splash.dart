@@ -6,7 +6,9 @@ import 'package:battari/logger.dart';
 import 'package:battari/main.dart';
 import 'package:battari/repository/user_repository.dart';
 import 'package:battari/model/state/user_state.dart';
+import 'package:battari/service/foreground_task_service.dart';
 import 'package:battari/service/souguu_service.dart';
+import 'package:battari/view/developer/developer_widgets.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
@@ -98,6 +100,7 @@ class Splash extends HookConsumerWidget {
     if (!isSouguuMutable) {
       isCall = await ref.read(souguuServiceInfoProvider.notifier).init();
     }
+    await initService();
 
     logger.d("splash done");
     transaction.finish();
@@ -123,5 +126,31 @@ class Splash extends HookConsumerWidget {
       });
     }
     return;
+  }
+
+  Future<void> initService() async {
+    if (!(await FlutterForegroundTask.isRunningService)) {
+      DeveloperWidgets.initService();
+      await Future.delayed(const Duration(milliseconds: 500));
+      startService();
+    }
+  }
+
+  Future<ServiceRequestResult> startService() async {
+    if (await FlutterForegroundTask.isRunningService) {
+      return FlutterForegroundTask.restartService();
+    } else {
+      return FlutterForegroundTask.startService(
+        serviceId: 256,
+        notificationTitle: 'Foreground Service is running',
+        notificationText: 'Tap to return to the app',
+        notificationIcon: null,
+        notificationButtons: [
+          const NotificationButton(id: '再起動', text: 'restart'),
+          const NotificationButton(id: '停止', text: 'stop'),
+        ],
+        callback: startCallback,
+      );
+    }
   }
 }
