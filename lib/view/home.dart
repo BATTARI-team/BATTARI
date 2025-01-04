@@ -4,6 +4,7 @@ import 'package:battari/logger.dart';
 import 'package:battari/service/souguu_service.dart';
 import 'package:battari/view/developer/developer_widgets.dart';
 import 'package:battari/view/online_widget.dart';
+import 'package:battari/view_model/is_home_view_model.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
@@ -22,6 +23,10 @@ class HomeView extends ConsumerWidget {
     //   }
     //   // ref.read(souguuServiceProvider.notifier).disconnectWebsocket();
     // });
+    var isHome = ref.watch(isHomeViewModelProvider).maybeWhen(
+          data: (data) => data,
+          orElse: () => false,
+        );
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: (() {
@@ -30,7 +35,7 @@ class HomeView extends ConsumerWidget {
         child: const Text("developer page"),
       ),
       body: Center(
-        child: loginedUserWidget(context, false),
+        child: loginedUserWidget(context, isHome),
       ),
     );
   }
@@ -99,10 +104,7 @@ class HomeView extends ConsumerWidget {
                   SizedBox(height: appSize.deviceHeight * 0.01),
                   Text(
                     data.name,
-                    style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                        fontSize: 20,
-                        color: AppColor.text.darkgray),
+                    style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20, color: AppColor.text.darkgray),
                   ),
                   Text("@${data.userId}"),
                   SizedBox(height: 5),
@@ -116,10 +118,7 @@ class HomeView extends ConsumerWidget {
                       SizedBox(width: 5),
                       Text(
                         '誰かと遭遇するかも...!',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w800,
-                            fontSize: 15,
-                            color: AppColor.text.darkgray),
+                        style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: AppColor.text.darkgray),
                       ),
                     ],
                   ),
