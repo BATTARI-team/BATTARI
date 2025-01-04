@@ -71,6 +71,7 @@ class Battari extends ConsumerWidget with WidgetsBindingObserver {
     return MaterialApp.router(
       title: 'Flutter Demo',
       theme: ThemeData(
+        fontFamily: 'NotoSansJP',
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         dividerColor: Colors.transparent,
         useMaterial3: true,

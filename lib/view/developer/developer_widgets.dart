@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:battari/constant/app_color.dart';
+import 'package:battari/constant/app_size.dart';
 import 'package:battari/logger.dart';
 import 'package:battari/main.dart';
 import 'package:battari/model/dto/websocket/cancel_call_websocket_dto.dart';
@@ -8,12 +10,14 @@ import 'package:battari/view/call.dart';
 import 'package:battari/view/developer/app_usage_time.dart';
 import 'package:battari/view/developer/background.dart';
 import 'package:battari/repository/user_repository.dart';
+import 'package:battari/view/online_widget.dart';
 import 'package:battari/view/developer/permission_developper_page.dart';
 import 'package:battari/view/instruction/setting_home_view.dart';
 import 'package:battari/view_model/is_home_view_model.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:battari/view/developer/websocket_test.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -51,66 +55,69 @@ class DeveloperWidgets extends StatelessWidget {
         appBar: AppBar(
           title: const Text("開発用"),
         ),
-        body: Column(
-          children: [
-            FutureBuilder(
-              future: () async {
-                var info = await PackageInfo.fromPlatform();
-                return "${info.version}+${info.buildNumber}";
-              }(),
-              builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                if (snapshot.hasData) {
-                  return Text("version: ${snapshot.data}");
-                } else {
-                  return const CircularProgressIndicator();
-                }
-              },
-            ),
-            _developerElement("websockettest", const WebSocketTest(), context),
-            Consumer(builder: (context, ref, _) {
-              return TextButton(
-                  child: const Text("clear shared preferences"),
-                  onPressed: () => ref.read(userSharedPreferencesRepositoryProvider).clear());
-            }),
-            // Consumer(
-            //   builder: (context, ref, child) {
-            //     ref.watch(souguuServiceProvider);
-            //     return Column(
-            //       mainAxisSize: MainAxisSize.min,
-            //       children: [
-            //         Text(ref.watch(souguuServiceInfoProvider).souguu.toString()),
-            //         TextButton(
-            //           child: const Text("websocketディスコネクト"),
-            //           onPressed: () => ref.read(souguuServiceProvider.notifier).disconnectWebsocket(),
-            //         )
-            //       ],
-            //     );
-            //   },
-            // ),
-            _developerElement("Background", const ExamplePage(), context),
-            TextButton(
-              child: const Text("button"),
-              onPressed: () {},
-            ),
-            _developerElement("appusage", AppUsageTime(), context),
-            _developerElement("call", Call(), context),
-            _developerElement("settings_home", SettingHomeView(), context),
-            TextButton(
-              child: const Text("""
-send cancel notif"""),
-              onPressed: () async {
-                var response = await http.put(Uri.parse('http://$ipAddress:5050/SouguuInfo/CancelCall'),
-                    headers: {
-                      'Content-Type': 'application/json',
-                      'Authorization': 'Bearer $Token',
-                    },
-                    body: jsonEncode(const CancelCallWebsocketDto(reason: "").toJson()));
-                logger.d(response.body + response.statusCode.toString());
-                return;
-              },
-            ),
-            _developerElement("permission", const PermissionDevelopperPage(), context)
-          ],
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              FutureBuilder(
+                future: () async {
+                  var info = await PackageInfo.fromPlatform();
+                  return "${info.version}+${info.buildNumber}";
+                }(),
+                builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                  if (snapshot.hasData) {
+                    return Text("version: ${snapshot.data}");
+                  } else {
+                    return const CircularProgressIndicator();
+                  }
+                },
+              ),
+              _developerElement("websockettest", const WebSocketTest(), context),
+              Consumer(builder: (context, ref, _) {
+                return TextButton(
+                    child: const Text("clear shared preferences"),
+                    onPressed: () => ref.read(userSharedPreferencesRepositoryProvider).clear());
+              }),
+              // Consumer(
+              //   builder: (context, ref, child) {
+              //     ref.watch(souguuServiceProvider);
+              //     return Column(
+              //       mainAxisSize: MainAxisSize.min,
+              //       children: [
+              //         Text(ref.watch(souguuServiceInfoProvider).souguu.toString()),
+              //         TextButton(
+              //           child: const Text("websocketディスコネクト"),
+              //           onPressed: () => ref.read(souguuServiceProvider.notifier).disconnectWebsocket(),
+              //         )
+              //       ],
+              //     );
+              //   },
+              // ),
+              _developerElement("Background", const ExamplePage(), context),
+              TextButton(
+                child: const Text("button"),
+                onPressed: () {},
+              ),
+              _developerElement("appusage", AppUsageTime(), context),
+              _developerElement("call", Call(), context),
+              _developerElement("settings_home", SettingHomeView(), context),
+              TextButton(
+                child: const Text("""
+          send cancel notif"""),
+                onPressed: () async {
+                  var response = await http.put(Uri.parse('http://$ipAddress:5050/SouguuInfo/CancelCall'),
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer $Token',
+                      },
+                      body: jsonEncode(const CancelCallWebsocketDto(reason: "").toJson()));
+                  logger.d(response.body + response.statusCode.toString());
+                  return;
+                },
+              ),
+              _developerElement("permission", const PermissionDevelopperPage(), context),
+              loginedUserWidget(),
+            ],
+          ),
         ));
   }
 

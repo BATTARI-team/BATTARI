@@ -41,12 +41,18 @@ class AppUsageState extends State<AppUsageTime> {
       await initUsage();
       print("a");
       DateTime currentTime = DateTime.now();
-      DateTime lastOpenTime = DateTime.fromMillisecondsSinceEpoch(_lastOpenTimeStamp!);
+      DateTime lastOpenTime =
+          DateTime.fromMillisecondsSinceEpoch(_lastOpenTimeStamp!);
 
       // 経過時間を秒で計算
-      int elapsedSeconds = (currentTime.difference(lastOpenTime).inSeconds / 60).toInt();
+      int elapsedSeconds =
+          (currentTime.difference(lastOpenTime).inSeconds / 60).toInt();
 
-      String appName = events.firstWhere((event) => event.timeStamp == _lastOpenTimeStamp.toString()).packageName ?? "不明なアプリ";
+      String appName = events
+              .firstWhere(
+                  (event) => event.timeStamp == _lastOpenTimeStamp.toString())
+              .packageName ??
+          "不明なアプリ";
 
       DateTime now = DateTime.now(); // 現在の時間を取得
       String formattedTime = '${now.hour}:${now.minute}:${now.second}';
@@ -67,7 +73,8 @@ class AppUsageState extends State<AppUsageTime> {
       DateTime endDate = DateTime.now();
       DateTime startDate = endDate.subtract(Duration(days: 1));
 
-      List<EventUsageInfo> queryEvents = await UsageStats.queryEvents(startDate, endDate);
+      List<EventUsageInfo> queryEvents =
+          await UsageStats.queryEvents(startDate, endDate);
 
       // 最新の eventType == 1 イベントのタイムスタンプを取得
       for (var event in queryEvents.reversed) {
@@ -94,7 +101,9 @@ class AppUsageState extends State<AppUsageTime> {
 
   @override
   Widget build(BuildContext context) {
-    List<EventUsageInfo> filteredEvents = events.where((event) => event.eventType == '1' || event.eventType == '2').toList();
+    List<EventUsageInfo> filteredEvents = events
+        .where((event) => event.eventType == '1' || event.eventType == '2')
+        .toList();
 
     return MaterialApp(
       home: Scaffold(
@@ -119,8 +128,8 @@ class AppUsageState extends State<AppUsageTime> {
                     var event = filteredEvents[index];
                     return ListTile(
                       title: Text(event.packageName!),
-                      subtitle:
-                          Text("最終使用時刻: ${DateTime.fromMillisecondsSinceEpoch(int.parse(events[index].timeStamp!)).toIso8601String()}"),
+                      subtitle: Text(
+                          "最終使用時刻: ${DateTime.fromMillisecondsSinceEpoch(int.parse(events[index].timeStamp!)).toIso8601String()}"),
                       trailing: Text(event.eventType!),
                     );
                   },
