@@ -10,6 +10,7 @@ class AppColor {
 class _Brand {
   final Color primary = const Color(0xFFFFFFFF);
   final Color secondary = const Color(0xFFFEF9EA);
+  final Color thirdly = const Color(0xFFFBE5A5);
 }
 
 class _Text {
