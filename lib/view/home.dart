@@ -28,6 +28,9 @@ class HomeView extends ConsumerWidget {
           orElse: () => false,
         );
     return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(onPressed: () {}, icon: Icon(Icons.menu)),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: (() {
           context.push('/developer');
