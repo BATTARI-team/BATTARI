@@ -54,6 +54,10 @@ class HomeView extends ConsumerWidget {
           color: Colors.red,
         );
       }
+      var isHome = ref.watch(isHomeViewModelProvider).maybeWhen(
+            orElse: () => false,
+            data: (data) => data,
+          );
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -63,7 +67,7 @@ class HomeView extends ConsumerWidget {
             username: data.name,
             userid: data.userId,
             cardcolor: AppColor.brand.secondary,
-            isHome: true,
+            isHome: isHome,
           )),
         ],
       );

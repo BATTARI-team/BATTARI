@@ -1,4 +1,5 @@
 import 'package:battari/constant/app_color.dart';
+import 'package:battari/view/offline_widget.dart';
 import 'package:battari/view/online_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:battari/constant/app_size.dart';
@@ -63,7 +64,9 @@ class userCard extends StatelessWidget {
                 Positioned(
                   top: 67,
                   left: 60,
-                  child: onlineWidget(width: 22, height: 22),
+                  child: isHome
+                      ? onlineWidget(width: 22, height: 22)
+                      : offlineWidget(width: 22, height: 22),
                 ),
               ],
             ),
@@ -81,19 +84,33 @@ class userCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                onlineWidget(
-                  height: 20,
-                  width: 20,
-                ),
+                isHome
+                    ? onlineWidget(
+                        height: 20,
+                        width: 20,
+                      )
+                    : offlineWidget(
+                        width: 20,
+                        height: 20,
+                      ),
                 const SizedBox(width: 5),
-                Text(
-                  '誰かと遭遇するかも...!',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w800,
-                    fontSize: 15,
-                    color: AppColor.text.darkgray,
-                  ),
-                ),
+                isHome
+                    ? Text(
+                        '誰かと遭遇するかも...!',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 15,
+                          color: AppColor.text.darkgray,
+                        ),
+                      )
+                    : Text(
+                        '今は遭遇しないよ',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 15,
+                          color: AppColor.text.darkgray,
+                        ),
+                      )
               ],
             ),
             const SizedBox(height: 8),
