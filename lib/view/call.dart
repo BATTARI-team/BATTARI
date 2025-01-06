@@ -26,6 +26,8 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
   Timer? _callTimer;
   String aiteUserName = "";
 
+  String userId = "aa";
+
   @override
   Widget build(BuildContext context, ref) {
     // 0: ローディング
@@ -64,6 +66,8 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
             aiteUserName = await ref.watch(userNameProviderByIdProvider(
                 souguuInfo.restSouguuNotification!.aiteUserId));
           }
+          userId = await ref.watch(userIdProviderByIdProvider(
+              souguuInfo.restSouguuNotification!.aiteUserId));
           debugPrint("agora init");
           await _initAgoraEngine(
               souguuInfo.restSouguuNotification?.token ?? "");
@@ -194,7 +198,7 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
       case 2:
         widget = Column(
           children: [
-            const Center(
+            Center(
               child: Text(
                 "通話中",
                 style: TextStyle(fontSize: 40),

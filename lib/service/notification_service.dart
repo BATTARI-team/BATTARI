@@ -104,3 +104,12 @@ Raw<Future<String>> userNameProviderById(ref, int id) async {
   });
   return jsonDecode(result.body)['name'];
 }
+
+@riverpod
+Raw<Future<String>> userIdProviderById(ref, int id) async {
+  var result = await http.put(Uri.parse('http://$ipAddress:5050/User/GetUser?userIndex=$id'), headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer $Token',
+  });
+  return jsonDecode(result.body)['userId'];
+}
