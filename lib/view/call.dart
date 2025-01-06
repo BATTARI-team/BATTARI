@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:battari/constant/app_color.dart';
+import 'package:battari/constant/app_size.dart';
 import 'package:battari/logger.dart';
 import 'package:battari/main.dart';
 import 'package:battari/model/dto/rest_souguu_notification.dart';
@@ -11,8 +12,10 @@ import 'package:battari/model/state/user_state.dart';
 import 'package:battari/service/notification_service.dart';
 import 'package:battari/service/souguu_service.dart';
 import 'package:battari/util/time_util.dart';
+import 'package:battari/view/battari_button.dart';
 import 'package:battari/view/usercard.dart';
 import 'package:battari/view_model/user_view_model.dart';
+import 'package:bordered_text/bordered_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -30,6 +33,7 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context, ref) {
+    final appSize = AppSize(context);
     // 0: ローディング
     // 1: 通話待ち
     // 2: 通話中
@@ -49,7 +53,7 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
               callId: 1,
               aiteUserId: 1,
               souguuDateTime: DateTime.now(),
-              callStartTime: DateTime.now().add(const Duration(seconds: 10)),
+              callStartTime: DateTime.now().add(const Duration(seconds: 15)),
               souguuReason: "instagramでBATTARI",
               token: "006f1e"));
       userState =
@@ -172,14 +176,20 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
             Center(
               child: Column(
                 children: [
+                  const Text('遭遇相手',
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
                   userCard(
                       username: aiteUserName,
-                      userid: 'battari',
+                      userid: userId,
                       isHome: true,
                       cardcolor: AppColor.brand.thirdly),
-                  Text(
+                  const SizedBox(
+                    height: 150,
+                  ),
+                  const Text(
                     "通話まであと",
-                    style: TextStyle(fontSize: 35),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -191,17 +201,40 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
                 child: Text(
               "${countdown.value}秒",
               style: const TextStyle(fontSize: 32),
-            ))
+            )),
+            const SizedBox(height: 100),
+            BattariTextButton(
+                backgrandColor: Colors.grey,
+                icon: Icons.volume_off_rounded,
+                onpressed: () {},
+                textColor: Colors.white,
+                text: "スピーカーをオフにする"),
+            BattariTextButton(
+                backgrandColor: AppColor.ui.buttonRed,
+                icon: Icons.cancel_outlined,
+                onpressed: () {},
+                textColor: Colors.white,
+                text: "遭遇を拒否する")
           ],
         );
         break;
       case 2:
         widget = Column(
           children: [
+            const Text('遭遇相手',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+            userCard(
+                username: aiteUserName,
+                userid: userId,
+                isHome: true,
+                cardcolor: AppColor.brand.thirdly),
+            const SizedBox(
+              height: 130,
+            ),
             Center(
               child: Text(
-                "通話中",
-                style: TextStyle(fontSize: 40),
+                "遭遇中！",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
             ),
             const SizedBox(
@@ -210,7 +243,7 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
             const Center(
               child: Text(
                 "通話終了まであと",
-                style: TextStyle(fontSize: 35),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
             ),
             Center(
@@ -218,7 +251,20 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
                 "${callCountdown.value}秒",
                 style: const TextStyle(fontSize: 32),
               ),
-            )
+            ),
+            const SizedBox(height: 87),
+            BattariTextButton(
+                backgrandColor: Colors.grey,
+                icon: Icons.volume_off_rounded,
+                onpressed: () {},
+                textColor: Colors.white,
+                text: "スピーカーをオフにする"),
+            BattariTextButton(
+                backgrandColor: AppColor.ui.buttonRed,
+                icon: Icons.cancel_outlined,
+                onpressed: () {},
+                textColor: Colors.white,
+                text: "遭遇を終了する")
           ],
         );
         break;
@@ -228,7 +274,7 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
             const Center(
               child: Text(
                 "通話終了",
-                style: TextStyle(fontSize: 40),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
             ),
             ElevatedButton(
