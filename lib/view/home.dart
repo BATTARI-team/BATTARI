@@ -29,12 +29,6 @@ class HomeView extends ConsumerWidget {
     return Scaffold(
       drawer: const BattariDrawer(),
       appBar: BattariAppBar(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: (() {
-          context.push('/developer');
-        }),
-        child: const Text("developer page"),
-      ),
       body: Center(
         child: loginedUserWidget(context, isHome),
       ),
