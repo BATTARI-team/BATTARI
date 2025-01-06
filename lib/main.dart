@@ -69,6 +69,7 @@ class Battari extends ConsumerWidget with WidgetsBindingObserver {
     });
     debugPrint("Battari build");
     return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
         fontFamily: 'NotoSansJP',
