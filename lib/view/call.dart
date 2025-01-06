@@ -50,7 +50,6 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
     var callCountdown = useState(0);
     SouguuServiceState souguuInfo = ref.watch(souguuServiceInfoProvider);
     UserState? userState = ref.watch(userViewModelProvider);
-    debugPrint(isSpeacker.value.toString());
     if (souguuInfo.restSouguuNotification == null || userState == null) {
       // デフォルト値挿入
       souguuInfo = SouguuServiceState(
@@ -156,6 +155,9 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
         Future.wait([task]);
       } else if (status.value == 3) {
         logger.i("通話終了");
+        WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+          context.pushReplacement("/");
+        });
         //#TODO ホーム画面に遷移
       }
       return null;
