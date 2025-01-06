@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
+import 'package:battari/components/app_bar.dart';
 import 'package:battari/logger.dart';
 import 'package:battari/main.dart';
 import 'package:battari/model/dto/rest_souguu_notification.dart';
@@ -197,7 +198,9 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
 
     return WithForegroundTask(
       child: Scaffold(
-        appBar: AppBar(),
+        appBar: BattariAppBar(
+          needDrawer: false,
+        ),
         body: widget,
       ),
     );
