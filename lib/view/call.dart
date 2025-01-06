@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
@@ -6,6 +7,7 @@ import 'package:battari/components/app_bar.dart';
 import 'package:battari/logger.dart';
 import 'package:battari/main.dart';
 import 'package:battari/model/dto/rest_souguu_notification.dart';
+import 'package:battari/model/dto/websocket/cancel_call_websocket_dto.dart';
 import 'package:battari/model/state/souguu_service_state.dart';
 import 'package:battari/model/state/user_state.dart';
 import 'package:battari/service/notification_service.dart';
@@ -17,6 +19,7 @@ import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:http/http.dart' as http;
 
 class Call extends HookConsumerWidget with WidgetsBindingObserver {
   Call({super.key});
@@ -147,7 +150,14 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
                 child: Text(
               "${countdown.value}秒",
               style: const TextStyle(fontSize: 32),
-            ))
+            )),
+            TextButton(
+                onPressed: () async {
+                  status.value = 3;
+                  _disposeTimer();
+                  _cancelCall();
+                },
+                child: const Text("遭遇を拒否する")),
           ],
         );
         break;
@@ -174,7 +184,17 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
                 "${callCountdown.value}秒",
                 style: const TextStyle(fontSize: 32),
               ),
-            )
+            ),
+            TextButton(
+                onPressed: () {
+                  status.value = 3;
+                  try {
+                    _engine.leaveChannel();
+                    _engine.disableAudio();
+                  } catch (e) {}
+                  _callTimer?.cancel();
+                },
+                child: const Text("会話を終了する")),
           ],
         );
         break;
@@ -206,6 +226,15 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
     );
   }
 
+  void _disposeTimer() {
+    if (_callTimer != null) {
+      _callTimer!.cancel();
+    }
+    if (_timer != null) {
+      _timer!.cancel();
+    }
+  }
+
   Future<void> _initAgoraEngine(String token) async {
     _engine = createAgoraRtcEngine();
     logger.d("appId: ${battariSetting.appIdAgora}");
@@ -220,6 +249,16 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
     await _engine.enableWebSdkInteroperability(true);
     await _engine.enableAudio();
     await _engine.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
+  }
+
+  Future<void> _cancelCall() async {
+    var response = await http.put(Uri.parse('http://$ipAddress:5050/SouguuInfo/CancelCall'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $Token',
+        },
+        body: jsonEncode(const CancelCallWebsocketDto(reason: "").toJson()));
+    logger.d(response.body + response.statusCode.toString());
   }
 
   Future<void> _requestPermissionForAndroid() async {
