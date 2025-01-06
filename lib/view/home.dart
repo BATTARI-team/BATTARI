@@ -1,3 +1,5 @@
+import 'package:battari/components/app_bar.dart';
+import 'package:battari/components/drawer.dart';
 import 'package:battari/constant/app_color.dart';
 import 'package:battari/constant/app_size.dart';
 import 'package:battari/logger.dart';
@@ -11,23 +13,22 @@ import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+class MyAppBar extends PreferredSize {
+  const MyAppBar({super.key, required super.preferredSize, required super.child});
+}
+
 class HomeView extends ConsumerWidget {
   const HomeView({super.key});
 
   @override
   Widget build(BuildContext context, ref) {
-    // FlutterForegroundTask.addTaskDataCallback((data) {
-    //   logger.d("foreground task data: $data");
-    //   if (context.mounted) {
-    //     ref.read(souguuServiceProvider.notifier).dealNotification(data.toString(), true);
-    //   }
-    //   // ref.read(souguuServiceProvider.notifier).disconnectWebsocket();
-    // });
     var isHome = ref.watch(isHomeViewModelProvider).maybeWhen(
           data: (data) => data,
           orElse: () => false,
         );
     return Scaffold(
+      drawer: const BattariDrawer(),
+      appBar: BattariAppBar(),
       floatingActionButton: FloatingActionButton(
         onPressed: (() {
           context.push('/developer');
