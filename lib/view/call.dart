@@ -1,12 +1,15 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:battari/constant/app_color.dart';
 import 'package:battari/constant/app_size.dart';
+import 'package:battari/components/app_bar.dart';
 import 'package:battari/logger.dart';
 import 'package:battari/main.dart';
 import 'package:battari/model/dto/rest_souguu_notification.dart';
+import 'package:battari/model/dto/websocket/cancel_call_websocket_dto.dart';
 import 'package:battari/model/state/souguu_service_state.dart';
 import 'package:battari/model/state/user_state.dart';
 import 'package:battari/service/notification_service.dart';
@@ -21,6 +24,7 @@ import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:http/http.dart' as http;
 
 class Call extends HookConsumerWidget with WidgetsBindingObserver {
   Call({super.key});
@@ -40,6 +44,7 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
     // 3: 通話終了
 
     var status = useState(0);
+    var isSpeacker = useState(true);
     var countdown = useState(0);
     int differenceFromOfficialTime = 0;
     var callCountdown = useState(0);
@@ -58,6 +63,16 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
               token: "006f1e"));
       userState =
           const UserState(id: 6, userId: "test", name: "test", token: "006f1e");
+    }
+
+    void _toggleSpeacker() {
+      if (isSpeacker.value) {
+        isSpeacker.value = false;
+        _engine.setEnableSpeakerphone(false);
+      } else {
+        isSpeacker.value = true;
+        _engine.setEnableSpeakerphone(true);
+      }
     }
 
     useEffect(() {
@@ -212,7 +227,11 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
             BattariTextButton(
                 backgrandColor: AppColor.ui.buttonRed,
                 icon: Icons.cancel_outlined,
-                onpressed: () {},
+                onpressed: () async {
+                  status.value = 3;
+                  _disposeTimer();
+                  _cancelCall();
+                },
                 textColor: Colors.white,
                 text: "遭遇を拒否する")
           ],
@@ -256,13 +275,22 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
             BattariTextButton(
                 backgrandColor: Colors.grey,
                 icon: Icons.volume_off_rounded,
-                onpressed: () {},
+                onpressed: () {
+                  _toggleSpeacker();
+                },
                 textColor: Colors.white,
                 text: "スピーカーをオフにする"),
             BattariTextButton(
                 backgrandColor: AppColor.ui.buttonRed,
                 icon: Icons.cancel_outlined,
-                onpressed: () {},
+                onpressed: () {
+                  status.value = 3;
+                  try {
+                    _engine.leaveChannel();
+                    _engine.disableAudio();
+                  } catch (e) {}
+                  _callTimer?.cancel();
+                },
                 textColor: Colors.white,
                 text: "遭遇を終了する")
           ],
@@ -288,10 +316,21 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
 
     return WithForegroundTask(
       child: Scaffold(
-        appBar: AppBar(),
+        appBar: BattariAppBar(
+          needDrawer: false,
+        ),
         body: widget,
       ),
     );
+  }
+
+  void _disposeTimer() {
+    if (_callTimer != null) {
+      _callTimer!.cancel();
+    }
+    if (_timer != null) {
+      _timer!.cancel();
+    }
   }
 
   Future<void> _initAgoraEngine(String token) async {
@@ -312,6 +351,17 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
     await _engine.enableWebSdkInteroperability(true);
     await _engine.enableAudio();
     await _engine.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
+  }
+
+  Future<void> _cancelCall() async {
+    var response = await http.put(
+        Uri.parse('http://$ipAddress:5050/SouguuInfo/CancelCall'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $Token',
+        },
+        body: jsonEncode(const CancelCallWebsocketDto(reason: "").toJson()));
+    logger.d(response.body + response.statusCode.toString());
   }
 
   Future<void> _requestPermissionForAndroid() async {

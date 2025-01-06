@@ -5,6 +5,7 @@ import 'package:battari/view/instruction/first_time_view.dart';
 import 'package:battari/view/instruction/login_view.dart';
 import 'package:battari/view/instruction/nickname_view.dart';
 import 'package:battari/view/instruction/register_view.dart';
+import 'package:battari/view/instruction/setting_home_view.dart';
 import 'package:battari/view/splash.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -27,6 +28,7 @@ final router = GoRouter(navigatorKey: navigatorKey, routes: [
   GoRoute(path: '/login', builder: (context, state) => const LoginView()),
   GoRoute(path: '/home', builder: (context, state) => const HomeView()),
   GoRoute(path: '/call', builder: (context, state) => Call()),
+  GoRoute(path: '/settings_home', builder: (context, state) => SettingHomeView()),
   GoRoute(
       path: '/foreground_init',
       builder: (context, state) {
