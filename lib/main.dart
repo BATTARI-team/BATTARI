@@ -31,7 +31,8 @@ String Token = "";
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   FlutterForegroundTask.initCommunicationPort();
-  battariSetting = BattariSetting.fromJson(jsonDecode(await rootBundle.loadString('battari_setting.json')));
+  battariSetting = BattariSetting.fromJson(
+      jsonDecode(await rootBundle.loadString('battari_setting.json')));
   var shared = await SharedPreferences.getInstance();
   await SentryFlutter.init((options) {
     options.dsn = battariSetting.sentry.dsn;

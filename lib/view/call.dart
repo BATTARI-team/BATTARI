@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
+import 'package:battari/constant/app_color.dart';
+import 'package:battari/constant/app_size.dart';
 import 'package:battari/components/app_bar.dart';
 import 'package:battari/logger.dart';
 import 'package:battari/main.dart';
@@ -13,7 +15,10 @@ import 'package:battari/model/state/user_state.dart';
 import 'package:battari/service/notification_service.dart';
 import 'package:battari/service/souguu_service.dart';
 import 'package:battari/util/time_util.dart';
+import 'package:battari/view/battari_button.dart';
+import 'package:battari/view/usercard.dart';
 import 'package:battari/view_model/user_view_model.dart';
+import 'package:bordered_text/bordered_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -26,17 +31,20 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
   late RtcEngine _engine;
   Timer? _timer;
   Timer? _callTimer;
+  String aiteUserName = "";
 
   String userId = "aa";
 
   @override
   Widget build(BuildContext context, ref) {
+    final appSize = AppSize(context);
     // 0: ローディング
     // 1: 通話待ち
     // 2: 通話中
     // 3: 通話終了
-    var status = useState(0);
-    var isSpeacker = useState(true);
+
+    final status = useState(0);
+    final isSpeacker = useState<bool>(true);
     var countdown = useState(0);
     int differenceFromOfficialTime = 0;
     var callCountdown = useState(0);
@@ -50,7 +58,7 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
               callId: 1,
               aiteUserId: 1,
               souguuDateTime: DateTime.now(),
-              callStartTime: DateTime.now().add(const Duration(seconds: 10)),
+              callStartTime: DateTime.now().add(const Duration(seconds: 15)),
               souguuReason: "instagramでBATTARI",
               token: "006f1e"));
       userState = const UserState(id: 6, userId: "test", name: "test", token: "006f1e");
@@ -69,6 +77,12 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
     useEffect(() {
       Future.wait([
         (() async {
+          if (souguuInfo.restSouguuNotification == null) {
+            logger.w("restSouguuNotification is null");
+            aiteUserName = "";
+          } else {
+            aiteUserName = await ref.watch(userNameProviderByIdProvider(souguuInfo.restSouguuNotification!.aiteUserId));
+          }
           userId = await ref.watch(userIdProviderByIdProvider(souguuInfo.restSouguuNotification!.aiteUserId));
           debugPrint("agora init");
           await _initAgoraEngine(souguuInfo.restSouguuNotification?.token ?? "");
@@ -95,6 +109,18 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
       ]);
       // #TODO 通話終了時にエンジンを破棄する, timerを破棄
       return () {
+        if (countdown.value != null) {
+          countdown.dispose();
+        }
+        if (callCountdown.value != null) {
+          callCountdown.dispose();
+        }
+        if (status.value != null) {
+          status.dispose();
+        }
+        if (_callTimer != null) {
+          _callTimer!.cancel();
+        }
         //_engine.destroy();
         _timer?.cancel();
       };
@@ -134,12 +160,16 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
         Future.wait([task]);
       } else if (status.value == 3) {
         logger.i("通話終了");
+        WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+          context.pushReplacement("/");
+        });
         //#TODO ホーム画面に遷移
       }
       return null;
     }, [status.value]);
 
     Widget widget;
+
     switch (status.value) {
       case 0:
         widget = const CircularProgressIndicator();
@@ -148,10 +178,19 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
         widget = Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Center(
-              child: Text(
-                "通話まであと",
-                style: TextStyle(fontSize: 35),
+            Center(
+              child: Column(
+                children: [
+                  const Text('遭遇相手', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+                  userCard(username: aiteUserName, userid: userId, isHome: true, cardcolor: AppColor.brand.thirdly),
+                  const SizedBox(
+                    height: 150,
+                  ),
+                  const Text(
+                    "通話まであと",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                ],
               ),
             ),
             const SizedBox(
@@ -162,23 +201,40 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
               "${countdown.value}秒",
               style: const TextStyle(fontSize: 32),
             )),
-            TextButton(
-                onPressed: () async {
+            const SizedBox(height: 100),
+            BattariTextButton(
+                backgrandColor: Colors.grey,
+                icon: isSpeacker.value ? Icons.volume_off_rounded : Icons.volume_up_rounded,
+                onpressed: () {
+                  _toggleSpeacker();
+                },
+                textColor: Colors.white,
+                text: isSpeacker.value ? "スピーカーをオフにする" : " スピーカーをオンにする"),
+            BattariTextButton(
+                backgrandColor: AppColor.ui.buttonRed,
+                icon: Icons.cancel_outlined,
+                onpressed: () async {
                   status.value = 3;
                   _disposeTimer();
                   _cancelCall();
                 },
-                child: const Text("遭遇を拒否する")),
+                textColor: Colors.white,
+                text: "遭遇を拒否する")
           ],
         );
         break;
       case 2:
         widget = Column(
           children: [
+            const Text('遭遇相手', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+            userCard(username: aiteUserName, userid: userId, isHome: true, cardcolor: AppColor.brand.thirdly),
+            const SizedBox(
+              height: 130,
+            ),
             Center(
               child: Text(
-                "通話中",
-                style: TextStyle(fontSize: 40),
+                "遭遇中！",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
             ),
             const SizedBox(
@@ -187,7 +243,7 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
             const Center(
               child: Text(
                 "通話終了まであと",
-                style: TextStyle(fontSize: 35),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
             ),
             Center(
@@ -196,8 +252,19 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
                 style: const TextStyle(fontSize: 32),
               ),
             ),
-            TextButton(
-                onPressed: () {
+            const SizedBox(height: 87),
+            BattariTextButton(
+                backgrandColor: Colors.grey,
+                icon: isSpeacker.value ? Icons.volume_off_rounded : Icons.volume_up_rounded,
+                onpressed: () {
+                  _toggleSpeacker();
+                },
+                textColor: Colors.white,
+                text: isSpeacker.value ? "スピーカーをオフにする" : " スピーカーをオンにする"),
+            BattariTextButton(
+                backgrandColor: AppColor.ui.buttonRed,
+                icon: Icons.cancel_outlined,
+                onpressed: () {
                   status.value = 3;
                   try {
                     _engine.leaveChannel();
@@ -205,12 +272,8 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
                   } catch (e) {}
                   _callTimer?.cancel();
                 },
-                child: const Text("会話を終了する")),
-            TextButton(
-                onPressed: () {
-                  _toggleSpeacker();
-                },
-                child: Text("スピーカー"))
+                textColor: Colors.white,
+                text: "遭遇を終了する")
           ],
         );
         break;
@@ -220,7 +283,7 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
             const Center(
               child: Text(
                 "通話終了",
-                style: TextStyle(fontSize: 40),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
             ),
             ElevatedButton(
