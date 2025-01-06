@@ -7,6 +7,7 @@ import 'package:battari/main.dart';
 import 'package:battari/model/dto/rest_souguu_notification.dart';
 import 'package:battari/model/state/souguu_service_state.dart';
 import 'package:battari/model/state/user_state.dart';
+import 'package:battari/service/notification_service.dart';
 import 'package:battari/service/souguu_service.dart';
 import 'package:battari/util/time_util.dart';
 import 'package:battari/view_model/user_view_model.dart';
@@ -21,6 +22,8 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
   late RtcEngine _engine;
   Timer? _timer;
   Timer? _callTimer;
+
+  String userId = "aa";
 
   @override
   Widget build(BuildContext context, ref) {
@@ -40,7 +43,7 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
           restSouguuNotification: RestSouguuNotification(
               callEndTime: DateTime.now().add(const Duration(seconds: 20)),
               callId: 1,
-              aiteUserId: 6,
+              aiteUserId: 1,
               souguuDateTime: DateTime.now(),
               callStartTime: DateTime.now().add(const Duration(seconds: 10)),
               souguuReason: "instagramでBATTARI",
@@ -51,6 +54,7 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
     useEffect(() {
       Future.wait([
         (() async {
+          userId = await ref.watch(userIdProviderByIdProvider(souguuInfo.restSouguuNotification!.aiteUserId));
           debugPrint("agora init");
           await _initAgoraEngine(souguuInfo.restSouguuNotification?.token ?? "");
           debugPrint("token : ${souguuInfo.restSouguuNotification?.token}");
@@ -149,7 +153,7 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
       case 2:
         widget = Column(
           children: [
-            const Center(
+            Center(
               child: Text(
                 "通話中",
                 style: TextStyle(fontSize: 40),
