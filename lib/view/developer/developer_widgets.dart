@@ -13,6 +13,7 @@ import 'package:battari/repository/user_repository.dart';
 import 'package:battari/view/online_widget.dart';
 import 'package:battari/view/developer/permission_developper_page.dart';
 import 'package:battari/view/instruction/setting_home_view.dart';
+import 'package:battari/view_model/is_home_view_model.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:battari/view/developer/websocket_test.dart';
 import 'package:flutter/material.dart';
@@ -36,7 +37,13 @@ class DeveloperWidgets extends StatelessWidget {
           Text("ユーザーID: ${data?.id}"),
           Text(
             "トークン:${data?.token}",
-          )
+          ),
+          Text("home:${data?.houseLatitude},${data?.houseLongitude}"),
+          ref.watch(isHomeViewModelProvider).maybeWhen(
+              orElse: () => const CircularProgressIndicator(),
+              data: (isHome) {
+                return Text("isHome: $isHome");
+              }),
         ],
       );
     });
@@ -48,87 +55,81 @@ class DeveloperWidgets extends StatelessWidget {
         appBar: AppBar(
           title: const Text("開発用"),
         ),
-        body: Column(
-          children: [
-            FutureBuilder(
-              future: () async {
-                var info = await PackageInfo.fromPlatform();
-                return "${info.version}+${info.buildNumber}";
-              }(),
-              builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                if (snapshot.hasData) {
-                  return Text("version: ${snapshot.data}");
-                } else {
-                  return const CircularProgressIndicator();
-                }
-              },
-            ),
-            _developerElement("websockettest", const WebSocketTest(), context),
-            Consumer(builder: (context, ref, _) {
-              return TextButton(
-                  child: const Text("clear shared preferences"),
-                  onPressed: () => ref
-                      .read(userSharedPreferencesRepositoryProvider)
-                      .clear());
-            }),
-            // Consumer(
-            //   builder: (context, ref, child) {
-            //     ref.watch(souguuServiceProvider);
-            //     return Column(
-            //       mainAxisSize: MainAxisSize.min,
-            //       children: [
-            //         Text(ref.watch(souguuServiceInfoProvider).souguu.toString()),
-            //         TextButton(
-            //           child: const Text("websocketディスコネクト"),
-            //           onPressed: () => ref.read(souguuServiceProvider.notifier).disconnectWebsocket(),
-            //         )
-            //       ],
-            //     );
-            //   },
-            // ),
-            _developerElement("Background", const ExamplePage(), context),
-            TextButton(
-              child: const Text("button"),
-              onPressed: () {},
-            ),
-            _developerElement("appusage", AppUsageTime(), context),
-            _developerElement("call", Call(), context),
-            _developerElement("settings_home", SettingHomeView(), context),
-            TextButton(
-              child: const Text("""
-send cancel notif"""),
-              onPressed: () async {
-                var response = await http.put(
-                    Uri.parse('http://$ipAddress:5050/SouguuInfo/CancelCall'),
-                    headers: {
-                      'Content-Type': 'application/json',
-                      'Authorization': 'Bearer $Token',
-                    },
-                    body: jsonEncode(
-                        const CancelCallWebsocketDto(reason: "").toJson()));
-                logger.d(response.body + response.statusCode.toString());
-                return;
-              },
-            ),
-            _developerElement(
-                "permission", const PermissionDevelopperPage(), context)
-          ],
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              FutureBuilder(
+                future: () async {
+                  var info = await PackageInfo.fromPlatform();
+                  return "${info.version}+${info.buildNumber}";
+                }(),
+                builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                  if (snapshot.hasData) {
+                    return Text("version: ${snapshot.data}");
+                  } else {
+                    return const CircularProgressIndicator();
+                  }
+                },
+              ),
+              _developerElement("websockettest", const WebSocketTest(), context),
+              Consumer(builder: (context, ref, _) {
+                return TextButton(
+                    child: const Text("clear shared preferences"),
+                    onPressed: () => ref.read(userSharedPreferencesRepositoryProvider).clear());
+              }),
+              // Consumer(
+              //   builder: (context, ref, child) {
+              //     ref.watch(souguuServiceProvider);
+              //     return Column(
+              //       mainAxisSize: MainAxisSize.min,
+              //       children: [
+              //         Text(ref.watch(souguuServiceInfoProvider).souguu.toString()),
+              //         TextButton(
+              //           child: const Text("websocketディスコネクト"),
+              //           onPressed: () => ref.read(souguuServiceProvider.notifier).disconnectWebsocket(),
+              //         )
+              //       ],
+              //     );
+              //   },
+              // ),
+              _developerElement("Background", const ExamplePage(), context),
+              TextButton(
+                child: const Text("button"),
+                onPressed: () {},
+              ),
+              _developerElement("appusage", AppUsageTime(), context),
+              _developerElement("call", Call(), context),
+              _developerElement("settings_home", SettingHomeView(), context),
+              TextButton(
+                child: const Text("""
+          send cancel notif"""),
+                onPressed: () async {
+                  var response = await http.put(Uri.parse('http://$ipAddress:5050/SouguuInfo/CancelCall'),
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer $Token',
+                      },
+                      body: jsonEncode(const CancelCallWebsocketDto(reason: "").toJson()));
+                  logger.d(response.body + response.statusCode.toString());
+                  return;
+                },
+              ),
+              _developerElement("permission", const PermissionDevelopperPage(), context),
+              loginedUserWidget(),
+            ],
+          ),
         ));
   }
 
   Widget _developerElement(String title, Widget widget, BuildContext context) {
-    return TextButton(
-        onPressed: (() => Navigator.of(context)
-            .push(MaterialPageRoute(builder: (context) => widget))),
-        child: Text(title));
+    return TextButton(onPressed: (() => Navigator.of(context).push(MaterialPageRoute(builder: (context) => widget))), child: Text(title));
   }
 
   Future<void> _requestPermissions() async {
     // Android 13+, you need to allow notification permission to display foreground service notification.
     //
     // iOS: If you need notification, ask for permission.
-    final NotificationPermission notificationPermission =
-        await FlutterForegroundTask.checkNotificationPermission();
+    final NotificationPermission notificationPermission = await FlutterForegroundTask.checkNotificationPermission();
     if (notificationPermission != NotificationPermission.granted) {
       await FlutterForegroundTask.requestNotificationPermission();
     }
@@ -155,13 +156,12 @@ send cancel notif"""),
     }
   }
 
-  void _initService() {
+  static void initService() {
     FlutterForegroundTask.init(
       androidNotificationOptions: AndroidNotificationOptions(
         channelId: 'foreground_service',
         channelName: 'Foreground Service Notification',
-        channelDescription:
-            'This notification appears when the foreground service is running.',
+        channelDescription: 'This notification appears when the foreground service is running.',
         onlyAlertOnce: true,
       ),
       iosNotificationOptions: const IOSNotificationOptions(

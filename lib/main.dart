@@ -76,6 +76,13 @@ class Battari extends ConsumerWidget with WidgetsBindingObserver {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         dividerColor: Colors.transparent,
         useMaterial3: true,
+        appBarTheme: const AppBarTheme(
+          surfaceTintColor: Colors.white,
+          shadowColor: Colors.black,
+          elevation: 0,
+          centerTitle: true,
+          iconTheme: IconThemeData(color: Colors.black),
+        ),
       ),
       routerConfig: router,
     );
