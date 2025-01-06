@@ -1,3 +1,4 @@
+import 'package:battari/components/app_bar.dart';
 import 'package:battari/constant/app_color.dart';
 import 'package:battari/constant/app_size.dart';
 import 'package:battari/logger.dart';
@@ -10,6 +11,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+class MyAppBar extends PreferredSize {
+  const MyAppBar({super.key, required super.preferredSize, required super.child});
+}
 
 class HomeView extends ConsumerWidget {
   const HomeView({super.key});
@@ -28,9 +33,7 @@ class HomeView extends ConsumerWidget {
           orElse: () => false,
         );
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(onPressed: () {}, icon: Icon(Icons.menu)),
-      ),
+      appBar: BattariAppBar(),
       floatingActionButton: FloatingActionButton(
         onPressed: (() {
           context.push('/developer');
