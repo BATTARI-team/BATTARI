@@ -36,6 +36,7 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
     // 2: 通話中
     // 3: 通話終了
     var status = useState(0);
+    var isSpeacker = useState(true);
     var countdown = useState(0);
     int differenceFromOfficialTime = 0;
     var callCountdown = useState(0);
@@ -53,6 +54,16 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
               souguuReason: "instagramでBATTARI",
               token: "006f1e"));
       userState = const UserState(id: 6, userId: "test", name: "test", token: "006f1e");
+    }
+
+    void _toggleSpeacker() {
+      if (isSpeacker.value) {
+        isSpeacker.value = false;
+        _engine.setEnableSpeakerphone(false);
+      } else {
+        isSpeacker.value = true;
+        _engine.setEnableSpeakerphone(true);
+      }
     }
 
     useEffect(() {
@@ -195,6 +206,11 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
                   _callTimer?.cancel();
                 },
                 child: const Text("会話を終了する")),
+            TextButton(
+                onPressed: () {
+                  _toggleSpeacker();
+                },
+                child: Text("スピーカー"))
           ],
         );
         break;
