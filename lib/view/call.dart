@@ -109,13 +109,18 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
       ]);
       // #TODO 通話終了時にエンジンを破棄する, timerを破棄
       return () {
-        countdown.dispose();
-        callCountdown.dispose();
+        if (countdown.value != null) {
+          countdown.dispose();
+        }
+        if (callCountdown.value != null) {
+          callCountdown.dispose();
+        }
+        if (status.value != null) {
+          status.dispose();
+        }
         if (_callTimer != null) {
           _callTimer!.cancel();
         }
-        status.dispose();
-
         //_engine.destroy();
         _timer?.cancel();
       };
