@@ -14,17 +14,17 @@ class BattariDrawer extends StatelessWidget {
             height: 40,
           ),
           ListTile(
-            title: const Text('Item 1'),
+            title: const Text('🏠　自宅の設定をする'),
             onTap: () {
-              context.pop();
+              context.push('/settings_home');
             },
           ),
+          ListTile(title: const Text("📄　プライバシーポリシー"), onTap: () {}),
           ListTile(
-            title: const Text('Item 2'),
-            onTap: () {
-              context.pop();
-            },
-          ),
+              title: const Text("🛠️　開発者用設定"),
+              onTap: () {
+                context.push('/developer');
+              })
         ],
       ),
     ));
