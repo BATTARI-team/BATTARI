@@ -1,4 +1,5 @@
 import 'package:battari/components/app_bar.dart';
+import 'package:battari/components/drawer.dart';
 import 'package:battari/constant/app_color.dart';
 import 'package:battari/constant/app_size.dart';
 import 'package:battari/logger.dart';
@@ -33,6 +34,7 @@ class HomeView extends ConsumerWidget {
           orElse: () => false,
         );
     return Scaffold(
+      drawer: BattariDrawer(),
       appBar: BattariAppBar(),
       floatingActionButton: FloatingActionButton(
         onPressed: (() {

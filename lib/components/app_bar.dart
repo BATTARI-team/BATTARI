@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 
 class BattariAppBar extends StatelessWidget implements PreferredSizeWidget {
   late final AppBar appBar;
+  BuildContext? context;
 
   BattariAppBar({super.key})
       : appBar = AppBar(
           elevation: 10,
           toolbarHeight: 70,
-          leading: IconButton(icon: const Icon(Icons.menu), onPressed: () {}),
+          leading: Builder(builder: (context) {
+            return IconButton(icon: const Icon(Icons.menu), onPressed: () => _onPressed(context));
+          }),
           title: Image.asset("assets/images/titleLogo.png", height: 50),
           shape: const Border(
             bottom: BorderSide(
@@ -16,6 +19,11 @@ class BattariAppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
           ),
         );
+
+  static void _onPressed(BuildContext? context) {
+    if (context == null) return;
+    Scaffold.of(context).openDrawer();
+  }
 
   @override
   Widget build(BuildContext context) {
