@@ -22,19 +22,12 @@ class HomeView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, ref) {
-    // FlutterForegroundTask.addTaskDataCallback((data) {
-    //   logger.d("foreground task data: $data");
-    //   if (context.mounted) {
-    //     ref.read(souguuServiceProvider.notifier).dealNotification(data.toString(), true);
-    //   }
-    //   // ref.read(souguuServiceProvider.notifier).disconnectWebsocket();
-    // });
     var isHome = ref.watch(isHomeViewModelProvider).maybeWhen(
           data: (data) => data,
           orElse: () => false,
         );
     return Scaffold(
-      drawer: BattariDrawer(),
+      drawer: const BattariDrawer(),
       appBar: BattariAppBar(),
       floatingActionButton: FloatingActionButton(
         onPressed: (() {
