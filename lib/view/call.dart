@@ -8,6 +8,7 @@ import 'package:battari/main.dart';
 import 'package:battari/model/dto/rest_souguu_notification.dart';
 import 'package:battari/model/state/souguu_service_state.dart';
 import 'package:battari/model/state/user_state.dart';
+import 'package:battari/service/notification_service.dart';
 import 'package:battari/service/souguu_service.dart';
 import 'package:battari/util/time_util.dart';
 import 'package:battari/view/usercard.dart';
@@ -23,6 +24,7 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
   late RtcEngine _engine;
   Timer? _timer;
   Timer? _callTimer;
+  String aiteUserName = "";
 
   @override
   Widget build(BuildContext context, ref) {
@@ -43,7 +45,7 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
           restSouguuNotification: RestSouguuNotification(
               callEndTime: DateTime.now().add(const Duration(seconds: 20)),
               callId: 1,
-              aiteUserId: 6,
+              aiteUserId: 1,
               souguuDateTime: DateTime.now(),
               callStartTime: DateTime.now().add(const Duration(seconds: 10)),
               souguuReason: "instagramでBATTARI",
@@ -55,6 +57,13 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
     useEffect(() {
       Future.wait([
         (() async {
+          if (souguuInfo.restSouguuNotification == null) {
+            logger.w("restSouguuNotification is null");
+            aiteUserName = "";
+          } else {
+            aiteUserName = await ref.watch(userNameProviderByIdProvider(
+                souguuInfo.restSouguuNotification!.aiteUserId));
+          }
           debugPrint("agora init");
           await _initAgoraEngine(
               souguuInfo.restSouguuNotification?.token ?? "");
@@ -89,6 +98,13 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
       ]);
       // #TODO 通話終了時にエンジンを破棄する, timerを破棄
       return () {
+        countdown.dispose();
+        callCountdown.dispose();
+        if (_callTimer != null) {
+          _callTimer!.cancel();
+        }
+        status.dispose();
+
         //_engine.destroy();
         _timer?.cancel();
       };
@@ -153,7 +169,7 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
               child: Column(
                 children: [
                   userCard(
-                      username: 'hogehoge',
+                      username: aiteUserName,
                       userid: 'battari',
                       isHome: true,
                       cardcolor: AppColor.brand.thirdly),

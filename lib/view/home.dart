@@ -24,11 +24,6 @@ class HomeView extends ConsumerWidget {
     //   // ref.read(souguuServiceProvider.notifier).disconnectWebsocket();
     // });
     return Scaffold(
-      appBar: AppBar(
-        title: Text('aa'),
-        centerTitle: true,
-        backgroundColor: AppColor.brand.secondary,
-      ),
       floatingActionButton: FloatingActionButton(
         onPressed: (() {
           context.push('/developer');
