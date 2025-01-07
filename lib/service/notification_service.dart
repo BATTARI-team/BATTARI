@@ -4,6 +4,7 @@ import 'package:battari/logger.dart';
 import 'package:battari/main.dart';
 import 'package:battari/model/dto/websocket/cancel_call_websocket_dto.dart';
 import 'package:battari/view/splash.dart';
+import 'package:battari/view_model/user_by_id_view_model.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
@@ -94,22 +95,4 @@ class NotificationService {
           android: AndroidNotificationDetails('cancel_call', 'cancel_call', importance: Importance.max, priority: Priority.high),
         ));
   }
-}
-
-@riverpod
-Raw<Future<String>> userNameProviderById(ref, int id) async {
-  var result = await http.put(Uri.parse('http://$ipAddress:5050/User/GetUser?userIndex=$id'), headers: {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer $Token',
-  });
-  return jsonDecode(result.body)['name'];
-}
-
-@riverpod
-Raw<Future<String>> userIdProviderById(ref, int id) async {
-  var result = await http.put(Uri.parse('http://$ipAddress:5050/User/GetUser?userIndex=$id'), headers: {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer $Token',
-  });
-  return jsonDecode(result.body)['userId'];
 }
