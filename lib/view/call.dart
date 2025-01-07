@@ -17,6 +17,7 @@ import 'package:battari/service/souguu_service.dart';
 import 'package:battari/util/time_util.dart';
 import 'package:battari/view/battari_button.dart';
 import 'package:battari/view/usercard.dart';
+import 'package:battari/view_model/user_by_id_view_model.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:bordered_text/bordered_text.dart';
 import 'package:flutter/material.dart';
@@ -57,7 +58,7 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
           restSouguuNotification: RestSouguuNotification(
               callEndTime: DateTime.now().add(const Duration(seconds: 20)),
               callId: 1,
-              aiteUserId: 1,
+              aiteUserId: 3,
               souguuDateTime: DateTime.now(),
               callStartTime: DateTime.now().add(const Duration(seconds: 15)),
               souguuReason: "instagramでBATTARI",
