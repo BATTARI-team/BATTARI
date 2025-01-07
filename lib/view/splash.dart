@@ -7,6 +7,7 @@ import 'package:battari/main.dart';
 import 'package:battari/repository/user_repository.dart';
 import 'package:battari/model/state/user_state.dart';
 import 'package:battari/service/foreground_task_service.dart';
+import 'package:battari/service/permission_service.dart';
 import 'package:battari/service/souguu_service.dart';
 import 'package:battari/view/developer/developer_widgets.dart';
 import 'package:battari/view_model/user_view_model.dart';
@@ -38,6 +39,7 @@ class Splash extends HookConsumerWidget {
 
   Future<void> init(BuildContext context, WidgetRef ref) async {
     var transaction = Sentry.startTransaction("Splash.init", "Splash.init");
+    await ref.read(permissionServiceProvider.notifier).init();
     var sharedPreferences = await SharedPreferences.getInstance();
     // この関数が終わらないと遷移しないため
     ProviderScope.containerOf(context).updateOverrides([

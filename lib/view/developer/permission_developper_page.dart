@@ -8,11 +8,13 @@ class PermissionDevelopperPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(body: Consumer(builder: (context, ref, _) {
-      return TextButton(
-          onPressed: () async {
-            await ref.read(permissionServiceProvider.notifier).init();
-          },
-          child: const Text("Get permission"));
+      return Center(
+        child: TextButton(
+            onPressed: () async {
+              await ref.read(permissionServiceProvider.notifier).init();
+            },
+            child: const Text("Get permission")),
+      );
     }));
   }
 }
