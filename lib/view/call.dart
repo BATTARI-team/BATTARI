@@ -33,7 +33,8 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
   Timer? _callTimer;
   String aiteUserName = "";
 
-  String userId = "aa";
+  String userId = "";
+  String? redirecToWhenCallEnd = "/";
 
   @override
   Widget build(BuildContext context, ref) {
@@ -137,6 +138,8 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
           callCountdown.value = souguuInfo.restSouguuNotification!.callEndTime.difference(now).inSeconds;
           _callTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
             if (callCountdown.value <= 0 || status.value == 3 || souguuInfo.restSouguuNotification!.callEndTime.compareTo(now) == -1) {
+              redirecToWhenCallEnd = null;
+
               status.value = 3;
 
               _engine.leaveChannel();
@@ -161,9 +164,10 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
       } else if (status.value == 3) {
         logger.i("通話終了");
         WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-          context.pushReplacement("/");
+          if (redirecToWhenCallEnd != null) {
+            context.pushReplacement(redirecToWhenCallEnd!);
+          }
         });
-        //#TODO ホーム画面に遷移
       }
       return null;
     }, [status.value]);
@@ -265,6 +269,7 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
                 backgrandColor: AppColor.ui.buttonRed,
                 icon: Icons.cancel_outlined,
                 onpressed: () {
+                  redirecToWhenCallEnd = null;
                   status.value = 3;
                   try {
                     _engine.leaveChannel();
@@ -277,6 +282,7 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
           ],
         );
         break;
+      // 結果画面
       default:
         widget = Column(
           children: [
