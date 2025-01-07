@@ -16,7 +16,7 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 
 part 'user_view_model.g.dart';
 
-const endPoint = "http://takutk.com:5050";
+const endPoint = "http://takutk.com:6060";
 
 @Riverpod(keepAlive: true)
 class UserViewModel extends _$UserViewModel {
