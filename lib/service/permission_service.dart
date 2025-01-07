@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:battari/logger.dart';
 import 'package:battari/model/state/permission_service_state.dart';
 import 'package:battari/service/foreground_task_service.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
@@ -18,6 +19,9 @@ class PermissionService extends _$PermissionService {
   }
 
   Future<void> init() async {
+    logger.d('permission init');
+    await requestCallPermission();
+
     state = state.copyWith(
       isFloatingPermitted: await requestBackgroundServicePermission(),
       isNotificationPermitted: await requestNotificationPermissions(),
