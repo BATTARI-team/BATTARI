@@ -22,7 +22,7 @@ void notificationTapBackground(NotificationResponse notificationResponse) async 
   if (notificationResponse.actionId == "cancel_call") {
     var sharedPref = await SharedPreferences.getInstance();
     var token = sharedPref.getString("token");
-    var response = await http.put(Uri.parse('http://$ipAddress:5050/SouguuInfo/CancelCall'),
+    var response = await http.put(Uri.parse('$endPoint/SouguuInfo/CancelCall'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',

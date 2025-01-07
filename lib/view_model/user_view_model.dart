@@ -16,7 +16,7 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 
 part 'user_view_model.g.dart';
 
-const ipAddress = "takutk.com";
+const endPoint = "http://takutk.com:5050";
 
 @Riverpod(keepAlive: true)
 class UserViewModel extends _$UserViewModel {
@@ -75,7 +75,7 @@ class UserViewModel extends _$UserViewModel {
       String name = "";
       int id = 0;
       String userId = "";
-      await http.put(Uri.parse('http://$ipAddress:5050/User/GetUser?userIndex=$userIndex'), headers: <String, String>{
+      await http.put(Uri.parse('http://$endPoint/User/GetUser?userIndex=$userIndex'), headers: <String, String>{
         'Authorization': 'Bearer $token',
       }).then((value) {
         var user = jsonDecode(value.body);
@@ -106,7 +106,7 @@ class UserViewModel extends _$UserViewModel {
     debugPrint("userFormState.Password: ${userFormState.Password}");
     try {
       await http
-          .post(Uri.parse('http://$ipAddress:5050/User/Login'),
+          .post(Uri.parse('http://$endPoint/User/Login'),
               headers: <String, String>{
                 'Content-Type': 'application/json; charset=UTF-8',
               },
@@ -129,7 +129,7 @@ class UserViewModel extends _$UserViewModel {
     debugPrint("token: $token");
 
     try {
-      await http.put(Uri.parse('http://$ipAddress:5050/User/GetUserByUserId?userId=${userFormState.BattariId}'), headers: <String, String>{
+      await http.put(Uri.parse('http://$endPoint/User/GetUserByUserId?userId=${userFormState.BattariId}'), headers: <String, String>{
         'Authorization': 'Bearer $token',
       }).then((value) {
         var user = jsonDecode(value.body);
@@ -184,9 +184,9 @@ class UserViewModel extends _$UserViewModel {
         }();
 
     try {
-      debugPrint('http://$ipAddress:5050/User/RefreshToken');
+      debugPrint('http://$endPoint/User/RefreshToken');
       await http
-          .post(Uri.parse('http://$ipAddress:5050/User/RefreshToken'),
+          .post(Uri.parse('http://$endPoint/User/RefreshToken'),
               headers: <String, String>{
                 'Content-Type': 'application/json; charset=UTF-8',
               },

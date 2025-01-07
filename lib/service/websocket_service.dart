@@ -137,7 +137,7 @@ class WebsocketService {
         var shared = _ref.read(sharedPreferencesProvider);
         try {
           await http
-              .post(Uri.parse('http://$ipAddress:5050/User/RefreshToken'),
+              .post(Uri.parse('http://$endPoint/User/RefreshToken'),
                   headers: <String, String>{
                     'Content-Type': 'application/json; charset=UTF-8',
                   },
@@ -151,7 +151,7 @@ class WebsocketService {
               _ref.read(userViewModelProvider.notifier).setToken(token!);
             } else {
               await http
-                  .post(Uri.parse('http://$ipAddress:5050/User/RefreshToken'),
+                  .post(Uri.parse('http://$endPoint/User/RefreshToken'),
                       headers: <String, String>{
                         'Content-Type': 'application/json; charset=UTF-8',
                       },
@@ -179,7 +179,7 @@ class WebsocketService {
     logger.i("websocketの接続を開始します");
 
     try {
-      channel = IOWebSocketChannel.connect(Uri.parse('ws://$ipAddress:5050/ws'), headers: {
+      channel = IOWebSocketChannel.connect(Uri.parse('ws://$endPoint/ws'), headers: {
         'Authorization':
             // user tokenを入れる
             //'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJCQVRUQVJJLXRlYW0iLCJuYW1laWQiOiJ0YWt1dG8xMTI3IiwibmFtZSI6InRha3V0bzExMjciLCJqdGkiOiJlZTFhMGEzMi1lMTE4LTQyOTMtOTIzNC05MTQ5ODI2NzcwN2MiLCJ1bmlxdWVfbmFtZSI6IjIiLCJleHAiOjE3MzAzMjM5MjR9.D3YpMLMsPd5n4_yjDbACkvuhO-qneSW6fntpvzegGPw'

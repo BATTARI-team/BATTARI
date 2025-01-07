@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 
 class CallUtil {
   static Future<void> cancelCall([String reason = ""]) async {
-    var response = await http.put(Uri.parse('http://$ipAddress:5050/SouguuInfo/CancelCall'),
+    var response = await http.put(Uri.parse('http://$endPoint/SouguuInfo/CancelCall'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $Token',

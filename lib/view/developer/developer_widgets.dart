@@ -71,6 +71,7 @@ class DeveloperWidgets extends StatelessWidget {
                   }
                 },
               ),
+              const Text("endpoint: http://$endPoint"),
               _developerElement("websockettest", const WebSocketTest(), context),
               Consumer(builder: (context, ref, _) {
                 return TextButton(
@@ -104,7 +105,7 @@ class DeveloperWidgets extends StatelessWidget {
                 child: const Text("""
           send cancel notif"""),
                 onPressed: () async {
-                  var response = await http.put(Uri.parse('http://$ipAddress:5050/SouguuInfo/CancelCall'),
+                  var response = await http.put(Uri.parse('http://$endPoint/SouguuInfo/CancelCall'),
                       headers: {
                         'Content-Type': 'application/json',
                         'Authorization': 'Bearer $Token',
