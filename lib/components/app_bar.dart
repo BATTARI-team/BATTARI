@@ -7,6 +7,18 @@ class BattariAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   BattariAppBar({super.key, this.needDrawer = true})
       : appBar = AppBar(
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 10),
+              child: IconButton(
+                onPressed: () {},
+                icon: const Icon(
+                  Icons.person_add_outlined,
+                  size: 30,
+                ),
+              ),
+            )
+          ],
           elevation: 10,
           toolbarHeight: 70,
           leading: Builder(builder: (context) {
