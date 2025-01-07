@@ -21,6 +21,8 @@ class PermissionService extends _$PermissionService {
   Future<void> init() async {
     logger.d('permission init');
     await requestCallPermission();
+    await requestUnrestrictedBattery();
+    await FlutterForegroundTask.requestIgnoreBatteryOptimization();
 
     state = state.copyWith(
       isFloatingPermitted: await requestBackgroundServicePermission(),
@@ -29,6 +31,12 @@ class PermissionService extends _$PermissionService {
       isLaunchService: await requestLaunchForegroundService(),
       isLocationPermitted: await requestLocationPermission(),
     );
+  }
+
+  Future<void> requestUnrestrictedBattery() async {
+    if (Platform.isAndroid) {
+      await Permission.ignoreBatteryOptimizations.request();
+    }
   }
 
   Future<bool> requestNotificationPermissions() async {

@@ -192,7 +192,7 @@ class SouguuService extends _$SouguuService {
     var shared = await SharedPreferences.getInstance();
     try {
       await http
-          .post(Uri.parse('http://$ipAddress:5050/User/RefreshToken'),
+          .post(Uri.parse('http://$ipAddress:$port/User/RefreshToken'),
               headers: <String, String>{
                 'Content-Type': 'application/json; charset=UTF-8',
               },
@@ -411,7 +411,7 @@ class SouguuService extends _$SouguuService {
     websocketProviderSubscription?.close();
     await Sentry.captureMessage("websocket disconnected", level: SentryLevel.debug);
 
-    await http.get(Uri.parse('http://$ipAddress:5050/SouguuInfo/ClearSouguuIncredient'), headers: <String, String>{
+    await http.get(Uri.parse('http://$ipAddress:$port/SouguuInfo/ClearSouguuIncredient'), headers: <String, String>{
       'Authorization': 'Bearer $Token',
     });
     websocketProviderSubscription = null;
@@ -434,7 +434,7 @@ class SouguuServiceInfo extends _$SouguuServiceInfo {
     var transaction = Sentry.startTransaction("Splash.init", "SouguuServiceInfo.init");
     logger.d("get souguu info");
     try {
-      var result = await http.get(Uri.parse('http://$ipAddress:5050/SouguuInfo/GetSouguuInfo'), headers: <String, String>{
+      var result = await http.get(Uri.parse('http://$ipAddress:$port/SouguuInfo/GetSouguuInfo'), headers: <String, String>{
         'Authorization': 'Bearer $Token',
       });
       transaction.startChild("parse result");
