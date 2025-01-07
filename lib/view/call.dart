@@ -347,7 +347,7 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
   }
 
   Future<void> _cancelCall() async {
-    var response = await http.put(Uri.parse('http://$ipAddress:5050/SouguuInfo/CancelCall'),
+    var response = await http.put(Uri.parse('http://$ipAddress:$port/SouguuInfo/CancelCall'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $Token',

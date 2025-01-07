@@ -10,7 +10,7 @@ part 'user_by_id_view_model.g.dart';
 
 @riverpod
 Raw<Future<String>> userProviderById(ref, int id) async {
-  var result = await http.put(Uri.parse('http://$ipAddress:5050/User/GetUser?userIndex=$id'), headers: {
+  var result = await http.put(Uri.parse('http://$ipAddress:$port/User/GetUser?userIndex=$id'), headers: {
     'Content-Type': 'application/json',
     'Authorization': 'Bearer $Token',
   });
