@@ -1,6 +1,7 @@
 import 'package:battari/view/instruction/register_view.dart';
 import 'package:battari/view_model/user_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -38,6 +39,7 @@ class _LoginViewState extends State<LoginView> {
                           });
                           var isSuccess = await ref.read(userViewModelProvider.notifier).login();
                           if (isSuccess.isEmpty) {
+                            FlutterForegroundTask.restartService();
                             context.push('/home');
                           } else {
                             setState(() {
