@@ -285,20 +285,29 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
         break;
       // 結果画面
       default:
-        widget = Column(
-          children: [
-            const Center(
-              child: Text(
+        widget = Center(
+          child: Column(
+            children: [
+              const Text('遭遇相手', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+              userCard(username: aiteUserName, userid: userId, isHome: true, cardcolor: AppColor.brand.thirdly),
+              const SizedBox(
+                height: 150,
+              ),
+              const Text(
                 "通話終了",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
-            ),
-            ElevatedButton(
-                onPressed: () {
-                  context.go("/");
-                },
-                child: const Text("ホームに戻る"))
-          ],
+              const SizedBox(
+                height: 150,
+              ),
+              BattariTextButton(
+                  backgrandColor: Colors.grey,
+                  icon: Icons.home_outlined,
+                  onpressed: () => context.go('/'),
+                  textColor: Colors.white,
+                  text: "ホームに戻る")
+            ],
+          ),
         );
     }
 
