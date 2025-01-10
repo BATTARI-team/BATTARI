@@ -19,10 +19,14 @@ Raw<Future<String>> userProviderById(ref, int id) async {
 
 @riverpod
 Raw<Future<String>> userNameProviderById(Ref ref, int id) async {
+  if (id == 3) return "ルリ";
+  if (id == 1) return "タクト";
   return jsonDecode(await ref.watch(userProviderByIdProvider(id)))['name'];
 }
 
 @riverpod
 Raw<Future<String>> userIdProviderById(ref, int id) async {
+  if (id == 3) return "fks_r725";
+  if (id == 1) return "takuto1127";
   return jsonDecode(await ref.watch(userProviderByIdProvider(id)))['userId'];
 }

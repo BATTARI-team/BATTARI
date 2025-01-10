@@ -55,18 +55,18 @@ class userCard extends StatelessWidget {
                     border: Border.all(color: AppColor.ui.white),
                     color: AppColor.ui.a,
                     shape: BoxShape.circle,
-                    image: const DecorationImage(
+                    image: DecorationImage(
                       fit: BoxFit.fill,
-                      image: AssetImage('assets/images/defaultIcon.png'),
+                      image: (userid == "takuto1127")
+                          ? const AssetImage('assets/images/secondIcon.png')
+                          : const AssetImage('assets/images/defaultIcon.png'),
                     ),
                   ),
                 ),
                 Positioned(
                   top: 67,
                   left: 60,
-                  child: isHome
-                      ? onlineWidget(width: 22, height: 22)
-                      : offlineWidget(width: 22, height: 22),
+                  child: isHome ? onlineWidget(width: 22, height: 22) : offlineWidget(width: 22, height: 22),
                 ),
               ],
             ),

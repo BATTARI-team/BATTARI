@@ -49,14 +49,14 @@ class SouguuService extends _$SouguuService {
   Timer? _souguuIncredientSender;
   Timer? _isHomeGetterTimer;
 
-  final souguuMaterialDuration = const Duration(minutes: 1);
-  final appUsageDuration = const Duration(seconds: 40);
+  final souguuMaterialDuration = const Duration(seconds: 3);
+  final appUsageDuration = const Duration(seconds: 1);
 
   int? userId;
 
   StreamSubscription<ScreenStateEvent>? _screenStateEventSubscription;
 
-  bool isHome = false;
+  bool isHome = true;
   bool isLock = false;
   Function(CancelCallWebsocketDto dto)? cancelCallListener;
 
@@ -228,6 +228,7 @@ class SouguuService extends _$SouguuService {
   final int distanceHome = 20;
   Future<bool> _isHome(Position position, UserState user) async {
     if (isLock) return false;
+    return true;
     var user = await ref.read(userSharedPreferencesRepositoryProvider).get();
     var _isHome = Geolocator.distanceBetween(
             position.latitude, position.longitude, user != null ? user.houseLatitude : 0, user != null ? user.houseLongitude : 0) <
@@ -245,7 +246,7 @@ class SouguuService extends _$SouguuService {
 
   bool isConnectOk() {
     logger.d("isConnectOk: ${isHome && !isLock}, isHome: $isHome, isLock: $isLock");
-    return (isHome && !isLock);
+    return !isLock;
   }
 
   @override
@@ -322,6 +323,8 @@ class SouguuService extends _$SouguuService {
   }
 
   void _isHomeGetter() async {
+    if (isHome == true) return;
+    isHome = true;
     var user = ref.read(userViewModelProvider);
     if (user == null) {
       logger.d('user is null');

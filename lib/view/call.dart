@@ -136,7 +136,7 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
         debugPrint(souguuInfo.restSouguuNotification!.token);
         var task = () async {
           var now = await TimeUtil.getOfficialTime();
-          callCountdown.value = souguuInfo.restSouguuNotification!.callEndTime.difference(now).inSeconds;
+          callCountdown.value = souguuInfo.restSouguuNotification!.callEndTime.difference(now).inSeconds - 45;
           _callTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
             if (callCountdown.value <= 0 || status.value == 3 || souguuInfo.restSouguuNotification!.callEndTime.compareTo(now) == -1) {
               redirecToWhenCallEnd = null;
@@ -234,7 +234,7 @@ class Call extends HookConsumerWidget with WidgetsBindingObserver {
             const Text('遭遇相手', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
             userCard(username: aiteUserName, userid: userId, isHome: true, cardcolor: AppColor.brand.thirdly),
             const SizedBox(
-              height: 130,
+              height: 80,
             ),
             Center(
               child: Text(
