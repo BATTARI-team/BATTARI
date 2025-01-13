@@ -16,7 +16,7 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 
 part 'user_view_model.g.dart';
 
-const ipAddress = "192.168.1.33";
+const ipAddress = "takutk.com";
 const port = "5050";
 
 @Riverpod(keepAlive: true)
