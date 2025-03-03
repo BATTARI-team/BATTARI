@@ -72,7 +72,7 @@ class MyTaskHandler extends TaskHandler {
     String token = "";
     try {
       await http
-          .post(Uri.parse('http://$ipAddress:$port/User/RefreshToken'),
+          .post(Uri.parse('https://$ipAddress/User/RefreshToken'),
               headers: <String, String>{
                 'Content-Type': 'application/json; charset=UTF-8',
               },
