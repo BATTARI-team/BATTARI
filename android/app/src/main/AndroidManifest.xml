@@ -50,7 +50,7 @@
             <!-- Add android:stopWithTask option only when necessary. -->
             <service 
                     android:name="com.pravera.flutter_foreground_task.service.ForegroundService"
-                    android:foregroundServiceType="dataSync|remoteMessaging" 
+                    android:foregroundServiceType="dataSync|remoteMessaging|mediaProjection|microphone|phoneCall" 
                     android:exported="false" />
     </application>
 			<uses-permission android:name="android.permission.INTERNET" />
@@ -70,6 +70,13 @@
 
 			<!-- foregroundServiceType: remoteMessaging -->
 			<uses-permission android:name="android.permission.FOREGROUND_SERVICE_REMOTE_MESSAGING" />
+            <!-- foregroundServiceType: mediaProjection-->
+            <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
+            <!-- foregroundServiceType: microphone-->
+            <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+            <!-- foregroundServiceType: phoneCall-->
+            <uses-permission android:name="android.permission.FOREGROUND_SERVICE_PHONE_CALL" />
+
             <uses-permission android:name="android.permission.INTERNET"/>
             <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
             <uses-permission android:name="android.permission.RECORD_AUDIO" />

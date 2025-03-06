@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:agora_rtc_engine/agora_rtc_engine.dart';
+import 'package:audio_session/audio_session.dart';
 import 'package:battari/logger.dart';
 import 'package:battari/main.dart';
 import 'package:battari/model/dto/app_service_communication/souguu_notification_between_app_and_service_dto.dart';
@@ -107,32 +109,29 @@ class SouguuService extends _$SouguuService {
             }
 
             void onAppOpened(Timer timer) async {
-              if (_untilCallStartTimer == null) {
-                logger.w("untilCallStartTimer is null");
-              }
-              timer.cancel();
-              bool _isForeground = await FlutterForegroundTask.isAppOnForeground;
-              await Future.delayed(const Duration(milliseconds: 200), () {
-                var serviceNotificationDto = SouguuNotificationBetweenAppAndServiceDto(websocketDto: dto.toJson(), token: Token);
-                FlutterForegroundTask.sendDataToMain(jsonEncode(serviceNotificationDto));
-                logger.i(serviceNotificationDto.toJson());
-              });
-              await Future.delayed(const Duration(milliseconds: 500), () {
-                var serviceNotificationDto = SouguuNotificationBetweenAppAndServiceDto(websocketDto: dto.toJson(), token: Token);
-                FlutterForegroundTask.sendDataToMain(jsonEncode(serviceNotificationDto));
-                logger.i(serviceNotificationDto.toJson());
-              });
-              Future.delayed(const Duration(milliseconds: 1500), () {
-                var serviceNotificationDto = SouguuNotificationBetweenAppAndServiceDto(websocketDto: dto.toJson(), token: Token);
-                FlutterForegroundTask.sendDataToMain(jsonEncode(serviceNotificationDto));
-                logger.i(serviceNotificationDto.toJson());
-              });
+              //if (_untilCallStartTimer == null) {
+              //  logger.w("untilCallStartTimer is null");
+              //}
+              //timer.cancel();
+              //bool _isForeground = await FlutterForegroundTask.isAppOnForeground;
+              //await Future.delayed(const Duration(milliseconds: 200), () {
+              //  var serviceNotificationDto = SouguuNotificationBetweenAppAndServiceDto(websocketDto: dto.toJson(), token: Token);
+              //  FlutterForegroundTask.sendDataToMain(jsonEncode(serviceNotificationDto));
+              //  logger.i(serviceNotificationDto.toJson());
+              //});
+              //await Future.delayed(const Duration(milliseconds: 500), () {
+              //  var serviceNotificationDto = SouguuNotificationBetweenAppAndServiceDto(websocketDto: dto.toJson(), token: Token);
+              //  FlutterForegroundTask.sendDataToMain(jsonEncode(serviceNotificationDto));
+              //  logger.i(serviceNotificationDto.toJson());
+              //});
+              //Future.delayed(const Duration(milliseconds: 1500), () {
+              //  var serviceNotificationDto = SouguuNotificationBetweenAppAndServiceDto(websocketDto: dto.toJson(), token: Token);
+              //  FlutterForegroundTask.sendDataToMain(jsonEncode(serviceNotificationDto));
+              //  logger.i(serviceNotificationDto.toJson());
+              //});
             }
 
-            void onTimerDone(Timer timer) {
-              FlutterForegroundTask.launchApp("/foreground_init");
-              onAppOpened(timer);
-            }
+            void onTimerDone(Timer timer) {}
 
             cancelCallListener = ((dto) {
               _untilCallStartTimer?.cancel();
@@ -141,39 +140,22 @@ class SouguuService extends _$SouguuService {
               ref.read(notificationServiceProviderProvider).showCallCancel(dto);
               //#TODO もしフォアグラウンドだったら，通話がキャンセルされたよ画面に遷移する
             });
-            debugPrint("5");
+            await _initAgoraEngine(notif.token);
+            await setupAudioSession();
 
-            bool _isForegroundOnTimerStart = await FlutterForegroundTask.isAppOnForeground;
-            _untilCallStartTimer = Timer.periodic(const Duration(seconds: 1), (Timer timer) async {
-              bool _isForeground = await FlutterForegroundTask.isAppOnForeground;
-              if ((_isForegroundOnTimerStart != true) && (_isForeground == true)) {
-                onAppOpened(timer);
-              } else {
-                int remain = ref
-                        .read(souguuServiceInfoProvider)
-                        .restSouguuNotification
-                        ?.callStartTime
-                        .difference(DateTime.now().subtract(Duration(seconds: diffrenceFromOfficialTime)))
-                        .inSeconds ??
-                    0;
-                if (ref
-                        .read(souguuServiceInfoProvider)
-                        .restSouguuNotification
-                        ?.callStartTime
-                        .compareTo(DateTime.now().subtract(Duration(seconds: diffrenceFromOfficialTime))) ==
-                    -1) {
-                  onTimerDone(timer);
-                }
-                if (notificationServiceSubscription != null && !notificationServiceSubscription!.closed) {
-                  notificationServiceSubscription?.read().showCounter(remain, notif.aiteUserId);
-                  Sentry.captureMessage("show counter", level: SentryLevel.debug);
-                } else {
-                  logger.w("notificationServiceSubscription is null or closed");
-                  Sentry.captureMessage("notificationServiceSubscription is null or closed");
-                  notificationServiceSubscription = ref.listen(notificationServiceProviderProvider, (previous, next) {});
-                }
-              }
-            });
+            logger.d("join channel${notif.callId} ${ref.read(userViewModelProvider)!.id} ${notif.token}");
+
+            final session = await AudioSession.instance;
+            bool focusGained = await session.setActive(true);
+
+            logger.d('focusGained: $focusGained');
+            _engine.joinChannel(
+                token: notif.token,
+                channelId: notif.callId.toString(),
+                uid: ref.read(userViewModelProvider)!.id,
+                options: const ChannelMediaOptions(
+                  clientRoleType: ClientRoleType.clientRoleBroadcaster,
+                ));
           }
         }
         if (dto.type == "cancel_call") {
@@ -186,6 +168,37 @@ class SouguuService extends _$SouguuService {
         await Sentry.captureException(e, stackTrace: StackTrace.current);
       }
     }
+  }
+
+  Future<void> setupAudioSession() async {
+    final session = await AudioSession.instance;
+    await session.configure(const AudioSessionConfiguration(
+      avAudioSessionCategory: AVAudioSessionCategory.playAndRecord,
+      avAudioSessionMode: AVAudioSessionMode.voiceChat,
+      androidAudioAttributes: AndroidAudioAttributes(
+        contentType: AndroidAudioContentType.speech,
+        usage: AndroidAudioUsage.voiceCommunication,
+      ),
+      androidAudioFocusGainType: AndroidAudioFocusGainType.gainTransientExclusive,
+      androidWillPauseWhenDucked: true,
+    ));
+  }
+
+  final RtcEngine _engine = createAgoraRtcEngine();
+
+  Future<void> _initAgoraEngine(String token) async {
+    logger.d("appId: ${battariSetting.appIdAgora}");
+    await _engine
+        .initialize(RtcEngineContext(appId: battariSetting.appIdAgora, channelProfile: ChannelProfileType.channelProfileCommunication));
+    _engine.registerEventHandler(RtcEngineEventHandler(
+      onError: ((err, msg) => logger.e("onError: $err, $msg")),
+      onJoinChannelSuccess: (connection, elapsed) => debugPrint("onJoinChannelSuccess: ${connection.channelId}, $elapsed"),
+      onUserJoined: (connection, remoteUid, elapsed) => debugPrint("onUserJoined: $connection, $remoteUid, $elapsed"),
+      onUserOffline: (remoteUid, reason, a) => debugPrint("onUserOffline: $remoteUid, $reason"),
+    ));
+    await _engine.enableWebSdkInteroperability(true);
+    await _engine.enableAudio();
+    await _engine.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
   }
 
   Future<void> _refreshToken() async {
@@ -271,22 +284,22 @@ class SouguuService extends _$SouguuService {
 
     _screenStateEventSubscription = Screen().screenStateStream.listen((ScreenStateEvent data) async {
       if (data == ScreenStateEvent.SCREEN_ON) {
-        // 画面がONになった時の処理
-        logger.i("screen on");
-        isLock = false;
-        if (isConnectOk()) {
-          if (websocketProviderSubscription != null) {
-            ref.read(websocketServiceProvider).needConnect();
-          } else {
-            _setWebsocketProviderSubs();
-          }
-        }
+        // // 画面がONになった時の処理
+        // logger.i("screen on");
+        // isLock = false;
+        // if (isConnectOk()) {
+        //   if (websocketProviderSubscription != null) {
+        //     ref.read(websocketServiceProvider).needConnect();
+        //   } else {
+        //     _setWebsocketProviderSubs();
+        //   }
+        // }
       } else if (data == ScreenStateEvent.SCREEN_OFF) {
-        // 画面がOFFになった時の処理
-        isLock = true;
-        await CallUtil.cancelCall("相手がオフラインになりました");
-        logger.i("screen off");
-        disconnectWebsocket();
+        // // 画面がOFFになった時の処理
+        // isLock = true;
+        // await CallUtil.cancelCall("相手がオフラインになりました");
+        // logger.i("screen off");
+        // disconnectWebsocket();
       }
     });
     _souguuIncredientSender = Timer.periodic(souguuMaterialDuration, (timer) {

@@ -4,6 +4,7 @@ import 'dart:core';
 
 import 'package:battari/logger.dart';
 import 'package:battari/main.dart';
+import 'package:battari/model/battari_setting/battari_setting.dart';
 import 'package:battari/model/dto/app_service_communication/souguu_notification_between_app_and_service_dto.dart';
 import 'package:battari/model/dto/websocket/websocket_dto.dart';
 import 'package:battari/model/souguu_incredient/souguu_incredient_data_appusage_model.dart';
@@ -12,6 +13,7 @@ import 'package:battari/repository/user_repository.dart';
 import 'package:battari/service/notification_service.dart';
 import 'package:battari/service/souguu_service.dart';
 import 'package:battari/view_model/user_view_model.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart' show FlutterForegroundTask, TaskHandler, TaskStarter;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -64,6 +66,8 @@ class MyTaskHandler extends TaskHandler {
   @override
   Future<void> onStart(DateTime timestamp, TaskStarter starter) async {
     var shared = await SharedPreferences.getInstance();
+
+    battariSetting = BattariSetting.fromJson(jsonDecode(await rootBundle.loadString('battari_setting.json')));
     providerContainer = ProviderContainer(overrides: [
       sharedPreferencesProvider.overrideWithValue(shared),
     ]);
