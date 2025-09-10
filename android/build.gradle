@@ -13,6 +13,40 @@ subprojects {
     project.evaluationDependsOn(':app')
 }
 
+// Ensure consistent Kotlin JVM target across all modules
+subprojects { project ->
+    // Align Java compileOptions for Android modules
+    plugins.withId("com.android.application") {
+        project.android {
+            compileOptions {
+                sourceCompatibility JavaVersion.VERSION_17
+                targetCompatibility JavaVersion.VERSION_17
+            }
+        }
+    }
+    plugins.withId("com.android.library") {
+        project.android {
+            compileOptions {
+                sourceCompatibility JavaVersion.VERSION_17
+                targetCompatibility JavaVersion.VERSION_17
+            }
+        }
+    }
+
+    // Align Kotlin jvmTarget across all modules using Kotlin Android plugin
+    plugins.withId("org.jetbrains.kotlin.android") {
+        tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+            kotlinOptions.jvmTarget = '17'
+        }
+    }
+
+    // Fallback for plain Java modules (non-Android)
+    tasks.withType(JavaCompile).configureEach {
+        sourceCompatibility = '17'
+        targetCompatibility = '17'
+    }
+}
+
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }
