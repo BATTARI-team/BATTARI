@@ -90,3 +90,4 @@ flutter:
   assets:
     - battari_setting.json
     - assets/images/
+    - assets/audios/

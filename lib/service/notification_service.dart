@@ -66,15 +66,15 @@ class NotificationService {
       '遭遇まであと$remain秒',
       const NotificationDetails(
         android: AndroidNotificationDetails(
-          actions: [
-            AndroidNotificationAction('cancel_call', '拒否'),
-          ],
-          onlyAlertOnce: true,
-          'channel id',
-          'channel name',
-          importance: Importance.max,
-          priority: Priority.high,
-        ),
+            actions: [
+              AndroidNotificationAction('cancel_call', '拒否'),
+            ],
+            onlyAlertOnce: true,
+            'channel id',
+            'channel name',
+            importance: Importance.max,
+            priority: Priority.high,
+            sound: RawResourceAndroidNotificationSound("sound")),
       ),
     );
     if (remain == 0) {
